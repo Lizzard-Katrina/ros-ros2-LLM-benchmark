@@ -1,0 +1,14 @@
+{
+  "task_id": "001_simple_pub_sub",
+  "task_name": "Simple Publisher and Subscriber (C++)",
+  "description": "Translate ROS1 talker/listener in C++ into equivalent ROS2 Foxy implementation.",
+  "ros_version_target": "foxy",
+  "language": "cpp",
+  "difficulty": "easy",
+  "source": "https://docs.ros.org/en/foxy/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Cpp-Publisher-And-Subscriber.html",
+  "expected_input_directory": "ros1_code",
+  "expected_output_directory": "expected_ros2_code",
+  "dockerfile": "docker/Dockerfile",
+  "notes": "ROS1 code is intentionally left blank for this benchmark, because the model is expected to infer the content from known ROS1 talker/listener pattern."
+}
+

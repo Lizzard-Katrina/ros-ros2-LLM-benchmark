@@ -1,0 +1,17 @@
+# ROS1 & ROS2 build folders
+build/
+devel/
+install/
+log/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# OS generated files
+.DS_Store
+*.swp
+*.bak
+
+# Docker logs
+docker/*.log

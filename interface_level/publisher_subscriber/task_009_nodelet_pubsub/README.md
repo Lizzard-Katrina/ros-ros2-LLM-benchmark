@@ -1,0 +1,21 @@
+{
+    "task_id": "task_009_nodelet_pubsub",
+    "task_name": "Nodelet Publisher/Subscriber",
+    "description": "Two ROS1 nodelets communicating within one process via a nodelet manager (zero-copy). Test whether AI can correctly configure nodelets and topic names.",
+    "category": "interface_level/publisher_subscriber",
+    "difficulty": "medium",
+    "ros1_version": "noetic",
+    "ros2_version": "foxy",
+    "language": "cpp",
+    "expected_inputs": [
+        "ros1_code/nodelets/publisher_nodelet.cpp",
+        "ros1_code/nodelets/subscriber_nodelet.cpp",
+        "ros1_code/launch/nodelet_manager.launch"
+    ],
+    "expected_outputs": [
+        "expected_ros2_code/"
+    ],
+    "docker_dir": "docker/",
+    "tests_dir": "tests/"
+}
+

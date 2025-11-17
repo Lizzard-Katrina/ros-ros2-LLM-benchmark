@@ -1,0 +1,9 @@
+<launch>
+    <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" output="screen"/>
+
+    <!-- TODO: load publisher nodelet -->
+    <node pkg="nodelet" type="nodelet" name="publisher_nodelet" args="load nodelet_pubsub/PublisherNodelet nodelet_manager"/>
+
+    <!-- TODO: load subscriber nodelet -->
+    <node pkg="nodelet" type="nodelet" name="subscriber_nodelet" args="load nodelet_pubsub/SubscriberNodelet nodelet_manager"/>
+</launch>

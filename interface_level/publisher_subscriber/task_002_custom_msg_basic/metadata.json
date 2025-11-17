@@ -1,0 +1,20 @@
+{
+  "task_id": "task_002",
+  "title": "Custom Message Basic — Publisher/Subscriber",
+  "category": "Interface-level correctness",
+  "subcategory": "Publisher–Subscriber",
+  "level": "basic",
+  "source": "ROS Wiki Tutorial (https://wiki.ros.org/ROS/Tutorials/CreatingMsgAndSrv)",
+  "ros1_code_path": "ros1_code/",
+  "expected_ros2_code_path": "expected_ros2_code/",
+  "docker_path": "docker/",
+  "tests_path": "tests/",
+  "description": "Implement a custom ROS1 message publisher and subscriber, and compare behavior with reference ROS2 implementation.",
+  "dependencies": [
+    "ROS1 Noetic",
+    "Python 3",
+    "catkin_tools",
+    "build-essential"
+  ],
+  "notes": "Students should complete missing parts in ros1_code. Docker provided for reproducible testing."
+}

@@ -1,0 +1,14 @@
+{
+    "task_id": "task_005_ros1_ros2_bridge",
+    "task_name": "ROS1 to ROS2 Bridge Publisher/Listener",
+    "description": "Convert ROS1 talker and ROS2 listener nodes for a cross-system communication task using ros1_bridge.",
+    "category": "interface_level/publisher_subscriber",
+    "difficulty": "medium",
+    "ros1_version": "noetic",
+    "ros2_version": "foxy",
+    "language": "python",
+    "expected_inputs": ["ros1_code/talker.py"],
+    "expected_outputs": ["expected_ros2_code/listener.py"],
+    "docker_dir": "docker/",
+    "tests_dir": "tests/"
+}

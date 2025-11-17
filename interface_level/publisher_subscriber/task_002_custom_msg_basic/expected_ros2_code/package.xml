@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>task_002_custom_msg_basic</name>
+  <version>0.0.1</version>
+  <description>ROS2 version of custom message publisher/subscriber task</description>
+  <maintainer email="student@example.com">Student</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <build_depend>rclpy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>rosidl_default_generators</build_depend>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+</package>

@@ -1,0 +1,19 @@
+{
+  "task_id": "task_003_image_transport",
+  "name": "Image Transport Publisher/Subscriber",
+  "description": "Publish and subscribe images using ROS1 image_transport. Publisher sends /camera/image_raw, Subscriber receives via image_transport. ROS1 code is intentionally left incomplete for benchmark evaluation.",
+  "ros_versions": ["ROS1 Noetic", "ROS2 Foxy"],
+  "language": "Python",
+  "difficulty": "medium",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "expected_ros2_code": "expected_ros2_code/",
+    "tests": "tests/",
+    "docker": "docker/"
+  },
+  "detection_targets": [
+    "ROS1 publisher uses image_transport",
+    "ROS1 subscriber uses image_transport",
+    "Correct topic naming (/camera/image_raw)"
+  ]
+}

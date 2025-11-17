@@ -1,0 +1,14 @@
+{
+    "task_id": "task_007_latched_publisher",
+    "task_name": "Latched Publisher",
+    "description": "Complete a ROS1 latched publisher node and optionally the ROS2 equivalent using QoS durability. Tests whether AI understands latch behavior and ROS1->ROS2 translation.",
+    "category": "interface_level/publisher_subscriber",
+    "difficulty": "medium",
+    "ros1_version": "noetic",
+    "ros2_version": "foxy",
+    "language": "python",
+    "expected_inputs": ["ros1_code/latched_publisher.py"],
+    "expected_outputs": ["expected_ros2_code/latched_publisher.py"],
+    "docker_dir": "docker/",
+    "tests_dir": "tests/"
+}

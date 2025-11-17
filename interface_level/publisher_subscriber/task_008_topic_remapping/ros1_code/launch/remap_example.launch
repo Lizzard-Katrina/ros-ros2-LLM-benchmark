@@ -1,0 +1,11 @@
+<launch>
+    <!-- Remap publisher and subscriber topics at runtime -->
+    <node pkg="your_package" type="publisher_node.py" name="publisher_node" output="screen">
+        <!-- TODO: remap topic name -->
+        <remap from="_____" to="remapped_topic"/>
+    </node>
+
+    <node pkg="your_package" type="subscriber_node.py" name="subscriber_node" output="screen">
+        <remap from="_____" to="remapped_topic"/>
+    </node>
+</launch>

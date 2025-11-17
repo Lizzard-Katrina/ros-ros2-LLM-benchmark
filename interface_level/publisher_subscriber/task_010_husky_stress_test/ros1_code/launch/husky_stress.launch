@@ -1,0 +1,6 @@
+<launch>
+    <!-- Launch multiple Husky publishers and aggregator subscriber -->
+    <node pkg="your_package" type="robot1_publisher.py" name="robot1_publisher" output="screen"/>
+    <node pkg="your_package" type="robot2_publisher.py" name="robot2_publisher" output="screen"/>
+    <node pkg="your_package" type="aggregator_node.py" name="aggregator_node" output="screen"/>
+</launch>

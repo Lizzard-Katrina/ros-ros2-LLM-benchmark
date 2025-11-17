@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>simple_pub_sub</name>
+  <version>0.0.1</version>
+  <description>ROS1 simple publisher/subscriber</description>
+
+  <maintainer email="you@example.com">Your Name</maintainer>
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+
+</package>

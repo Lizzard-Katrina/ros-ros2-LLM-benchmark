@@ -1,0 +1,14 @@
+{
+    "task_id": "task_006_multi_topic_synchronization",
+    "task_name": "Multi-topic Synchronization with message_filters",
+    "description": "Synchronize two sensor topics (e.g., stereo camera left/right) using ROS message_filters. Requires understanding of ApproximateTime/ExactTime, callback signatures, and ROS1 synchronization design.",
+    "category": "interface_level/publisher_subscriber",
+    "difficulty": "medium-high",
+    "ros1_version": "noetic",
+    "ros2_version": "foxy",
+    "language": "cpp",
+    "expected_inputs": ["ros1_code/stereo_sync.cpp"],
+    "expected_outputs": ["expected_ros2_code/stereo_sync.cpp"],
+    "docker_dir": "docker/",
+    "tests_dir": "tests/"
+}

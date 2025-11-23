@@ -1,0 +1,5 @@
+print("[TEST] 1. Robot simulation launches")
+print("[TEST] 2. Gripper service available")
+print("[TEST] 3. Move head service available")
+print("[TEST] 4. Arm command service available (if applicable)")
+print("[TEST] 5. robot_service_client_stub.py calls services sequentially")

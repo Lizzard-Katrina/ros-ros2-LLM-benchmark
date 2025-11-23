@@ -1,0 +1,14 @@
+{
+  "task_id": "task_002_custom_srv",
+  "name": "Create and Use a Custom ROS Service (.srv)",
+  "description": "Define a custom AddThreeInts.srv, generate interfaces, build with catkin, and implement Python service & client. ROS1 skeleton is provided; user/AI completes ROS2 implementation.",
+  "ros_version": ["ROS1 Noetic", "ROS2 Humble"],
+  "language": "Python",
+  "difficulty": "Basic",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "tests": "tests/",
+    "docker": "docker/"
+  },
+  "expected_outcome": "Custom service file (.srv) is correctly defined; catkin_make generates service headers; ROS1 service server starts correctly; client calls service successfully returning sum = a + b + c; ROS2 implementation works equivalently."
+}

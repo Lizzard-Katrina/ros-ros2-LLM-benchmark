@@ -1,0 +1,6 @@
+- Server should load an internal MP3 database.
+- Client_query1 should search by artist and return a non-empty track list.
+- Client_query2 should search by title and return matching tracks.
+- ROS2 version should generate custom service definitions correctly.
+- Service type name and import paths must match the custom .srv.
+- No launch/runtime errors.

@@ -1,0 +1,14 @@
+{
+  "task_id": "task_001_simple_service",
+  "name": "Simple Python Service & Client",
+  "description": "Client asks server to sum two numbers. ROS1 skeleton code is provided; AI/user completes ROS2 implementation.",
+  "ros_version": ["ROS1 Noetic", "ROS2 Humble"],
+  "language": "Python",
+  "difficulty": "Beginner",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "tests": "tests/",
+    "docker": "docker/"
+  },
+  "expected_outcome": "Service node starts successfully; client call returns correct result (e.g., 2 + 3 = 5); ROS2 scripts run without errors."
+}

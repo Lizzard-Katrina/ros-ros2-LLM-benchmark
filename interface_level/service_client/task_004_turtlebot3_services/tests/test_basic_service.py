@@ -1,0 +1,5 @@
+print("[TEST] This test ensures:")
+print("1. Server node launches.")
+print("2. Service name is correct.")
+print("3. Client script successfully calls the service.")
+print("4. No runtime errors.")

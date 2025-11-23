@@ -1,0 +1,16 @@
+{
+    "task_id": "task_003_mp3_db_service",
+    "category": "interface_level/service_client",
+    "title": "MP3 Database Query Service (Custom Service with Multiple Clients)",
+    "description": "A more advanced ROS1 service example where a server manages a simulated MP3 database and multiple clients perform different types of queries. This task evaluates the model’s ability to translate custom service definitions, internal server state, and multiple ROS client interactions.",
+    "ros1_version": "ROS Noetic",
+    "ros2_version": "ROS Humble",
+    "difficulty": "basic",
+    "directories": {
+        "ros1_code": "Ros1 service server/client templates with custom .srv",
+        "srv": "Custom QueryMP3.srv definition",
+        "docker": "Docker build environment for ROS1/ROS2 translation",
+        "tests": "Optional future validation"
+    },
+    "expected_behavior": "Server launches successfully, clients make valid queries, and server responds with correct filtered track lists."
+}

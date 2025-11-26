@@ -1,0 +1,14 @@
+{
+    "task_id": "task_011",
+    "name": "Object Tracking Action",
+    "description": "Benchmark ROS1 → ROS2 translation for MoveIt Perception Pipeline object tracking action server",
+    "ros_versions": ["ROS1 Kinetic"],
+    "language": "Python",
+    "difficulty": "Medium-High",
+    "directories": {
+        "ros1_code": "ros1_code",
+        "expected_ros2_code": "expected_ros2_code",
+        "tests": "tests",
+        "docker": "docker"
+    }
+}

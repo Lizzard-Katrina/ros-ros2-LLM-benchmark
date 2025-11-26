@@ -1,0 +1,14 @@
+{
+    "task_id": "task_008",
+    "name": "Follow Joint Trajectory Action",
+    "description": "Benchmark ROS1 → ROS2 translation for FollowJointTrajectory action server",
+    "ros_versions": ["ROS1 Noetic"],
+    "language": "Python",
+    "difficulty": "Medium",
+    "directories": {
+        "ros1_code": "ros1_code",
+        "expected_ros2_code": "expected_ros2_code",
+        "tests": "tests",
+        "docker": "docker"
+    }
+}

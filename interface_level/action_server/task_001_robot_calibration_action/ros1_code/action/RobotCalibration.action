@@ -1,0 +1,11 @@
+# Goal
+int32 target_accuracy
+string mode
+---
+# Feedback
+string current_status
+float32 progress
+---
+# Result
+bool success
+string message

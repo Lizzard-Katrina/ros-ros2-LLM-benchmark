@@ -1,0 +1,14 @@
+{
+    "task_id": "task_004",
+    "name": "Fetch Head Pointing Action",
+    "description": "Benchmark ROS1 → ROS2 translation for Fetch robot head pointing action server",
+    "ros_versions": ["ROS1 Noetic"],
+    "language": "Python",
+    "difficulty": "Medium",
+    "directories": {
+        "ros1_code": "ros1_code",
+        "expected_ros2_code": "expected_ros2_code",
+        "tests": "tests",
+        "docker": "docker"
+    }
+}

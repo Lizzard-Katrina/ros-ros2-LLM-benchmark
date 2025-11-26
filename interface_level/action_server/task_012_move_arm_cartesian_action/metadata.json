@@ -1,0 +1,14 @@
+{
+    "task_id": "task_012",
+    "name": "Move Arm Cartesian Action",
+    "description": "Benchmark ROS1 → ROS2 translation for MoveIt Cartesian action server with continuous feedback",
+    "ros_versions": ["ROS1 Kinetic"],
+    "language": "Python",
+    "difficulty": "High",
+    "directories": {
+        "ros1_code": "ros1_code",
+        "expected_ros2_code": "expected_ros2_code",
+        "tests": "tests",
+        "docker": "docker"
+    }
+}

@@ -1,0 +1,18 @@
+{
+  "task_id": "006_dynamic_param_rqt_reconfigure",
+  "task_name": "Dynamic Parameter Change via rqt_reconfigure",
+  "goal": "Assess LLM's ability to migrate ROS1-style dynamic parameter reconfigure to ROS2 node parameters.",
+  "source": {
+    "rqt_reconfigure": "https://wiki.ros.org/rqt_reconfigure",
+    "github": "https://github.com/ros-visualization/rqt_reconfigure"
+  },
+  "ros1_files": [
+    "version01_dynamic_reconfigure.py"
+  ],
+  "num_holes": 1,
+  "difficulty": "easy",
+  "expected_ros2_changes": [
+    "Replace rospy.get_param and dynamic_reconfigure.Server usage with ROS2 parameters and parameter events",
+    "Ensure parameter updates are reflected in node logic in real-time"
+  ]
+}

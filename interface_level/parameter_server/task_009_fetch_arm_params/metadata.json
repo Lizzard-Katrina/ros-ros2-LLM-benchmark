@@ -1,0 +1,17 @@
+{
+  "task_id": "009_fetch_arm_params",
+  "task_name": "Fetch Robot Arm Controller Parameters",
+  "goal": "Assess LLM's ability to migrate ROS1-style controller parameter loading for Fetch robot arm to ROS2.",
+  "source": {
+    "github": "https://github.com/ZebraDevs/fetch_ros"
+  },
+  "ros1_files": [
+    "version01_fetch_arm_params.py"
+  ],
+  "num_holes": 1,
+  "difficulty": "medium",
+  "expected_ros2_changes": [
+    "Replace rospy.get_param with ROS2 declare_parameter calls",
+    "Ensure arm controllers initialize correctly with loaded parameters"
+  ]
+}

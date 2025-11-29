@@ -1,0 +1,18 @@
+{
+  "task_id": "005_laser_scan_filter_params",
+  "task_name": "Laser Scan Filter Parameters",
+  "goal": "Assess LLM's ability to migrate ROS1 parameter loading for laser scan filters to ROS2 node parameters.",
+  "source": {
+    "laser_filters": "https://github.com/ros-perception/laser_filters"
+  },
+  "ros1_files": [
+    "version01_load_filter_params.py"
+  ],
+  "num_holes": 1,
+  "difficulty": "easy",
+  "expected_ros2_changes": [
+    "Replace rospy.get_param usage with ROS2 declare_parameter",
+    "Ensure dynamic reconfigure parameters are correctly migrated if applicable",
+    "Update filter logic to read ROS2 node parameters"
+  ]
+}

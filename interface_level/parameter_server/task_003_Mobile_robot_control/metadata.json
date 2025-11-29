@@ -1,0 +1,19 @@
+{
+  "task_id": "003_mobile_robot_speed_control",
+  "task_name": "Mobile Robot Speed Control",
+  "goal": "Assess LLM's ability to migrate ROS1 parameter loading for speed control to ROS2 node parameters.",
+  "source": {
+    "diff_drive_controller": "https://wiki.ros.org/diff_drive_controller",
+    "ros_controllers": "https://github.com/ros-controls/ros_controllers"
+  },
+  "ros1_files": [
+    "version01_load_params.py"
+  ],
+  "num_holes": 1,
+  "difficulty": "interface-level (parameter server) – moderate",
+  "expected_ros2_changes": [
+    "Replace rospy.get_param usage with ROS2 declare_parameter",
+    "Load YAML speed limits into ROS2 node parameters",
+    "Ensure speed limit updates are correctly propagated at runtime"
+  ]
+}

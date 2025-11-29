@@ -1,0 +1,17 @@
+{
+  "task_id": "008_gazebo_sim_param",
+  "task_name": "Gazebo Simulation Parameter Loading",
+  "goal": "Assess LLM's ability to migrate ROS1-style parameter loading for Gazebo simulations to ROS2.",
+  "source": {
+    "github": "https://github.com/ros-simulation/gazebo_ros_pkgs"
+  },
+  "ros1_files": [
+    "version01_gazebo_params.py"
+  ],
+  "num_holes": 1,
+  "difficulty": "median",
+  "expected_ros2_changes": [
+    "Replace rospy.get_param with ROS2 declare_parameter calls",
+    "Ensure Gazebo controllers initialize correctly with loaded parameters"
+  ]
+}

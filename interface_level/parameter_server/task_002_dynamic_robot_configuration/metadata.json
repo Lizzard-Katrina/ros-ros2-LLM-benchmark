@@ -1,0 +1,18 @@
+{
+  "task_id": "002_dynamic_robot_configuration",
+  "task_name": "Dynamic Robot Configuration (YAML-based)",
+  "goal": "Assess LLM's ability to migrate YAML-loaded ROS1 parameters into ROS2 node parameters with proper declaration.",
+  "source": {
+    "ros_tutorials": "https://github.com/ros/ros_tutorials"
+  },
+  "ros1_files": [
+    "version01_load_yaml.py"
+  ],
+  "num_holes": 1,
+  "difficulty": "interface-level (parameter server) – moderate",
+  "expected_ros2_changes": [
+    "Replace rosparam YAML loading with ROS2 parameter YAML file.",
+    "Use node.declare_parameter() before reading parameters.",
+    "Flatten or restructure nested parameters if needed."
+  ]
+}

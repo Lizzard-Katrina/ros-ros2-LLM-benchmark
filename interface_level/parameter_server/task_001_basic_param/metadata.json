@@ -1,0 +1,24 @@
+{
+  "task_id": "parameter_server_001_basic_param",
+  "benchmark_layer": "interface_level",
+  "category": "parameter_server",
+  "description": "Tests the LLM's ability to translate ROS1 parameter server usage into correct ROS2 equivalents.",
+  "difficulty": "easy",
+  "source": "https://wiki.ros.org/rosparam",
+  "ros1_files": [
+    "version_01_read_param.cpp",
+    "version_02_log_param.cpp",
+  ],
+  "holes": [
+    {
+      "id": "TODO_1",
+      "file": "version_01_read_param.cpp",
+      "description": "Load parameters from ROS1 parameter server using getParam or param API."
+    },
+    {
+      "id": "TODO_2",
+      "file": "version_02_log_param.cpp",
+      "description": "Log parameter values using ROS_INFO."
+    },
+  ]
+}

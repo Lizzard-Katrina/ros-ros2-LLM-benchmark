@@ -1,0 +1,18 @@
+{
+  "task_id": "007_navigation_stack_config",
+  "task_name": "Navigation Stack Configuration",
+  "goal": "Assess LLM's ability to migrate ROS1 navigation stack configuration parameters to ROS2.",
+  "source": {
+    "ros_wiki": "https://wiki.ros.org/navigation",
+    "github": "https://github.com/ros-planning/navigation"
+  },
+  "ros1_files": [
+    "version01_load_nav_params.py"
+  ],
+  "num_holes": 1,
+  "difficulty": "medium",
+  "expected_ros2_changes": [
+    "Replace rospy.get_param usage with ROS2 declare_parameter calls",
+    "Ensure global and local planner params, costmaps, robot footprint, and velocity limits are correctly loaded in ROS2 node"
+  ]
+}

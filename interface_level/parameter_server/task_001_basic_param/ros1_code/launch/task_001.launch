@@ -1,0 +1,8 @@
+<launch>
+  <rosparam file="$(find task_001_basic_param)/config/default_params.yaml" command="load" />
+
+  <node pkg="task_001_basic_param"
+        type="version_01_read_param"
+        name="version_01"
+        output="screen"/>
+</launch>

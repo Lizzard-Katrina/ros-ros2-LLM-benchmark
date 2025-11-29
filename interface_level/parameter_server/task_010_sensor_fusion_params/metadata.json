@@ -1,0 +1,17 @@
+{
+  "task_id": "010_sensor_fusion_params",
+  "task_name": "Autonomous Vehicle Sensor Fusion Parameters",
+  "goal": "Assess LLM's ability to migrate ROS1-style sensor fusion parameter loading (EKF) to ROS2.",
+  "source": {
+    "github": "https://github.com/cra-ros-pkg/robot_localization"
+  },
+  "ros1_files": [
+    "version01_sensor_fusion.py"
+  ],
+  "num_holes": 1,
+  "difficulty": "medium",
+  "expected_ros2_changes": [
+    "Replace rospy.get_param with ROS2 declare_parameter calls",
+    "Ensure EKF node initializes correctly with loaded parameters"
+  ]
+}

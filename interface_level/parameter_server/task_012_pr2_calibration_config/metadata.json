@@ -1,0 +1,18 @@
+{
+  "task_id": "012_pr2_calibration_config",
+  "task_name": "PR2 Robot Calibration Config",
+  "description": "PR2 calibration motion depends on configuration parameters loaded from ROS1 parameter server. Evaluate LLM’s ability to migrate ROS1 calibration parameter loading to ROS2.",
+  "source": {
+    "github": "https://github.com/PR2/pr2_doors"
+  },
+  "ros1_files": [
+    "version01_calibration_params.py"
+  ],
+  "num_holes": 1,
+  "difficulty": "medium",
+  "expected_ros2_changes": [
+    "Replace rospy.get_param / ros::param::get with ROS2 declare_parameter/get_parameter",
+    "Properly restructure calibration configuration parameters loaded from YAML",
+    "Ensure PR2 calibration parameters are available at node startup (static parameters)"
+  ]
+}

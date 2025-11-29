@@ -1,0 +1,9 @@
+{
+  "task_id": "014",
+  "name": "SLAM Mapping Config Parameters",
+  "category": "interface_level/parameter_server",
+  "difficulty": "medium",
+  "source": "https://github.com/ros-perception/slam_gmapping",
+  "ros_version": "Noetic",
+  "ros1_code_versions": ["v01", "v02", "v03"]
+}

@@ -1,0 +1,11 @@
+{
+  "task_id": "task_013_px4_flight_params",
+  "level": "interface_level/parameter_server",
+  "difficulty": "medium",
+  "source": "https://github.com/PX4/px4_ros_com",
+  "tags": ["ros1", "parameters", "px4"],
+  "expected_time": "medium",
+  "original_code_param_behavior": "Load PX4 flight control parameters from ROS param server and use them to configure controller/evaluator logic.",
+  "what_student_must_fill": "Missing get_param calls and missing parameter-dependent computation logic.",
+  "notes": "Based on simplified PX4 controller logic for benchmarking parameter-server comprehension."
+}

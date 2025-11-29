@@ -1,0 +1,14 @@
+{
+  "task_id": "011",
+  "name": "moveit_motion_planning_parameters",
+  "description": "Load and use MoveIt parameters (planner config, velocity/acceleration scaling) from ROS1 param server. Users fill in ROS1 code TODOs to test ROS2 migration.",
+  "source": "https://github.com/moveit/moveit_tutorials",
+  "ros_versions": ["ROS1 (Noetic)"],
+  "language": "python",
+  "difficulty": "high",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "expected_ros2_code": "expected_ros2_code/",
+    "docker": "docker/"
+  }
+}

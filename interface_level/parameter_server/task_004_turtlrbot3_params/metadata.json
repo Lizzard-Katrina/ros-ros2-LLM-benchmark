@@ -1,0 +1,18 @@
+{
+  "task_id": "004_turtlebot3_model_params",
+  "task_name": "TurtleBot3 Model Parameters",
+  "goal": "Assess LLM's ability to migrate ROS1-style robot model parameter loading to ROS2 node parameters.",
+  "source": {
+    "turtlebot3": "https://github.com/ROBOTIS-GIT/turtlebot3"
+  },
+  "ros1_files": [
+    "version01_load_model_params.py"
+  ],
+  "num_holes": 1,
+  "difficulty": "easy",
+  "expected_ros2_changes": [
+    "Replace rospy.get_param usage with ROS2 declare_parameter",
+    "Load robot model parameters (robot_type, wheel_diameter, wheel_base) into ROS2 node parameters",
+    "Ensure parameters are read correctly by all nodes during initialization"
+  ]
+}

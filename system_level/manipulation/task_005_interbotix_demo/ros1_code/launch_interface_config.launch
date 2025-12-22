@@ -1,0 +1,20 @@
+<launch>
+  <arg name="robot_model" default=""/>
+
+  <!-- TODO (Task 005-4):
+       Choose which interface to launch.
+       Source code supports:
+       - C++ interface
+       - Python interface
+       - GUI interface
+  -->
+  <arg name="use_cpp_interface" default="false"/>
+  <arg name="use_python_interface" default="false"/>
+
+  <node if="$(arg use_python_interface)"
+        name="moveit_python_interface"
+        pkg="interbotix_moveit_interface"
+        type="moveit_python_interface"
+        output="screen"
+        ns="$(arg robot_model)"/>
+</launch>

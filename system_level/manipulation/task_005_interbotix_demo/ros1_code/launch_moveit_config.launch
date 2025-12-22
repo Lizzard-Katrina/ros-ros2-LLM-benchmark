@@ -1,0 +1,22 @@
+<launch>
+  <arg name="robot_model" default=""/>
+
+  <!-- TODO (Task 005-3):
+       Select exactly ONE execution mode.
+       Valid choices in source code:
+       - use_gazebo
+       - use_actual
+       - use_fake
+  -->
+  <arg name="use_gazebo" default="false"/>
+  <arg name="use_actual" default="false"/>
+  <arg name="use_fake"   default="false"/>
+
+  <!-- MoveIt core -->
+  <include file="$(find interbotix_xsarm_moveit)/launch/move_group.launch"
+           ns="$(arg robot_model)">
+    <arg name="robot_model" value="$(arg robot_model)"/>
+    <arg name="fake_execution" value="$(arg use_fake)"/>
+  </include>
+
+</launch>

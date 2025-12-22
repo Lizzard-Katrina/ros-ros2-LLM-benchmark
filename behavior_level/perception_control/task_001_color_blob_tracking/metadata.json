@@ -1,0 +1,35 @@
+{
+  "task_id": "task_001",
+  "task_name": "color_blob_tracking",
+  "description": "Detect a colored blob using a camera and command the robot to move toward it. Perception → Control.",
+  "ros_versions": {
+    "ros1": ["kinetic", "noetic"],
+    "ros2": ["foxy", "humble"]
+  },
+  "language": "cpp",
+  "difficulty": "easy",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "ros2_code": "ros2_code/",
+    "tests": "tests/",
+    "docker": "docker/"
+  },
+  "todos": [
+    {
+      "file": "ros1_code/src/constructor_init.cpp",
+      "description": "Initialize blob tracking parameters",
+      "expected_outcome": "Node compiles, subscribers/publishers initialized, color bounds and max speed set"
+    },
+    {
+      "file": "ros1_code/src/blob_detection.cpp",
+      "description": "Detect color blob in camera image",
+      "expected_outcome": "Blob detected, blob_center_ and blob_detected_ updated"
+    },
+    {
+      "file": "ros1_code/src/control_command.cpp",
+      "description": "Convert blob_center_ into cmd_vel",
+      "expected_outcome": "Robot moves toward blob; stops if not detected"
+    }
+  ],
+  "readme_file": "README.md"
+}

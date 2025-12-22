@@ -1,0 +1,4 @@
+<launch>
+  <!-- Adjust pkg/type to your catkin package when integrating scaffold -->
+  <node pkg="smacc_task007_demo" type="smacc_runtime_node" name="smacc_demo" output="screen" />
+</launch>

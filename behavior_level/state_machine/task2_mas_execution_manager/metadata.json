@@ -1,0 +1,28 @@
+{
+  "task_id": "task2_mas_execution_manager",
+  "task_name": "MAS Execution Manager - Translation Benchmark",
+  "category": "behavior_level",
+  "subcategory": "state_machine_actionlib",
+  "source": "https://github.com/b-it-bots/mas_execution_manager",
+  "ros_version": "ROS1 (Noetic / Melodic compatible)",
+  "language": "python",
+  "difficulty": "medium",
+  "description": "A simplified MAS Execution Manager that demonstrates SMACH-based task sequencing and actionlib-driven execution. For the benchmark, LLMs will be given variants where core SMACH transitions, actionlib sequences, or recovery logic are removed. The LLM must reconstruct these logical blocks for a correct ROS2 translation or repair.",
+  "variants_note": "Multiple variant files are provided (each contains one TODO block). Each variant corresponds to a single evaluation point.",
+  "structure": {
+    "ros1_code": {
+      "launch": ["mas_exec_manager.launch"],
+      "nodes": ["execution_manager.py"],
+      "src": "mas_exec_manager/",
+      "variants_dir": "ros1_code/src/mas_exec_manager/variants/",
+      "originals_dir": "ros1_code/src/mas_exec_manager/originals/"
+    }
+  },
+  "benchmark_targets": [
+    "SMACH transitions & retries",
+    "actionlib send/wait/get_state/cancel sequence",
+    "failure & recovery handling",
+    "userdata / param-driven behavior"
+  ],
+  "authoring_notes": "Original code adapted and simplified for benchmarking. When creating variants, keep interfaces identical and only remove the internal logical block; preserve imports, class definitions and function signatures."
+}

@@ -1,0 +1,38 @@
+{
+  "task_id": "task_007",
+  "task_name": "autonomous_navigation",
+  "description": "LiDAR + camera fusion for autonomous navigation using perception → planning → control pipeline.",
+  "ros_versions": {
+    "ros1": ["kinetic", "melodic", "noetic"]
+  },
+  "language": "cpp",
+  "difficulty": "hard",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "tests": "tests/",
+    "docker": "docker/"
+  },
+  "todos": [
+    {
+      "file": "ros1_code/src/constructor_init.cpp",
+      "description": "Load navigation parameters",
+      "expected_outcome": "Node initialized, parameters applied"
+    },
+    {
+      "file": "ros1_code/src/sensor_fusion.cpp",
+      "description": "Fuse LiDAR + camera",
+      "expected_outcome": "Fused local obstacle representation"
+    },
+    {
+      "file": "ros1_code/src/path_planning.cpp",
+      "description": "Plan local path",
+      "expected_outcome": "Valid nav_msgs/Path published"
+    },
+    {
+      "file": "ros1_code/src/motion_controller.cpp",
+      "description": "Generate /cmd_vel",
+      "expected_outcome": "Robot moves toward goal following safe path"
+    }
+  ],
+  "readme_file": "README.md"
+}

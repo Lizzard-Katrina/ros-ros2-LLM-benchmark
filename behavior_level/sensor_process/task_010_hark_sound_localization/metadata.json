@@ -1,0 +1,30 @@
+{
+  "task_id": "task_010",
+  "task_name": "hark_sound_localization",
+  "description": "Estimate sound source direction using a microphone array. Subscribe to /audio/raw, process audio data, and publish /sound_direction. Core algorithm is left as TODO for LLM to fill.",
+  "ros_versions": {
+    "ros1": ["kinetic", "noetic"],
+    "ros2": ["foxy", "humble"]
+  },
+  "language": "cpp",
+  "difficulty": "hard",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "ros2_code": "ros2_code/",
+    "tests": "tests/",
+    "docker": "docker/"
+  },
+  "todos": [
+    {
+      "file": "ros1_code/src/constructor_init.cpp",
+      "description": "Initialize sound localization algorithm: buffers, parameters, and FFT modules",
+      "expected_outcome": "Node compiles, subscribers/publishers initialized, buffers ready for audio processing"
+    },
+    {
+      "file": "ros1_code/src/audio_processing.cpp",
+      "description": "Compute sound source direction from microphone array",
+      "expected_outcome": "Estimated direction updated and published to /sound_direction"
+    }
+  ],
+  "readme_file": "README.md"
+}

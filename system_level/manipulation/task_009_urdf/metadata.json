@@ -1,0 +1,22 @@
+{
+  "task_id": "009",
+  "task_name": "ROS1 Manipulator URDF + MoveIt + Gazebo",
+  "source": "https://github.com/lFatality/ros_moveit_gazebo_ws",
+  "description": "ROS1 example of a generic manipulator with URDF description, MoveIt motion planning, and Gazebo simulation. Focus on completing missing integration logic rather than parameter tuning.",
+  "difficulty_level": "hard",
+  "expected_outcome": [
+    "URDF defines a complete manipulator with consistent joints, links, and transmissions.",
+    "MoveIt demo can launch successfully and visualize the robot model.",
+    "Gazebo simulation loads controllers and accepts trajectory commands.",
+    "Planned trajectories in MoveIt result in simulated joint motion in Gazebo."
+  ],
+  "docker": {
+    "dockerfile": "docker/Dockerfile",
+    "setup": "docker/setup.sh"
+  },
+  "ros1_code": [
+    "src/arm_description/urdf/arm_urdf.urdf",
+    "src/arm_moveit_config/launch/demo.launch",
+    "src/arm_moveit_config/config/controllers.yaml"
+  ]
+}

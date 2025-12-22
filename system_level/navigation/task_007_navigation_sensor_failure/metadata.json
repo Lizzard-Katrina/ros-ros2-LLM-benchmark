@@ -1,0 +1,11 @@
+{
+  "task_id": "integration_007",
+  "task_name": "Navigation Failure Recovery",
+  "level": "integration_level",
+  "category": "navigation",
+  "description": "Evaluate correctness of navigation stack recovery and state transitions under controller failure.",
+  "ros_version": "ROS1 Noetic",
+  "language": "C++",
+  "difficulty": "Median",
+  "source": "https://github.com/ros-planning/navigation"
+}

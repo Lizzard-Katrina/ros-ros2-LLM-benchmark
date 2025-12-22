@@ -1,0 +1,21 @@
+{
+  "task_id": "task008A_robot_statemachine",
+  "task_name": "Robot Statemachine (RSM) - Advanced state-machine scaffold",
+  "source": "https://github.com/MarcoStb1993/robot_statemachine",
+  "description": "Advanced scaffold focused on state lifecycle, transition evaluation and dispatch handling. Variants remove core logic in specific places; LLM must fill in logic maintaining original interfaces and behavior.",
+  "ros_versions": {"ros1": "noetic"},
+  "language": "python",
+  "difficulty": "advanced",
+  "todo_files": [
+    "rsm_core/state_machine.py",
+    "rsm_core/transitions.py",
+    "rsm_nodes/robot_node.py"
+  ],
+  "expected_outcomes": [
+    "Variant implementations, once filled, will produce the same state transition sequence as the ORIGINAL for the provided demo scenario.",
+    "State.on_enter must initialize timers and log; on_exit must log duration.",
+    "Transition.evaluate must return True only when the condition callable (if present) evaluates to True.",
+    "StateMachine.run must call current_state.execute(), look up transitions for that state, evaluate transition conditions, perform on_exit/on_enter calls and swap states accordingly."
+  ],
+  "notes": "Original source files included in ros1_code/src/original/. Each variant file contains one TODO block. README_eval.md contains per-variant validation checklists."
+}

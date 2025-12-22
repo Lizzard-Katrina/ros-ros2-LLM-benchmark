@@ -1,0 +1,22 @@
+{
+  "task_id": "task3",
+  "task_name": "NRP Experimental FSM",
+  "description": "Translate ROS1 NRP Experimental FSM code to ROS2. Flow: Experiment Input → SMACH State Machine → Simulation Environment Commands → Feedback.",
+  "ros_versions": {
+    "ros1": "noetic",
+    "ros2": "humble"
+  },
+  "language": "Python",
+  "difficulty": "intermediate",
+  "directories": {
+    "ros1_code": "ros1_code",
+    "ros2_code": "ros2_code (to be completed)",
+    "launch": "ros1_code/launch",
+    "src": "ros1_code/src"
+  },
+  "todo_files": [
+    "variant_01_state_logic_missing.py",
+    "variant_02_sim_command_missing.py",
+    "variant_03_feedback_processing_missing.py"
+  ]
+}

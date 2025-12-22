@@ -1,0 +1,12 @@
+{
+  "task_id": "manipulation_001_pick_place_panda",
+  "task_name": "Pick and Place with Franka Panda",
+  "level": "integration_level",
+  "category": "manipulation",
+  "ros_version": "ROS1 Noetic",
+  "language": "C++",
+  "difficulty": "Basic",
+  "source": [
+    "https://github.com/ros-planning/moveit_task_constructor/tree/master/demo"
+  ]
+}

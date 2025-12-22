@@ -1,0 +1,34 @@
+{
+  "task_id": "task_005",
+  "task_name": "rgbd_stereo_pointcloud_control",
+  "description": "Use RGB-D or stereo camera to generate point cloud and control mobile robot. Perception → Control.",
+  "ros_versions": {
+    "ros1": ["kinetic", "noetic"]
+  },
+  "language": "cpp",
+  "difficulty": "medium",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "ros2_code": "ros2_code/",
+    "tests": "tests/",
+    "docker": "docker/"
+  },
+  "todos": [
+    {
+      "file": "ros1_code/src/constructor_init.cpp",
+      "description": "Initialize motion control parameters",
+      "expected_outcome": "Node parameters set; subscribers/publishers ready; node compiles"
+    },
+    {
+      "file": "ros1_code/src/pointcloud_processing.cpp",
+      "description": "Process point cloud to detect obstacles",
+      "expected_outcome": "obstacle_detected_ true if any point closer than threshold"
+    },
+    {
+      "file": "ros1_code/src/motion_publisher.cpp",
+      "description": "Publish velocity commands based on obstacle detection",
+      "expected_outcome": "Robot avoids obstacles or moves forward; commands published to /cmd_vel"
+    }
+  ],
+  "readme_file": "README.md"
+}

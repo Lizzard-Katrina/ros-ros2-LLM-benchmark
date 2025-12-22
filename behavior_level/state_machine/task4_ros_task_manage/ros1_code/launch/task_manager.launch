@@ -1,0 +1,4 @@
+
+<launch>
+    <node pkg="smach_tutorial" type="task_manager_main.py" name="ros_task_manager" output="screen"/>
+</launch>

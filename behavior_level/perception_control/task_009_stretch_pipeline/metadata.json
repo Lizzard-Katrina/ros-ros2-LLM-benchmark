@@ -1,0 +1,42 @@
+{
+  "task_id": "009",
+  "task_name": "stretch_pipeline",
+  "title": "Hello Robot Stretch Mobile Manipulator Pipeline",
+  "source": "https://github.com/hello-robot/stretch_ros",
+  "description": "Perception → Object Detection/Mapping → Planner (Arm + Base) → Controller → Actuators. ROS1 scaffold for LLM to convert / fill algorithmic parts.",
+  "ros_versions": {
+    "ros1": ["kinetic", "noetic"],
+    "ros2": ["foxy", "humble"]
+  },
+  "language": "cpp",
+  "difficulty": "hard",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "ros2_code": "ros2_code/",
+    "tests": "tests/",
+    "docker": "docker/"
+  },
+  "todos": [
+    {
+      "file": "ros1_code/src/perception_node.cpp",
+      "description": "Detect objects from RGB-D camera and publish detections",
+      "expected_outcome": "Publishes /detected_objects with object poses."
+    },
+    {
+      "file": "ros1_code/src/mapping_node.cpp",
+      "description": "Maintain/update local map from detections",
+      "expected_outcome": "Publishes /local_map representing objects and obstacles."
+    },
+    {
+      "file": "ros1_code/src/planner_node.cpp",
+      "description": "Compute arm + base trajectories given local_map",
+      "expected_outcome": "Publishes /planned_path (arm + base) message."
+    },
+    {
+      "file": "ros1_code/src/controller_node.cpp",
+      "description": "Execute planned trajectories on Stretch controllers",
+      "expected_outcome": "Sends controller commands to /stretch_controller/cmd or joint trajectories."
+    }
+  ],
+  "readme_file": "README.md"
+}

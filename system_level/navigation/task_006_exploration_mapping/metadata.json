@@ -1,0 +1,13 @@
+{
+  "task_id": "integration_nav_006",
+  "task_name": "Unknown Environment Exploration + Mapping",
+  "level": "integration_level",
+  "category": "navigation",
+  "description": "Run SLAM in unknown environment, save map, start localization and navigation, then send goals and verify robot navigation behavior.",
+  "ros_version": "ROS1 Noetic",
+  "language": "Python",
+  "difficulty": "Median",
+  "source": [
+    "https://docs.hello-robot.com/0.2/stretch-tutorials/ros1/navigation_stack/"
+  ]
+}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scxml xmlns="http://www.w3.org/2005/07/scxml"
+       version="1.0" initial="stateA">
+
+  <state id="stateA">
+    <onentry>
+      <log label="enter">Entering stateA</log>
+    </onentry>
+    <transition event="toB" target="stateB"/>
+  </state>
+
+  <state id="stateB">
+    <onentry>
+      <log label="enter">Entering stateB</log>
+    </onentry>
+    <transition event="toFinal" target="final"/>
+  </state>
+
+  <final id="final">
+    <onentry>
+      <log label="enter">Reached final</log>
+    </onentry>
+  </final>
+
+</scxml>

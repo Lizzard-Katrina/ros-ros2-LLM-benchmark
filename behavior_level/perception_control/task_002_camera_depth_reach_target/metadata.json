@@ -1,0 +1,35 @@
+{
+  "task_id": "task_002",
+  "task_name": "camera_depth_reach_target",
+  "description": "Detect an object using depth camera and move robotic arm to reach it. Perception → Control.",
+  "ros_versions": {
+    "ros1": ["kinetic", "noetic"],
+    "ros2": ["foxy", "humble"]
+  },
+  "language": "cpp",
+  "difficulty": "hard",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "ros2_code": "ros2_code/",
+    "tests": "tests/",
+    "docker": "docker/"
+  },
+  "todos": [
+    {
+      "file": "ros1_code/src/constructor_init.cpp",
+      "description": "Initialize MoveIt planning parameters",
+      "expected_outcome": "MoveGroupInterface initialized; planning time, velocity, acceleration set; node compiles"
+    },
+    {
+      "file": "ros1_code/src/object_detection.cpp",
+      "description": "Detect object from depth camera and update target_pose_",
+      "expected_outcome": "target_pose_ updated; target_detected_ set true if object found"
+    },
+    {
+      "file": "ros1_code/src/motion_planner.cpp",
+      "description": "Generate and execute trajectory to reach target_pose_",
+      "expected_outcome": "Robot arm moves to target; stops if target not detected"
+    }
+  ],
+  "readme_file": "README.md"
+}

@@ -1,0 +1,12 @@
+{
+  "task_id": "002",
+  "task_name": "Simulation Integration: Gazebo ↔ ROS Demo",
+  "source": "https://github.com/ros-simulation/gazebo_ros_demos",
+  "description": "Complete the missing parts of the launch file and Gazebo world plugin to enable full simulation integration. Students will need to spawn the robot, connect ROS topics, and implement plugin logic.",
+  "difficulty_level": "easy",
+  "expected_outcome": [
+    "Launch Gazebo with the custom hello world.",
+    "Implement ROS ↔ Gazebo plugin communication.",
+    "Subscribe and publish sensor topics correctly."
+  ],
+}

@@ -1,0 +1,34 @@
+{
+  "task_id": "task_003",
+  "task_name": "multi_node_perception_control",
+  "description": "ROS1 multi-node system: sensor data processed and control commands published. Perception → Control.",
+  "ros_versions": {
+    "ros1": ["kinetic", "noetic"]
+  },
+  "language": "cpp",
+  "difficulty": "easy",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "ros2_code": "ros2_code/",
+    "tests": "tests/",
+    "docker": "docker/"
+  },
+  "todos": [
+    {
+      "file": "ros1_code/src/constructor_init.cpp",
+      "description": "Initialize multi-node processing system",
+      "expected_outcome": "Subscribers/publishers initialized; processing parameters set; node compiles"
+    },
+    {
+      "file": "ros1_code/src/sensor_processing.cpp",
+      "description": "Process LaserScan data",
+      "expected_outcome": "LaserScan processed; processed_value_ updated; data_ready_ true"
+    },
+    {
+      "file": "ros1_code/src/command_publisher.cpp",
+      "description": "Convert processed data to cmd_vel",
+      "expected_outcome": "Robot moves based on sensor input; data_ready handled"
+    }
+  ],
+  "readme_file": "README.md"
+}

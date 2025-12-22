@@ -1,0 +1,13 @@
+{
+  "task_id": "behavior_sensor_001",
+  "name": "LaserScan Obstacle Detection",
+  "description": "Convert ROS1 laser scan processing node to ROS2. Focus on filtering a LaserScan topic and publishing obstacle positions.",
+  "ros_version": "ROS1 Noetic",
+  "language": "Python",
+  "difficulty": "Medium",
+  "has_multiple_fill_in_files": true,
+  "files_with_blanks": [
+    "laser_obstacle_filter_part1.py",
+    "laser_obstacle_filter_part2.py"
+  ]
+}

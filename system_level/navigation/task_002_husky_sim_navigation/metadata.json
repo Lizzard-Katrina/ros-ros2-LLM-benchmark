@@ -1,0 +1,14 @@
+{
+  "task_id": "integration_nav_002",
+  "task_name": "Robot Navigation in Simulation (Husky)",
+  "level": "integration_level",
+  "category": "navigation",
+  "description": "Validate correct integration of Gazebo simulation with Husky robot and ROS navigation stack.",
+  "ros_version": "ROS1 Noetic",
+  "language": "Python",
+  "difficulty": "Basic",
+  "source": [
+    "https://www.clearpathrobotics.com/assets/guides/noetic/husky/HuskyMove.html",
+    "https://github.com/husky/husky"
+  ]
+}

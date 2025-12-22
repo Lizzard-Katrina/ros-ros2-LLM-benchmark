@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="your_pkg" type="depth_proc_node.py" name="stereo_depth_processor" output="screen"/>
+</launch>

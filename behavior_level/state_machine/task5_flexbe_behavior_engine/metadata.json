@@ -1,0 +1,15 @@
+{
+  "task_id": "task5_flexbe_behavior_engine",
+  "task_name": "FlexBE Behavior Engine (turtlebot3 demo) - Translation Benchmark",
+  "source": "https://github.com/FlexBE/flexbe_behavior_engine",
+  "description": "Translate core parts of the FlexBE behavior engine (state execution loop, event handling, feedback processing). Variants remove concrete logic blocks taken from the original module; LLM must reconstruct them while preserving interfaces so the behavior matches the original.",
+  "ros_versions": { "ros1": "noetic" },
+  "language": "python",
+  "difficulty": "high",
+  "todo_files": [
+    "ros1_code/src/variants/variant_01_state_execution_missing.py",
+    "ros1_code/src/variants/variant_02_event_handling_missing.py",
+    "ros1_code/src/variants/variant_03_feedback_processing_missing.py"
+  ],
+  "notes": "Each variant file is a full module with exactly one TODO block. The original files are included under original/ for direct comparison."
+}

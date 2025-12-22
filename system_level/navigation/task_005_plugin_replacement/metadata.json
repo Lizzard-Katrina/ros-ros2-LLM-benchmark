@@ -1,0 +1,13 @@
+{
+  "task_id": "integration_nav_005",
+  "task_name": "Plugin Replacement (Planner/Controller)",
+  "level": "integration_level",
+  "category": "navigation",
+  "description": "Replace planner plugin in the ROS Navigation stack, update launch and YAML parameters, and validate navigation behavior.",
+  "ros_version": "ROS1 Noetic",
+  "language": "Python",
+  "difficulty": "Median",
+  "source": [
+    "https://prabhjotkaurgosal.com/a-guide-to-implementing-ros-navigation-stack-on-your-robot/4/"
+  ]
+}

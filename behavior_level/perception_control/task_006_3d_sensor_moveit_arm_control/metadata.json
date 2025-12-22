@@ -1,0 +1,39 @@
+{
+  "task_id": "task_006",
+  "task_name": "3d_sensor_moveit_arm_control",
+  "description": "3D sensor point cloud used for robotic arm control via MoveIt. Perception → Control.",
+  "ros_versions": {
+    "ros1": ["kinetic", "noetic"]
+  },
+  "language": "cpp",
+  "difficulty": "hard",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "ros2_code": "ros2_code/",
+    "tests": "tests/",
+    "docker": "docker/"
+  },
+  "todos": [
+    {
+      "file": "ros1_code/src/constructor_init.cpp",
+      "description": "Initialize MoveIt interface and parameters",
+      "expected_outcome": "MoveIt interface ready; node compiles"
+    },
+    {
+      "file": "ros1_code/src/pointcloud_processing.cpp",
+      "description": "Process point cloud to extract target pose",
+      "expected_outcome": "Target_pose_ updated; new_target_available_ true"
+    },
+    {
+      "file": "ros1_code/src/motion_planning.cpp",
+      "description": "Generate trajectory using MoveIt",
+      "expected_outcome": "Planned trajectory available"
+    },
+    {
+      "file": "ros1_code/src/arm_command_publisher.cpp",
+      "description": "Send trajectory to arm controller",
+      "expected_outcome": "Arm moves to target; new_target_available_ handled"
+    }
+  ],
+  "readme_file": "README.md"
+}

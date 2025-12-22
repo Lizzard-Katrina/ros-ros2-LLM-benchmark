@@ -1,0 +1,8 @@
+<launch>
+    <node
+        pkg="task_008_camera_object_detection_yolo"
+        type="yolo_detector_node.py"
+        name="yolo_detector"
+        output="screen"
+    />
+</launch>

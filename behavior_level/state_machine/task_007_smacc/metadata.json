@@ -1,0 +1,15 @@
+{
+  "task_id": "task007_smacc",
+  "task_name": "SMACC (State Machine Asynchronous C++) - Benchmark",
+  "source": "https://github.com/robosoft-ai/SMACC",
+  "description": "C++ ROS1 scaffold derived from SMACC. Variants remove concrete runtime pieces (state entry/exit execution, transition guard evaluation, event dispatch loop). LLMs must reconstruct removed logic while preserving interfaces so translated ROS2 C++ code can be validated.",
+  "ros_versions": { "ros1": "noetic" },
+  "language": "cpp",
+  "difficulty": "difficult",
+  "todo_files": [
+    "ros1_code/src/variants/variant_01_state_exec_missing.cpp",
+    "ros1_code/src/variants/variant_02_transition_guard_missing.cpp",
+    "ros1_code/src/variants/variant_03_event_dispatch_missing.cpp"
+  ],
+  "notes": "Original files in ros1_code/src/original/ contain full implementations for ground-truth comparison. Each variant file contains exactly one TODO..END block."
+}

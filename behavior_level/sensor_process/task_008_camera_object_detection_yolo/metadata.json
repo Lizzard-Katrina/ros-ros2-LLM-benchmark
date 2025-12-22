@@ -1,0 +1,18 @@
+{
+    "task_id": "task_008_camera_object_detection_yolo",
+    "task_name": "Camera to Object Detection (YOLO)",
+    "level": "behavior_level",
+    "category": "sensor_process",
+    "description": "Subscribe to a camera image topic and perform object detection using a YOLO-based processing node. Input: /camera/image_raw. Output: bounding boxes and detection results.",
+    "difficulty": "medium",
+    "language": "Python",
+    "ros1_topics": [
+        "/camera/image_raw"
+    ],
+    "expected_ros2_behavior": "A ROS2 node using rclpy subscribing to /camera/image_raw and performing YOLO inference, publishing detection results on /detections.",
+    "directories": {
+        "ros1_code": "Contains ROS1 Python implementation with TODO placeholders for LLM completion.",
+        "tests": "Reserved for future validation tests.",
+        "dockerfile": "Dockerfile for building and running ROS1 environment."
+    }
+}

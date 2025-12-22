@@ -1,0 +1,9 @@
+{
+    "task_id": "task_007_hector_slam_mapping",
+    "level": "behavior_level",
+    "category": "sensor_process",
+    "difficulty":"medium",
+    "description": "Subscribe to /scan and run Hector SLAM to produce /map and /pose.",
+    "source": "https://github.com/tu-darmstadt-ros-pkg/hector_slam",
+    "expected_ros2_behavior": "A ROS2 node should subscribe to /scan, launch Hector SLAM (ported version), and publish /map and /pose topics."
+}

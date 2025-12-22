@@ -1,0 +1,24 @@
+{
+  "task_id": "001",
+  "task_name": "Classic Simulation Integration Smoke Test",
+  "source": "https://github.com/ros/urdf_tutorial",
+  "description": "End-to-end test of URDF simulation integration. Spawn URDF in Gazebo, connect simulation plugins, and visualize in RViz.",
+  "difficulty_level": "easy",
+  "expected_outcome": [
+    "Gazebo successfully spawns the robot described in the URDF/XACRO file.",
+    "ROS publishes /robot_description topic.",
+    "RViz shows the robot model correctly.",
+    "Joint states can be manipulated via joint_state_publisher (GUI or non-GUI)."
+  ],
+  "files_to_edit": [
+    {
+      "path": "urdf_tutorial/urdf/08-macroed.urdf.xacro",
+      "todo": "Define the robot's base_link including visual, collision, and inertial properties"
+    }
+  ],
+  "validation": [
+    "Launch `display.launch` in a ROS workspace and check Gazebo spawns the robot.",
+    "Verify RViz shows the robot correctly.",
+    "Optionally manipulate joint states to confirm correct state publishing."
+  ]
+}

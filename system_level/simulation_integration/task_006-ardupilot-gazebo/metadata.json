@@ -1,0 +1,16 @@
+{
+  "task_id": "006",
+  "task_name": "ArduPilot SITL + Gazebo + ROS1",
+  "source": "https://github.com/ArduPilot/ardupilot_gazebo",
+  "description": "Integrate ArduPilot SITL with Gazebo and ROS1 (MAVROS). The plugin simulates drone actuation and sensor feedback.",
+  "difficulty_level": "high",
+  "expected_outcome": [
+    "Receive servo packets → update motor commands → send state to SITL",
+    "Preserve full parameter loading and configuration",
+    "Plugin skeleton ready to extend with sensors and PID controllers"
+  ],
+  "files": [
+    "include/ArduPilotPlugin.hh",
+    "src/ArduPilotPlugin.cc"
+  ]
+}

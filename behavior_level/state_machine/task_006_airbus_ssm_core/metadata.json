@@ -1,0 +1,15 @@
+{
+  "task_id": "task006_airbus_ssm_core",
+  "task_name": "SCXML-based Smart State-Machine (Airbus) - Translation Benchmark",
+  "source": "https://index.ros.org/r/airbus_coop/",
+  "description": "Benchmark scaffold derived from Airbus SCXML-based SSM. Variants remove concrete state-machine runtime logic (graph construction, event dispatch, transition evaluation). LLM must reconstruct removed sections while preserving interfaces so translated ROS2 version can be validated against the original behavior.",
+  "ros_versions": { "ros1": "noetic" },
+  "language": "python",
+  "difficulty": "advanced",
+  "todo_files": [
+    "ros1_code/src/variants/variant_01_graph_construction_missing.py",
+    "ros1_code/src/variants/variant_02_event_dispatch_missing.py",
+    "ros1_code/src/variants/variant_03_transition_eval_missing.py"
+  ],
+  "notes": "Original files included under original/ for direct comparison. Each variant contains exactly one TODO...END block extracted/adapted from original runtime code."
+}

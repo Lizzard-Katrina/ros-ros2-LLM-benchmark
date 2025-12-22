@@ -1,0 +1,19 @@
+{
+    "task_id": "task_006_stereo_depth_map",
+    "task_name": "Stereo Camera Depth Map Generation",
+    "level": "behavior_level",
+    "category": "sensor_process",
+    "description": "Compute a depth map from synchronized stereo camera inputs. Inputs: /left/image_raw and /right/image_raw. Output: /depth/image.",
+    "ros1_topics": [
+        "/left/image_raw",
+        "/right/image_raw"
+    ],
+    "expected_ros2_behavior": "A stereo processing node subscribing to both images, computing a depth/disparity map, and publishing /depth/image.",
+    "language": "Python",
+    "difficulty": "medium",
+    "directories": {
+        "ros1_code": "Contains ROS1 Python code with one TODO per file for LLM completion.",
+        "tests": "Empty directory reserved for future test cases.",
+        "dockerfile": "Dockerfile located in the task root."
+    }
+}

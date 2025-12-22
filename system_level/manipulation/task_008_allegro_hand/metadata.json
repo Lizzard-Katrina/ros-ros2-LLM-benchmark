@@ -1,0 +1,20 @@
+{
+  "task_id": "008",
+  "task_name": "Allegro Hand V5 ROS1",
+  "source": "https://github.com/Wonikrobotics-git/allegro_hand_ros_v5",
+  "description": "ROS1 support for Allegro Hand V5 (4-finger robotic hand). Fine manipulation only. Connect driver, read joint states, send torque commands, execute finger motions.",
+  "difficulty_level": "median",
+  "expected_outcome": [
+    "AllegroHandNode publishes joint positions to 'allegro_hand/joint_states'.",
+    "Demo node subscribes to joint positions and prints them for verification.",
+    "Torque commands from AllegroHandNode should update finger positions."
+  ],
+  "docker": {
+    "dockerfile": "docker/Dockerfile",
+    "setup": "docker/setup.sh"
+  },
+  "ros1_code": [
+    "src/allegro_hand_node.py",
+    "src/demo_get_joint_state.cpp"
+  ]
+}

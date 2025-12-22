@@ -1,0 +1,17 @@
+{
+  "task_id": "manipulation_002",
+  "task_name": "UR5 Pick-and-Place in Gazebo",
+  "level": "integration_level",
+  "category": "manipulation",
+  "ros_version": "ROS1 Noetic",
+  "language": "Python",
+  "difficulty": "Basic",
+  "source": [
+    "https://github.com/pietrolechthaler/UR5-Pick-and-Place-Simulation"
+  ],
+  "focus": [
+    "perception-planning-execution integration",
+    "multi-node coordination",
+    "motion planning correctness"
+  ]
+}

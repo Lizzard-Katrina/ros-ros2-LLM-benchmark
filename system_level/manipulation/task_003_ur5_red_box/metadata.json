@@ -1,0 +1,13 @@
+{
+  "task_id": "task_003",
+  "name": "arm_ik_integration",
+  "description": "Integration-level correctness test for robotic arm IK and trajectory execution",
+  "ros_version": ["ROS1: noetic"],
+  "language": "C++",
+  "difficulty": "Basic",
+  "directories": {
+    "ros1_code": "ros1_code",
+    "tests": "tests",
+    "docker": "docker"
+  }
+}

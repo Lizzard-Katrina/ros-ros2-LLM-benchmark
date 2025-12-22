@@ -1,0 +1,13 @@
+{
+  "task_id": "007",
+  "name": "TM Robot Arms ROS1 Driver & Demo",
+  "description": "Integration-level correctness benchmark for TM industrial robot arms ROS1 driver",
+  "language": "cpp",
+  "difficulty":"medium",
+  "framework": "ros1",
+  "source": "https://github.com/TechmanRobotInc/tmr_ros1",
+  "files": [
+    "ros1_code/src/tm_ros_node.h",
+    "ros1_code/src/demo_get_sct_response.cpp"
+  ]
+}

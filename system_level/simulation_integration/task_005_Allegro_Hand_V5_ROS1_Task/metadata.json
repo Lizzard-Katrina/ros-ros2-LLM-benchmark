@@ -1,0 +1,13 @@
+{
+  "task_id": "008",
+  "task_name": "Allegro Hand V5 ROS1",
+  "source": "https://github.com/Wonikrobotics-git/allegro_hand_ros_v5",
+  "description": "ROS1 support for Allegro Hand V5 (4-finger robotic hand). Fine manipulation only. Connect driver, read IMU data, and provide basic ROS topics.",
+  "difficulty_level": "median",
+  "expected_outcome": [
+    "Implement Gazebo IMU plugin skeleton",
+    "Implement message buffer header skeleton",
+    "Fill in the addNoise method with IMU noise simulation",
+    "Ensure the package builds in ROS1"
+  ]
+}

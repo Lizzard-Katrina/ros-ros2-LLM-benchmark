@@ -1,0 +1,28 @@
+{
+  "task_id": "010",
+  "task_name": "Manipulation Integration – Reach Study",
+  "source": "https://github.com/ros-industrial/reach_ros",
+  "description": "Integration-level manipulation task: implement core logic for MoveIt IK solver and manipulability evaluation using planning scene and robot state.",
+  "ros_version": "ROS1 Noetic",
+  "language": "C++",
+  "difficulty_level": "hard",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "tests": "tests/",
+    "docker": "docker/"
+  },
+  "todos": [
+    {
+      "file": "ros1_code/ik_solveIK_todo.cpp",
+      "source_file": "src/ik/moveit_ik_solver.cpp",
+      "function": "MoveItIKSolver::solveIK",
+      "expected_outcome": "Implement IK solving using RobotState, joint subset, collision checking, and return valid solutions."
+    },
+    {
+      "file": "ros1_code/manipulability_score_todo.cpp",
+      "source_file": "src/evaluation/manipulability_moveit.cpp",
+      "function": "ManipulabilityMoveIt::calculateScore(const std::map<std::string, double>& pose)",
+      "expected_outcome": "Compute manipulability correctly from singular values of Jacobian, respecting row subsets and excluded links."
+    }
+  ]
+}

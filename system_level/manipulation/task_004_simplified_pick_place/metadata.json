@@ -1,0 +1,28 @@
+{
+  "task_id": "integration_manipulation_004",
+  "task_name": "Simplified Pick and Place",
+  "level": "integration",
+  "category": "manipulation",
+  "interface": "pick_and_place_pipeline",
+  "description": "Integration-level ROS1 manipulation task involving MoveIt, TF, IK, and GraspIt-based pick and place planning.",
+  "source_repository": "https://github.com/gstavrinos/ez_pick_and_place",
+  "ros_version": {
+    "ros1": "noetic",
+    "ros2": null
+  },
+  "language": "python",
+  "difficulty": "Median",
+  "focus": [
+    "integration_correctness",
+    "motion_planning",
+    "inverse_kinematics",
+    "tf_transform_chain"
+  ],
+  "evaluation_type": "behavioral",
+  "expected_output": "Successful pick and place execution without runtime errors.",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "docker": "docker/",
+    "tests": "tests/"
+  }
+}

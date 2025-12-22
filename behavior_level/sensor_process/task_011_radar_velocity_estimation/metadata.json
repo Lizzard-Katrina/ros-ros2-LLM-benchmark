@@ -1,0 +1,30 @@
+{
+  "task_id": "task_011",
+  "task_name": "radar_velocity_estimation",
+  "description": "Compute radial velocities from radar signals. Subscribe to /radar/scan, process radar data, and publish /radar_velocity. Core algorithm is left as TODO for LLM to fill.",
+  "ros_versions": {
+    "ros1": ["kinetic", "noetic"],
+    "ros2": ["foxy", "humble"]
+  },
+  "language": "cpp",
+  "difficulty": "hard",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "ros2_code": "ros2_code/",
+    "tests": "tests/",
+    "docker": "docker/"
+  },
+  "todos": [
+    {
+      "file": "ros1_code/src/constructor_init.cpp",
+      "description": "Initialize radar velocity estimation algorithm: buffers, parameters, and FFT/Doppler modules",
+      "expected_outcome": "Node compiles, subscribers/publishers initialized, buffers ready for radar processing"
+    },
+    {
+      "file": "ros1_code/src/radar_processing.cpp",
+      "description": "Compute radial velocities from radar signals",
+      "expected_outcome": "Estimated radial velocities updated and published to /radar_velocity"
+    }
+  ],
+  "readme_file": "README.md"
+}

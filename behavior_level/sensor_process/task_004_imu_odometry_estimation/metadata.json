@@ -1,0 +1,18 @@
+{
+    "task_id": "task_004_imu_odometry_estimation",
+    "task_name": "IMU to Odometry Estimation",
+    "level": "behavior_level",
+    "category": "sensor_process",
+    "description": "Fuse raw IMU sensor data into linear and angular velocity estimates using an EKF-style processor. Input topic: /imu/data_raw. Output topic: /odom/imu.",
+    "ros1_topics": [
+        "/imu/data_raw"
+    ],
+    "ros2_equivalence": "Not provided. Expected ROS2 outcome is an EKF-style node publishing /odom/imu.",
+    "language": "Python",
+    "difficulty": "easy",
+    "directories": {
+        "ros1_code": "ROS1 code with one TODO per file.",
+        "tests": "Empty folder for future validation.",
+        "dockerfile": "Dockerfile located in root directory."
+    }
+}

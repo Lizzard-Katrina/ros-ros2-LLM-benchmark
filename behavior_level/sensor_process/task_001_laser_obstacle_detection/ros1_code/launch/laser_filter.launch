@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="laser_obstacle_detection" type="laser_obstacle_filter.py" name="laser_filter" output="screen" />
+</launch>

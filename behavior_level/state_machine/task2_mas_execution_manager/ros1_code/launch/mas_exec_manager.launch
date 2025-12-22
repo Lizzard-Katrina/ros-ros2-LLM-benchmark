@@ -1,0 +1,20 @@
+
+<launch>
+    <!-- Launch the execution manager node -->
+    <node pkg="mas_exec_manager"
+          type="execution_manager.py"
+          name="execution_manager"
+          output="screen">
+        <!-- high-level parameters for the manager -->
+        <param name="/mas_exec_manager/tasks" value="['pick','place']" />
+        <param name="/mas_exec_manager/retry_attempts" value="2" />
+        <param name="/mas_exec_manager/timeout_sec" value="10" />
+        <param name="/mas_exec_manager/allow_replanning" value="true" />
+    </node>
+
+    <!-- (Optional) Launch a local action server simulator for testing -->
+    <node pkg="mas_exec_manager"
+          type="robot_action_node.py"
+          name="task_server"
+          output="screen"/>
+</launch>

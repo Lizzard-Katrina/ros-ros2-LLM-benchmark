@@ -1,0 +1,23 @@
+{
+  "task_id": "010",
+  "task_name": "ROS1 rosbag Recorder Benchmark",
+  "source": "https://github.com/ros/ros_comm",
+  "description": "Benchmark task for ROS1 rosbag recorder. Node publishes messages → recorder queues → writes to bag.",
+  "difficulty_level": "median",
+  "expected_outcome": [
+    "Messages published to topics are queued and correctly written to a ROS bag file.",
+    "Queue handling, subscription, and writing are properly benchmarked.",
+    "Supports snapshot recording and multiple topics."
+  ],
+  "files": [
+    "src/recorder_queue.cpp",
+    "src/recorder_write.cpp",
+    "src/recorder_subscribe.cpp",
+    "CMakeLists.txt",
+    "package.xml",
+    "Dockerfile"
+  ],
+  "framework": "ros",
+  "ros_version": "1",
+  "language": "cpp"
+}

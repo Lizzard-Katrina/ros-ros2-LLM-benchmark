@@ -1,0 +1,19 @@
+{
+  "task_id": "003",
+  "task_name": "TurtleBot3 Simulation",
+  "source": "https://github.com/ROBOTIS-GIT/turtlebot3_simulations",
+  "description": "Integrate a TurtleBot3 robot model with Gazebo simulation and ROS nodes, observe sensors, odometry, and TF topics.",
+  "difficulty_level": "median",
+  "expected_outcome": [
+    "Launch Gazebo with the TB3 robot in the specified world",
+    "Robot model spawns with all links and joints correctly defined",
+    "Sensor topics (LIDAR, camera, IMU) publish correctly to ROS",
+    "Teleop or navigation nodes can be run and TF/odom topics observed",
+    "Students practice filling in missing blocks in URDF and launch files"
+  ],
+  "source_files": [
+    "turtlebot3_gazebo/launch/turtlebot3_world.launch.py",
+    "turtlebot3_gazebo/urdf/turtlebot3_burger_cam.urdf",
+    "turtlebot3_gazebo/urdf/turtlebot3_waffle.urdf"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "task_id": "integration_nav_004",
+  "task_name": "TurtleBot3 Obstacle Navigation",
+  "level": "integration_level",
+  "category": "navigation",
+  "description": "Navigation with obstacle avoidance using TurtleBot3 move_base stack in simulation.",
+  "ros_version": "ROS1 Noetic",
+  "language": "Python",
+  "difficulty": "basic",
+  "source": [
+    "https://turtlebot3.ncnynl.com/en/turtlebot3/docs/en/platform/turtlebot3/navigation/",
+    "https://github.com/muralikarteek7/turtlebot3_dwa_navigation"
+  ]
+}

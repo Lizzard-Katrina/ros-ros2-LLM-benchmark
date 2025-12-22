@@ -1,0 +1,14 @@
+{
+  "task_id": "007",
+  "task_name": "CARLA ROS Bridge",
+  "source": "https://github.com/carla-simulator/ros-bridge",
+  "description": "Integrate CARLA simulator with ROS1 topics for vehicle control and sensor data. Supports synchronous and asynchronous modes, handling multiple actors and sensors.",
+  "difficulty_level": "high",
+  "expected_outcome": [
+    "Control commands from ROS are applied in CARLA.",
+    "Actor states and world info are updated each tick.",
+    "Clock and status messages are published to ROS.",
+    "Ego vehicle commands are handled correctly in synchronous mode.",
+    "Spawn/destroy objects and retrieve blueprints via ROS services."
+  ]
+}

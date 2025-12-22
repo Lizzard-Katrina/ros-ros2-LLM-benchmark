@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="your_pkg" type="ekf_processor.py" name="ekf_processor" output="screen"/>
+</launch>

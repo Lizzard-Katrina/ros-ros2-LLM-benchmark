@@ -1,0 +1,14 @@
+{
+  "task_id": "integration_nav_001",
+  "task_name": "Simple Map Navigation (2D Goal)",
+  "level": "integration_level",
+  "category": "navigation",
+  "description": "Validate correct integration of ROS navigation stack: map_server, AMCL, move_base, and goal execution.",
+  "ros_version": "ROS1 Noetic",
+  "language": "Python",
+  "difficulty": "Basic",
+  "source": [
+    "https://wiki.ros.org/navigation/Tutorials/RobotSetup",
+    "https://github.com/hungarianrobot/Project-3-Navigation"
+  ]
+}

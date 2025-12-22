@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>stretch_pipeline</name>
+  <version>0.0.1</version>
+  <description>Stretch pipeline scaffold for benchmark task 009</description>
+  <maintainer email="you@example.com">You</maintainer>
+  <license>MIT</license>
+
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>cv_bridge</depend>
+  <depend>image_transport</depend>
+  <depend>std_msgs</depend>
+
+  <buildtool_depend>catkin</buildtool_depend>
+</package>

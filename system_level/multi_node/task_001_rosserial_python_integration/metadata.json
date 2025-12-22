@@ -1,0 +1,40 @@
+{
+  "task_id": "system_multi_node_001",
+  "task_name": "rosserial_python_serial_bridge",
+  "level": "system_level",
+  "category": "multi_node_orchestration",
+  "source_repository": "https://github.com/ros-drivers/rosserial",
+  "source_branch": "noetic-devel",
+  "source_code_path": "rosserial_python/nodes/serial_node.py",
+  "ros_version": "ROS1 Noetic",
+  "language": "Python",
+  "difficulty": "medium",
+  "task_type": "code_completion",
+  "migration_target": "ROS2 (conceptual)",
+  "capabilities": [
+    "legacy ROS1 system understanding",
+    "multi-node integration correctness",
+    "serial-to-ROS bridge",
+    "node lifecycle management",
+    "fault recovery and reconnection"
+  ],
+  "todo_files": [
+    {
+      "file": "ros1_code/serial_node_connection_todo.py",
+      "description": "Core serial connection lifecycle loop responsible for bridging external hardware into ROS topics."
+    }
+  ],
+  "expected_outcome": [
+    "The node continuously attempts to connect to a serial device.",
+    "Upon successful connection, serial data is published to ROS topics.",
+    "The system recovers automatically from serial or OS-level errors.",
+    "The node shuts down cleanly when ROS is terminated."
+  ],
+  "docker": {
+    "base_image": "ros:noetic-ros-base",
+    "requires_hardware": false,
+    "optional_devices": [
+      "/dev/ttyUSB0"
+    ]
+  }
+}

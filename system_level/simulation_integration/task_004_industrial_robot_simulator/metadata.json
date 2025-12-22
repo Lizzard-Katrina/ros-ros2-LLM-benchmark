@@ -1,0 +1,27 @@
+{
+  "task_id": "004",
+  "task_name": "Industrial Robot Simulator",
+  "source": "https://github.com/ros-industrial/industrial_core",
+  "description": "Simulates industrial robot controller semantics in ROS1. Start simulator, emulate industrial controller messages, command trajectories, and read status/feedback topics.",
+  "difficulty_level": "easy",
+  "expected_outcome": [
+    "A working ROS1 launch file that starts the industrial robot simulator and actionlib interface.",
+    "Nodes with TODO scaffolds filled in to process joint trajectory commands and publish robot state.",
+    "Correct message publishing and subscription using standard industrial_msgs definitions."
+  ],
+  "directory_structure": [
+    "industrial_robot_simulator/launch/robot_interface_simulator.launch",
+    "industrial_robot_client/src/generic_joint_trajectory_action_node.cpp",
+    "industrial_robot_client/src/generic_robot_state_node.cpp",
+    "industrial_msgs/msg/DebugLevel.msg",
+    "industrial_msgs/msg/DeviceInfo.msg",
+    "industrial_msgs/msg/RobotMode.msg",
+    "industrial_msgs/msg/RobotStatus.msg",
+    "industrial_msgs/msg/TriState.msg"
+  ],
+  "notes": [
+    "Node logic needs to be implemented in the TODO sections.",
+    "Launch file is functional but may require parameter configuration.",
+    "Messages follow ROS-Industrial conventions."
+  ]
+}

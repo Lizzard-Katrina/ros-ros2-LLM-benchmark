@@ -1,0 +1,13 @@
+{
+  "task_id": "behavior_sensor_002",
+  "name": "Camera Edge Detection",
+  "description": "ROS1 node subscribes to /camera/image_raw, applies Canny edge detection, and publishes /edges. Node split into two part files with single blanks for agent to fill.",
+  "ros_version": "ROS1 Noetic",
+  "language": "Python",
+  "difficulty": "Easy",
+  "has_multiple_fill_in_files": true,
+  "files_with_blanks": [
+    "edge_detection_node_part1.py",
+    "edge_detection_node_part2.py"
+  ]
+}

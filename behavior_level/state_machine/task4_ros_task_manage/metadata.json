@@ -1,0 +1,20 @@
+{
+  "task_id": "task4",
+  "task_name": "ROS Task Manager",
+  "description": "Translate ROS1 Task Manager combining SMACH and Actionlib to ROS2. Flow: Task Input → SMACH Planner → Actionlib Commands → Robot Actuators → Feedback",
+  "ros_versions": {
+    "ros1": "noetic"
+  },
+  "language": "Python",
+  "difficulty": "easy",
+  "directories": {
+    "ros1_code": "ros1_code",
+    "launch": "ros1_code/launch",
+    "src": "ros1_code/src"
+  },
+  "todo_files": [
+    "variant_01_smach_planner_missing.py",
+    "variant_02_action_call_missing.py",
+    "variant_03_feedback_processing_missing.py"
+  ]
+}

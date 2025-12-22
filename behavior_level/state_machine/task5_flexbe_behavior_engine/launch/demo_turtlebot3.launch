@@ -1,0 +1,4 @@
+<launch>
+    <!-- Launch the FlexBE engine module (this demo uses simplified local modules) -->
+    <node pkg="flexbe_task5_demo" type="behavior_engine.py" name="flexbe_behavior_engine" output="screen"/>
+</launch>

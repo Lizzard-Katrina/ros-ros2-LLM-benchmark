@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="airbus_ssm_task006_demo" type="ssm_runtime.py" name="ssm_runtime" output="screen" args="$(find task006_airbus_ssm_core)/scxml_examples/simple_demo.scxml"/>
+</launch>

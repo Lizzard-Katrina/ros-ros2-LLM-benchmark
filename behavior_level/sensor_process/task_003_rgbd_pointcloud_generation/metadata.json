@@ -1,0 +1,19 @@
+{
+    "task_id": "task_003_rgbd_pointcloud_generation",
+    "task_name": "RGB-D to Point Cloud Conversion",
+    "level": "behavior_level",
+    "category": "sensor_process",
+    "description": "Convert synchronized RGB and depth images from an RGB-D camera into a 3D point cloud. Input topics: /camera/rgb/image_color and /camera/depth. Output topic: /point_cloud.",
+    "ros1_topics": [
+        "/camera/rgb/image_color",
+        "/camera/depth"
+    ],
+    "ros2_equivalence": "Not provided. Benchmark focuses on ROS1 → ROS2 translation and reasoning.",
+    "language": "Python",
+    "difficulty": "easy",
+    "directories": {
+        "ros1_code": "ROS1 code with TODO placeholders for LLM to fill.",
+        "tests": "Empty for now; can be used for automated validation.",
+        "dockerfile": "Dockerfile located at task root directory."
+    }
+}

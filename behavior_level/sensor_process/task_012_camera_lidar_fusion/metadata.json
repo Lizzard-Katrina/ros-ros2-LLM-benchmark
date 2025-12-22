@@ -1,0 +1,31 @@
+{
+  "task_id": "task_012",
+  "task_name": "camera_lidar_fusion",
+  "description": "Fuse camera and LiDAR outputs for visualization. Subscribe to /camera/image_raw and /lidar/points, process sensor data, and publish /fused_markers. Core fusion algorithm is left as TODO for LLM to fill.",
+  "ros_versions": {
+    "ros1": ["kinetic", "noetic"],
+    "ros2": ["foxy", "humble"]
+  },
+  "language": "cpp",
+  "difficulty": "hard",
+  "directories": {
+    "ros1_code": "ros1_code/",
+    "ros2_code": "ros2_code/",
+    "tests": "tests/",
+    "docker": "docker/"
+  },
+  "todos": [
+    {
+      "file": "ros1_code/src/camera_fusion.cpp",
+      "description": "Fuse camera image with latest LiDAR cloud for visualization",
+      "expected_outcome": "Estimated fused markers published to /fused_markers; node compiles; subscribers/publishers initialized"
+    },
+    {
+      "file": "ros1_code/src/lidar_fusion.cpp",
+      "description": "Fuse LiDAR cloud with latest camera image for visualization",
+      "expected_outcome": "Estimated fused markers published to /fused_markers; node compiles; subscribers/publishers initialized"
+    }
+  ],
+  "readme_file": "README.md"
+}
+

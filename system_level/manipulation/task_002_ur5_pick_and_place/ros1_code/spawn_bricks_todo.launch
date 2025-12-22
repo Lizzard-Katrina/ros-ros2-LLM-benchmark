@@ -1,0 +1,14 @@
+<launch>
+
+  <!-- Gazebo world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch"/>
+
+  <node name="spawn_brick"
+        pkg="gazebo_ros"
+        type="spawn_model"
+        args="-file $(find ur5_gazebo)/models/lego/model.sdf
+              -sdf
+              -model lego_1
+              -x 0.5 -y 0.0 -z 0.75"/>
+
+</launch>

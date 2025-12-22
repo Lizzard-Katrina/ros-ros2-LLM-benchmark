@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="roscpp_tutorials" type="talker" name="dummy_talker" output="screen"/>
+    <node pkg="smach_tutorial" type="experiment_main.py" name="nrp_experiment_fsm" output="screen"/>
+</launch>

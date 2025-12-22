@@ -1,0 +1,68 @@
+<?xml version="1.0" ?>
+<robot name="manipulator">
+
+    <!-- Materials -->
+    <material name="yellow"><color rgba="0.0 0.8 0.0 1.0" /></material>
+    <material name="red"><color rgba="0.0 0.8 0.0 1.0" /></material>
+    <material name="black"><color rgba="0.0 0.0 0.0 1.0" /></material>
+    <material name="blue"><color rgba="0.0 0.0 0.0 1.0" /></material>
+    <material name="white"><color rgba="0.0 0.0 0.0 1.0" /></material>
+
+    <!-- Base link -->
+    <link name="world"/>
+    <link name="base_link">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0.01" />
+            <material name="silver"><color rgba="0.75 0.75 0.75 1" /></material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0 0.01" />
+            <geometry><cylinder length="0.02" radius="0.5" /></geometry>
+        </collision>
+        <inertial>
+            <mass value="0.1" />
+            <inertia ixx="0.03" iyy="0.03" izz="0.03" ixy="0.0" ixz="0.0" iyz="0.0" />
+        </inertial>
+    </link>
+
+    <!-- Fixed joint connecting base to world -->
+    <joint name="fixed" type="fixed">
+        <parent link="world"/>
+        <child link="base_link"/>
+    </joint>
+
+    <!-- Link 1 and Joint 1 -->
+    <link name="link1">
+        <visual><origin rpy="0 0 0" xyz="0 0 0.05"/>
+            <geometry><cylinder length="0.10" radius="0.10"/></geometry>
+            <material name="silver"><color rgba="0.75 0.75 0.75 1"/></material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0 0.05"/>
+            <geometry><cylinder length="0.10" radius="0.10"/></geometry>
+        </collision>
+        <inertial>
+            <mass value="0.1"/>
+            <inertia ixx="0.03" iyy="0.03" izz="0.03" ixy="0.0" ixz="0.0" iyz="0.0"/>
+        </inertial>
+    </link>
+
+    <joint name="joint1" type="continuous">
+        <origin rpy="0 0 0" xyz="0 0 0.01"/>
+        <parent link="base_link"/>
+        <child link="link1"/>
+        <axis xyz="0 0 1"/>
+    </joint>
+
+    <!-- TODO: Insert joint definitions for joint2~joint6 and fingers -->
+    <!-- Note: Fill in limits, dynamics, axes, and transmission blocks for each joint -->
+    <!--END TODO>
+
+    <!-- Gazebo plugin -->
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/</robotNamespace>
+        </plugin>
+    </gazebo>
+
+</robot>

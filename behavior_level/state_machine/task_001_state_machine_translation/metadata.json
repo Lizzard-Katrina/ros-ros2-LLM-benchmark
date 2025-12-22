@@ -1,0 +1,43 @@
+{
+  "task_id": "behavior_sm_001",
+  "task_name": "basic_turnstile_state_machine_correctness",
+  "category": "behavior_level",
+  "subcategory": "state_machine_correctness",
+  "ros_version": "ros1_melodic",
+  "language": "python",
+  "difficulty": "easy",
+  "description": "This task evaluates an LLM’s ability to translate ROS1 code involving a SMACH-based finite state machine. The FSM is a classic turnstile example with two states (Locked, Unlocked). The benchmark focuses on correctness of state machine translation, including state transitions, state execution logic, and processing of inputs. All ROS interfaces remain intact, and only internal state logic is removed as TODO blocks.",
+  "source": {
+    "repo": "https://github.com/deebuls/smach-tutorial",
+    "license": "BSD",
+    "notes": "Original code adapted and reorganized for benchmark purposes. Structural integrity of SMACH state machine preserved."
+  },
+  "structure": {
+    "ros1_code": {
+      "nodes": [
+        "turnstile_node.py"
+      ],
+      "launch": [
+        "turnstile.launch"
+      ],
+      "todo_files": [
+        "state_locked.py",
+        "state_unlocked.py",
+        "transition_table.py"
+      ]
+    },
+    "docker": [
+      "Dockerfile",
+      "setup.sh"
+    ],
+    "tests": []
+  },
+  "benchmark_rules": {
+    "hole_structure": "Each TODO file contains exactly one isolated TODO block. Only core FSM logic is removed; ROS boilerplate, class structure, and interface remain intact.",
+    "expected_llm_output": "LLM must reconstruct correct state behavior, transition conditions, and update internal variables following the SMACH execution model.",
+    "validation": {
+      "per_file": "Each TODO file is unit-testable with mock events and expected state outputs.",
+      "full_pipeline": "Running turnstile_node with event inputs should result in correct state transitions observable in ROS logs."
+    }
+  }
+}

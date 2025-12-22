@@ -1,0 +1,14 @@
+{
+  "task_id": "006",
+  "task_name": "TurtleBot3 Pick & Place Objects",
+  "description": "Benchmark for LLMs: complete missing parts in ROS1 behavior tree and controller code for pick & place task."},
+  "difficulty": "median",
+  "subtasks": [
+    {"id": "006-1", "name": "Check Object", "source": "ros1_code/src/pickup_behaviors_node.py"},
+    {"id": "006-2", "name": "Get Object", "source": "ros1_code/src/pickup_behaviors_node.py"},
+    {"id": "006-3", "name": "Let Object", "source": "ros1_code/src/pickup_behaviors_node.py"},
+    {"id": "006-4", "name": "Move Robot", "source": "ros1_code/src/turtlebot_controller_node.py"},
+    {"id": "006-5", "name": "Manage Objects", "source": "ros1_code/src/manage_objects_node.py"},
+    {"id": "006-6", "name": "Launch & RViz", "source": "ros1_code/launch/pick_up_objects_task.launch"}
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "task_id": "012",
+  "task_name": "ROS Multimaster Integration and Synchronization",
+  "source": "https://github.com/fkie/multimaster_fkie",
+  "difficulty_level": "hard",
+  "focus": [
+    "multinode integration",
+    "multi-master coordination",
+    "distributed ROS systems"
+  ],
+  "key_components": [
+    "master discovery",
+    "state monitoring",
+    "synchronization lifecycle"
+  ],
+  "expected_outcome": [
+    "Implement master state extraction",
+    "Handle master discovery updates",
+    "Manage synchronization across multiple ROS masters"
+  ]
+}

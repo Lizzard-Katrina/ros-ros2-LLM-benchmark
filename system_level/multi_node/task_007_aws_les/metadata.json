@@ -1,0 +1,18 @@
+{
+  "task_id": "007",
+  "task_name": "AWS Lex Integration in ROS1",
+  "source": "https://github.com/aws-robotics/lex-ros1",
+  "difficulty_level": "median",
+  "integration_level": "cloud-ros-multinode",
+  "files_with_blanks": [
+    "lex_node/src/lex_node.cpp",
+    "lex_node/include/lex_node/lex_node.h"
+  ],
+  "expected_capabilities": [
+    "ROS service orchestration",
+    "Cloud API integration",
+    "Semantic request-response reasoning",
+    "Intent and slot interpretation",
+    "Robust handling of external service failures"
+  ]
+}

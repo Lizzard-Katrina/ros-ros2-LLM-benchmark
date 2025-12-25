@@ -1,0 +1,12 @@
+{
+  "task_id": "010",
+  "task_name": "Multi-Robot Route Coordination",
+  "source": "https://github.com/tuw-robotics/tuw_multi_robot",
+  "package": "tuw_multi_robot_router",
+  "file": "src/route_coordinator.cpp",
+  "domain": "multi-robot systems",
+  "focus": "multinode integration",
+  "integration_pattern": "centralized coordination",
+  "removed_function": "RouteCoordinatorWrapper::checkSegment",
+  "difficulty_level": "median"
+}

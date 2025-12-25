@@ -1,0 +1,30 @@
+{
+  "task_id": "005",
+  "task_name": "KIE Multi-Agent ROS Node Synchronization",
+  "source": "https://github.com/fkie/fkie-multi-agent-suite",
+  "description": "Multi-agent orchestration suite for multi-master ROS1: node discovery, registration, and cross-host topic/service synchronization.",
+  "difficulty_level": "median",
+  "expected_outcome": [
+    "Student fills in the logic for ROS node startup and registration.",
+    "Student implements node monitoring (alive/status) checks.",
+    "Student implements cross-host discovery service callbacks.",
+    "Integration test passes with multiple nodes simulating multi-host environment."
+  ],
+  "files": [
+    {
+      "file_path": "fkie_mas_daemon/ros_node.py",
+      "role": "ROS node startup and registration",
+      "todo": "Implement ROS node initialization and registration logic to support multi-node discovery."
+    },
+    {
+      "file_path": "fkie_mas_daemon/monitor.py",
+      "role": "Node state monitoring",
+      "todo": "Implement node monitoring and heartbeat logic for multi-node integration."
+    },
+    {
+      "file_path": "fkie_mas_discovery/src/fkie_mas_discovery/discovery_service.py",
+      "role": "Cross-host node discovery",
+      "todo": "Implement discovery service callbacks to allow multi-master node detection."
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "task_id": "011",
+  "task_name": "AMR Interoperability via VDA5050 Adapter",
+  "source": "https://github.com/inorbit-ai/ros_amr_interop",
+  "integration_type": [
+    "plugin-based state aggregation",
+    "standard-to-local action translation",
+    "fleet-level interoperability"
+  ],
+  "primary_language": "C++",
+  "middleware": "ROS2",
+  "concepts_tested": [
+    "multinode integration",
+    "adapter pattern",
+    "pluginlib architecture",
+    "robot-fleet interoperability",
+    "standardized robot interfaces"
+  ],
+  "difficulty_level": "hard"
+}

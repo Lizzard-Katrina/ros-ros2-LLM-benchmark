@@ -1,0 +1,24 @@
+{
+  "task_id": "ROS_PARAM_001",
+  "task_name": "ROS1 Parameter Server Multinode Integration",
+  "source": "https://github.com/ros/ros_comm/tree/noetic-devel",
+  "language": "C++",
+  "difficulty":"median",
+  "framework": "ROS1 (Noetic)",
+  "task_level": "integration",
+  "modified_files": [
+    {
+      "path": "clients/roscpp/src/libros/param.cpp",
+      "functions": [
+        "set(const std::string&, const XmlRpc::XmlRpcValue&)",
+        "getImpl(const std::string&, XmlRpc::XmlRpcValue&, bool)"
+      ]
+    }
+  ],
+  "expected_properties": [
+    "multinode parameter visibility",
+    "parameter cache consistency",
+    "master-based parameter synchronization"
+  ]
+}
+

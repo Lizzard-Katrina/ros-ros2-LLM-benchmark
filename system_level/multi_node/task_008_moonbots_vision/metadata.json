@@ -1,0 +1,30 @@
+{
+  "task_id": "008",
+  "task_name": "MoonBots Vision Sensor I2C Read",
+  "source": "https://github.com/tianli/MoonBot",
+  "description": "Extract and implement I2C communication for MoonBot's vision sensor, focusing on reading vision data and detection results.",
+  "difficulty_level": "median",
+  "expected_outcome": [
+    "Send vision_type to the sensor",
+    "Read number of detected objects",
+    "Return MU_OK if no detections",
+    "Read frame count",
+    "Limit detect to MU_MAX_RESULT",
+    "Read each detected object's data",
+    "Populate vision_state->vision_result[i]",
+    "Return appropriate mu_err_t code"
+  ],
+  "files_to_edit": [
+    "MuVisionSensorIII/MuVisionSensorIII_V1.1.4/src/mu_vision_sensor_i2c_interface.cpp"
+  ],
+  "todo": [
+    "Write vision_type to sensor register",
+    "Read number of detected objects",
+    "Return early if detect is 0",
+    "Read frame count",
+    "Ensure detect <= MU_MAX_RESULT",
+    "Loop over each detection and read its data",
+    "Populate vision_state->vision_result[i]",
+    "Return correct mu_err_t error codes"
+  ]
+}

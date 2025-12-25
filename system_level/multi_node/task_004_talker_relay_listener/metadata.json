@@ -1,0 +1,16 @@
+{
+  "task_id": "004",
+  "task_name": "Multinode Talker-Relay-Listener",
+  "source": "https://github.com/ros/ros_tutorials/tree/noetic-devel/roscpp_tutorials",
+  "ros_version": "ROS1",
+  "difficulty_level": "easy",
+  "integration_level": "multinode",
+  "missing_files": [
+    "ros1_code/relay.cpp"
+  ],
+  "expected_outcome": [
+    "Relay node subscribes to a talker topic",
+    "Relay node republishes messages unchanged",
+    "Listener receives relayed messages successfully"
+  ]
+}

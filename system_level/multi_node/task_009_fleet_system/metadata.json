@@ -1,0 +1,16 @@
+{
+  "task_id": "009",
+  "task_name": "Fleet-Level Multinode Integration (Robofleet)",
+  "source": "https://github.com/ut-amrl/robofleet",
+  "difficulty":"hard",
+  "integration_level": "multinode",
+  "removed_files": [
+    "robofleet_server/src/subscriptions.ts",
+    "robofleet_client/robofleet_client/RosClientNode.hpp"
+  ],
+  "focus": [
+    "fleet-level subscription state management",
+    "robot-local ROS multinode integration",
+    "topic-based message routing across multiple robots"
+  ]
+}

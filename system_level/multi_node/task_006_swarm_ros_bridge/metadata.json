@@ -1,0 +1,32 @@
+{
+  "task_id": "006",
+  "task_name": "Swarm ROS Bridge",
+  "source": "https://github.com/shupx/swarm_ros_bridge",
+  "ros_version": "ros1",
+  "difficulty_level": "hard",
+  "task_type": "integration",
+  "multinode": true,
+  "communication": [
+    "ROS",
+    "ZeroMQ"
+  ],
+  "scaffolded_files": [
+    {
+      "path": "src/bridge_node.cpp",
+      "scaffold_type": "logic-closure",
+      "description": "End-to-end ROS to ZeroMQ message bridging pipeline"
+    },
+    {
+      "path": "include/ros_sub_pub.hpp",
+      "scaffold_type": "logic-closure",
+      "description": "ROS message type dispatch and subscriber/publisher creation"
+    }
+  ],
+  "expected_capabilities": [
+    "distributed-communication",
+    "multinode-integration",
+    "middleware-bridging",
+    "concurrent-message-handling",
+    "ros-topic-consistency"
+  ]
+}

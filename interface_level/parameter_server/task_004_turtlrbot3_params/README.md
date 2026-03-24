@@ -1,43 +1,42 @@
-# 004 TurtleBot3 Model Parameters
+# Task 004: TurtleBot3 Dynamic Parameter Observer Migration
 
-## Task Overview
-This benchmark task evaluates the ability of a model to migrate ROS1-style
-robot model parameter loading into ROS2 node parameters. Key migration challenge
-is replacing `rospy.get_param` calls with ROS2 `declare_parameter()` calls
-so that all nodes correctly initialize with model parameters.
+## 1. Brief Description
+This task involves migrating the parameter handling logic of the `turtlebot3.cpp` node from ROS 1 to ROS 2. Unlike static parameter retrieval, the primary objective here is to implement an **Asynchronous Observer Pattern**. The developer must utilize a ROS 2 Asynchronous Parameter Client to monitor specific parameter events (`motors.profile_acceleration`) and execute a callback to synchronize these changes with hardware motor profiles, including necessary physical unit conversions.
 
-## Directory Structure
-004_turtlebot3_model_params/
-├── metadata.json
-├── README.md
-├── docker/
-│   ├── Dockerfile
-│   └── run.sh
-└── ros1_code/
-    └── version01_load_model_params.py
+---
 
-## Holes and Purpose
-### version01_load_model_params.py
-- **Hole:** Loading TurtleBot3 model parameters from ROS1 parameter server
-- **Reason:** This is the key migration point for ROS2
-- **Expected outcome:** Model should replace `rospy.get_param` with ROS2 `declare_parameter` and correctly load model params (robot_type, wheel_diameter, wheel_base)
+## 2. Hole Design Strategy
 
-## Docker Instructions
-1. Build and run Docker image:
-```bash
-cd docker
-chmod +x run.sh
-./run.sh
-```
+The task utilizes two strategically placed "holes" to evaluate the model's depth of understanding regarding the ROS 2 parameter lifecycle:
 
-2. Launches a ROS1 environment with code ready for testing.
+### A. Static Initialization & Service Readiness (`init_dynamixel_sdk_wrapper`)
+* **Design Intent**: To test if the model understands the service-based nature of ROS 2 parameters.
+* **Key Concept**: In ROS 2, the parameter server is an asynchronous entity. The implementation must include `wait_for_service` logic to ensure the client connects to the server during node startup, preventing initialization failures if the service is not yet available.
 
-3. Source
+### B. Asynchronous Event Response (`parameter_event_callback`)
+* **Design Intent**: To evaluate the model's ability to parse complex message structures and maintain physical logic integrity.
+* **Key Constraints**: 
+    * **Architecture**: Models are strictly required to use the `on_parameter_event` stream rather than the simpler `add_on_set_parameters_callback` hook. This tests the ability to handle advanced asynchronous streams.
+    * **Physics**: The migration must preserve the mathematical relationship: `Profile Acceleration = Value / Constant`. This is a critical indicator of "semantic migration" vs. "blind syntax translation."
 
-```https://github.com/ROBOTIS-GIT/turtlebot3```
-4. Notes
-Only ROS1 code is provided.
+---
 
-The file contains one TODO for model to complete.
+## 3. Testcase Design & Expected Outcomes
 
+The evaluation uses **Full-file Regex Scanning** to ensure the code meets both architectural and logical standards.
 
+| Testcase | Design Principle | Expected Outcome |
+| :--- | :--- | :--- |
+| **`test_async_client_architecture`** | Verifies the use of the requested Asynchronous Observer architecture. | Successful detection of `AsyncParametersClient` instantiation. |
+| **`test_service_readiness_logic`** | Checks for robust handling of ROS 2 asynchronous service characteristics. | Presence of `wait_for_service` logic with appropriate timeout. |
+| **`test_api_constraint_compliance`** | Evaluates instruction following by excluding non-standard API alternatives. | Usage of `on_parameter_event`; absence of `add_on_set_parameters_callback`. |
+| **`test_target_parameter_recognition`** | Confirms the logic targets the correct parameter string. | Match for the string `"motors.profile_acceleration"`. |
+| **`test_physics_logic_preservation`** | **Core Logic Check**. Verifies the mathematical integrity of the migration. | Identification of the **Division (/)** operator between the value and the constant. |
+| **`test_event_message_parsing`** | Validates understanding of the `ParameterEvent` message structure. | Iteration through the `event->changed_parameters` list. |
+| **`test_value_extraction_style`** | Checks for standard ROS 2 parameter value extraction methods. | Usage of `.as_double()` or `from_parameter_msg` for type conversion. |
+| **`test_logging_semantic_content`** | Verifies the feedback loop requirements. | Log message must contain the specific physical unit `"rev/min2"`. |
+| **`test_no_legacy_ros1_symbols`** | Ensures complete migration and removal of legacy code. | Total absence of `ros::NodeHandle`, `getParam`, etc. (outside of comments). |
+
+---
+
+> **Note for Evaluators**: This task is a high-resolution benchmark. It successfully fails models that perform "syntax-only" translations (e.g., those that mistakenly use multiplication instead of division or bypass the requested Observer Pattern for simpler hooks).

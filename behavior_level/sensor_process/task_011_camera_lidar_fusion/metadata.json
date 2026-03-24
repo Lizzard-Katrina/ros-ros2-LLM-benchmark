@@ -1,0 +1,9 @@
+{
+    "task_id": "task_012_camera_object_detection_yolo",
+    "level": "behavior_level",
+    "category": "sensor_process",
+    "description":""description": "Migrate IMM-UKF-PDA tracker from ROS 1 to ROS 2, focusing on TF2 Buffer and message namespaces.",
+    "difficulty": "medium",
+    "language": "C++",
+    }
+}

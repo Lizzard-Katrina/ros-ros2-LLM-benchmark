@@ -1,20 +1,23 @@
 #!/usr/bin/env python3
 import rospy
-from sensor_msgs.msg import Image
-# image_transport import
-# TODO: import image_transport Subscriber
-
+#mock Image Class
+class Image:
+    # minimal mock attributes for Image message
+    width = 640
+    height = 480
+    encoding = "rgb8"
+    data = b''
 def callback(msg):
-    # TODO: 检测点：确保消息接收使用了 image_transport
+    # TODO: ensure the usage of image_transport
     rospy.loginfo("Received an image")
 
 def main():
     rospy.init_node('camera_subscriber_node')
     
-    # TODO: 使用 image_transport 创建 subscriber
+    # use image_transport to construct subscriber
     # sub = ...
 
     rospy.spin()
-
+    # END OF TODO
 if __name__ == '__main__':
     main()

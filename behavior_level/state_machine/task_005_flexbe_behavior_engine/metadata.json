@@ -1,0 +1,26 @@
+{
+  "task_id": "flexbe_nav_005",
+  "task_type": "framework_api_refactoring",
+  "component": "flexbe_navigation_states",
+  "source_file": "flexbe_navigation_states/move_base_state.py",
+  "description": "Refactor a deprecated MoveBase state to Nav2. Tests the ability to adhere to FlexBE's ProxyActionClient pattern and avoid manual ROS 2 Future management which causes node instability.",
+  "difficulty": "hard",
+  "tags": [
+    "ros2_migration",
+    "nav2",
+    "flexbe",
+    "proxy_pattern",
+    "action_client",
+    "anti_pattern_detection"
+  ],
+  "requirements": {
+    "ros_distro": "humble/jazzy",
+    "framework": "flexbe_core",
+    "action_msg": "nav2_msgs/action/NavigateToPose"
+  },
+  "oracle_config": {
+    "test_file": "test/test_oracle_ros2.py",
+    "framework": "pytest",
+    "expected_pass_count": 5
+  }
+}

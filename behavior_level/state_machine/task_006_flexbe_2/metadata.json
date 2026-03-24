@@ -1,0 +1,24 @@
+{
+  "task_id": "flexbe_manip_006_strict",
+  "task_type": "data_integrity_migration",
+  "component": "flexbe_manipulation_states",
+  "source_file": "flexbe_manipulation_states/get_joint_values_state.py",
+  "description": "Strict verification of incremental data collection in ROS 2. Requires handling of partial joint state updates, buffer draining, and strict node-clock synchronization.",
+  "difficulty": "hard",
+  "tags": [
+    "ros2",
+    "flexbe_proxy",
+    "joint_states",
+    "data_alignment",
+    "sim_time_safety"
+  ],
+  "requirements": {
+    "ros_distro": "humble/jazzy",
+    "framework": "flexbe_core",
+    "message_type": "sensor_msgs/msg/JointState"
+  },
+  "oracle_config": {
+    "test_file": "test/test_oracle_ros2.py",
+    "framework": "pytest",
+  }
+}

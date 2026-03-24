@@ -9,9 +9,6 @@
     "version01_sensor_fusion.py"
   ],
   "num_holes": 1,
-  "difficulty": "medium",
-  "expected_ros2_changes": [
-    "Replace rospy.get_param with ROS2 declare_parameter calls",
-    "Ensure EKF node initializes correctly with loaded parameters"
-  ]
+  "difficulty": "basic",
+  "language":"C++",
 }

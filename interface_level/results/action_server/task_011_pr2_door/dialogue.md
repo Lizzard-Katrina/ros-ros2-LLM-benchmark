@@ -1,0 +1,141 @@
+# Task: action_server/task_011_pr2_door
+
+```python
+#!/usr/bin/env python3
+# Software License Agreement (BSD License)
+#
+# Copyright (c) 2008, Willow Garage, Inc.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+#  * Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following
+#    disclaimer in the documentation and/or other materials provided
+#    with the distribution.
+#  * Neither the name of the Willow Garage nor the names of its
+#    contributors may be used to endorse or promote products derived
+#    from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+
+## Gazebo collision validation 
+PKG = 'pr2_doors_gazebo_demo'
+NAME = 'test_door_no_executive'
+
+import unittest, sys, os, math
+import time
+
+import rclpy
+from rclpy.node import Node
+from rclpy.action import ActionClient
+from rclpy.duration import Duration
+
+from nav_msgs.msg import *
+from std_msgs.msg import String
+from move_base_msgs.action import MoveBase
+from door_msgs.action import Door
+
+
+TEST_DURATION = 60000.0
+
+
+class TestDoorNoExecutive(unittest.TestCase):
+    def __init__(self, *args):
+        super(TestDoorNoExecutive, self).__init__(*args)
+
+        rclpy.init(args=None)
+        self.node = rclpy.create_node('open_door_test')
+
+        # initial door
+        prior_door = Door.Goal().door
+        prior_door.frame_p1.x = 1.0
+        prior_door.frame_p1.y = -0.5
+        prior_door.frame_p2.x = 1.0
+        prior_door.frame_p2.y = 0.5
+        prior_door.door_p1.x = 1.0
+        prior_door.door_p1.y = -0.5
+        prior_door.door_p2.x = 1.0
+        prior_door.door_p2.y = 0.5
+        prior_door.travel_dir.x = 1.0
+        prior_door.travel_dir.y = 0.0
+        prior_door.travel_dir.z = 0.0
+        prior_door.rot_dir = Door.Goal().door.ROT_DIR_COUNTERCLOCKWISE
+        prior_door.hinge = Door.Goal().door.HINGE_P2
+        prior_door.header.frame_id = "base_footprint"
+        self.door = Door.Goal()
+        self.door.door = prior_door
+
+        self.move = MoveBase.Goal()
+        self.move.target_pose.header.frame_id = 'odom_combined'
+        self.move.target_pose.pose.position.x = 10.0
+        self.move.target_pose.pose.position.y = 10.0
+        self.move.target_pose.pose.orientation.w = 1.0
+
+        # TODO:
+        # Implement ROS2 ActionClient logic for Door and MoveBase actions
+        self.ac_door = ActionClient(self.node, Door, 'door_action')
+        self.ac_move = ActionClient(self.node, MoveBase, 'move_base')
+
+        # Wait for action servers to be available
+        if not self.ac_door.wait_for_server(timeout_sec=5.0):
+            self.node.get_logger().error('Door action server not available')
+        if not self.ac_move.wait_for_server(timeout_sec=5.0):
+            self.node.get_logger().error('MoveBase action server not available')
+        # END OF TODO
+
+        self.sub = self.node.create_subscription(String, '/test_output', self.stringOutput, 10)
+
+    def stringOutput(self, msg):
+        print(msg.data)
+
+    def test_door_no_executive(self):
+        # Send door goal and wait for result
+        send_goal_future = self.ac_door.send_goal_async(self.door)
+        rclpy.spin_until_future_complete(self.node, send_goal_future, timeout_sec=TEST_DURATION / 1000.0)
+        goal_handle = send_goal_future.result()
+        self.assertIsNotNone(goal_handle)
+        self.assertTrue(goal_handle.accepted)
+
+        get_result_future = goal_handle.get_result_async()
+        rclpy.spin_until_future_complete(self.node, get_result_future, timeout_sec=TEST_DURATION / 1000.0)
+        result = get_result_future.result()
+        self.assertEqual(result.status, 4)  # SUCCEEDED
+
+        # Send move_base goal and wait for result
+        send_goal_future = self.ac_move.send_goal_async(self.move)
+        rclpy.spin_until_future_complete(self.node, send_goal_future, timeout_sec=TEST_DURATION / 1000.0)
+        goal_handle = send_goal_future.result()
+        self.assertIsNotNone(goal_handle)
+        self.assertTrue(goal_handle.accepted)
+
+        get_result_future = goal_handle.get_result_async()
+        rclpy.spin_until_future_complete(self.node, get_result_future, timeout_sec=TEST_DURATION / 1000.0)
+        result = get_result_future.result()
+        self.assertEqual(result.status, 4)  # SUCCEEDED
+
+
+if __name__ == '__main__':
+    import launch_testing
+    import launch_testing_ros
+    import pytest
+
+    # Use unittest runner with rclpy init and shutdown handled by test framework
+    unittest.main()
+```

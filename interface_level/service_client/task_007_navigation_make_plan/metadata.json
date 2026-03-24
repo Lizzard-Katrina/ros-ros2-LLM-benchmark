@@ -1,0 +1,18 @@
+{
+  "task_id": "task_007_navigation_make_plan",
+  "task_name": "Navigation Make Plan - Service Client",
+  "category": "interface",
+  "type": "service_client",
+  "source_framework": "ROS1",
+  "target_framework": "ROS2",
+  "language": "C++",
+  "masked_function": "AmclNode::requestMap",
+  "core_concepts": [
+    "ros2_service_client",
+    "wait_for_service",
+    "response_handling",
+    "mutex_semantics"
+  ],
+  "num_tests": 4,
+  "difficulty": "basic-medium"
+}

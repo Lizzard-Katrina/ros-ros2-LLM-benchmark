@@ -5,11 +5,8 @@
   "source": {
     "turtlebot3": "https://github.com/ROBOTIS-GIT/turtlebot3"
   },
-  "ros1_files": [
-    "version01_load_model_params.py"
-  ],
   "num_holes": 1,
-  "difficulty": "easy",
+  "difficulty": "median",
   "expected_ros2_changes": [
     "Replace rospy.get_param usage with ROS2 declare_parameter",
     "Load robot model parameters (robot_type, wheel_diameter, wheel_base) into ROS2 node parameters",

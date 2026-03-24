@@ -1,67 +1,25 @@
-# Task 003 — RGB-D to Point Cloud (Behavior Level / Sensor Process)
+# Task 003: RGBD PointCloud Generation - Multi-Sensor Fusion
 
-## 🔍 Task Description
-This task converts synchronized RGB and depth images into a 3D point cloud.
-It mimics the `rgbd_launch` behavior from ROS image_pipeline.
-
-### Input Topics:
-- `/camera/rgb/image_color`
-- `/camera/depth`
-
-### Output Topic:
-- `/point_cloud`
-
+## 1. Brief Description
+Implement the core C++ fusion logic for an RGBD camera pipeline. This node merges a Depth map with an RGB image to produce a colored `sensor_msgs/PointCloud2`.
 ---
+source code
+```https://github.com/ros-perception/image_pipeline/blob/rolling/depth_image_proc/src/point_cloud_xyzrgb.cpp```
 
-## 📁 Directory Structure
+## 2. Excavation Strategy
+We have hollowed out the **Image Callback**. The goal is to move beyond simple coding and test **Physical Integrity**:
+- **Geometry Awareness**: Scaling camera intrinsics when resizing images.
+- **Library Integration**: Utilizing template kernels (`convertDepth<T>`) for performance.
+- **Synchronization**: Ensuring the output cloud is temporally and spatially aligned with the depth sensor.
 
-task_003_rgbd_pointcloud_generation/
-│── metadata.json  
-│── Dockerfile  
-│── setup.sh  
-│── ros1_code/
-│   ├── rgbd_processor.py      ← contains **one TODO**
-│   ├── rgb_subscriber.py      ← contains **one TODO**
-│   ├── depth_subscriber.py    ← contains **one TODO**
-│   └── launch/
-│       └── rgbd_to_pointcloud.launch
-│── tests/
+## 3. Oracle Design & Expected Outcomes
+| Test | Intent | Passing Outcome |
+| :--- | :--- | :--- |
+| **Intrinsic Scaling** | Geometric Accuracy | Manual multiplication of focal lengths by resize ratio. |
+| **Offset Usage** | Code Efficiency | Explicit `red_offset`, `blue_offset` identification. |
+| **Kernel Call** | Library Standard | Concurrent use of `convertDepth` and `convertRgb`. |
+| **Header Sync** | Coordinate Safety | `cloud_msg->header = depth_msg->header`. |
+| **Memory** | Modern C++ | Usage of `std::make_unique` and `std::move`. |
 
----
-
-## 🧩 TODO Locations (for LLM translation tasks)
-
-### 1. rgb_subscriber.py
-Goal: create ROS1 subscriber for `/camera/rgb/image_color`
-
-### 2. depth_subscriber.py
-Goal: create ROS1 subscriber for `/camera/depth`
-
-### 3. rgbd_processor.py
-Goal: using synchronized RGB + depth → generate and publish point cloud
-
-Each file includes:
-```
-TODO:...
-END:...
-```
-
----
-
-## 🐳 Docker Instructions
-
-### Build image
-docker build -t task003_rgbd
-
-### Run container
-docker run -it --net=host task003_rgbd
-
-### Inside container: run ROS1 version
-
-roslaunch rgbd_task rgbd_to_pointcloud.launch
----
-
-## 🧪 Validation Notes
-- No ROS2 code is provided.
-- Benchmark focuses on prompting LLM to produce ROS2 version by translating ROS1 logic.
-
+## 4. Engineering Impact
+This task ensures the 3D data produced is metrically accurate. Failing to scale intrinsics or synchronize headers results in "ghosting" or distorted point clouds, which would break downstream SLAM and planning algorithms.

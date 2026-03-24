@@ -1,74 +1,132 @@
-# Task 001 – Basic Parameter Server
+# Task 001 — Parameter Server Cache Semantics (ROS1 → ROS2)
 
-This task evaluates the LLM's ability to translate ROS1 parameter server operations into ROS2 equivalents.
+## 1. Brief Description
 
-The task uses three single-hole ROS1 code files, each testing one transformation skill.
+This task evaluates semantic preservation when migrating ROS1 parameter-server client logic to ROS2.
+
+The ROS1 source implements a subscription-backed parameter cache that:
+
+- retrieves parameters with optional caching,
+- subscribes to parameter updates from the master,
+- updates the local cache on remote changes,
+- invalidates parent namespace caches to preserve hierarchical consistency.
+
+The ROS2 target is expected to reproduce these semantics using ROS2 parameter mechanisms (e.g., parameter services and parameter events), rather than ROS1 XMLRPC-based master calls.
+
+This task focuses on parameter consistency semantics, not transport-level compatibility.
+
+---
+source code:
+`https://github.com/ros/ros_comm/blob/noetic-devel/clients/roscpp/src/libros/param.cpp`
+
+
+## 2. Code Blanking Strategy
+
+Instead of blanking many small helpers, this task blanks one coherent semantic loop:
+
+- `getImpl(...)`
+- `update(...)`
+- `invalidateParentParams(...)`
+
+These three functions together form the full cache-consistency cycle in ROS1:
+
+cached get → subscription → remote update → cache refresh → parent invalidation
+
+Other parts of the file remain intact so that:
+
+- key resolution logic is preserved,
+- data structures (cache map, subscribed set) remain visible,
+- the model must reconstruct the behavioral semantics, not scaffolding.
 
 ---
 
-## Files and TODO Holes
+## 3. Test Case Semantics
 
-### **version_01_read_param.cpp**
-- **TODO_1:** Load `robot_name` and `start_mode` from the parameter server.
-- Focus: ROS1 `getParam` → ROS2 `get_parameter`.
+The oracle performs static semantic checks.  
+It does not execute ROS nodes.
 
-### **version_02_log_param.cpp**
-- **TODO_2:** Log retrieved parameters.
-- Focus: ROS1 `ROS_INFO` → ROS2 `RCLCPP_INFO`.
-
-### **version_03_update_param.cpp**
-- **TODO_3:** Update a parameter at runtime.
-- Focus: ROS1 `setParam` → ROS2 `set_parameters`.
-
-Each hole is isolated so evaluation can measure specific sub-skill performance.
+It verifies that the ROS2 solution preserves the *behavioral intent* of the ROS1 implementation.
 
 ---
 
-## Expected Outcomes
+### Test A — ROS2 parameter system usage
 
-### version_01_read_param.cpp
-Must correctly load parameters from: config/default_params.yaml
+**Checks**
+- Uses ROS2 APIs (`rclcpp`)
+- Does not use ROS1 master/XMLRPC calls
 
-### version_02_log_param.cpp
-Must print something like:
-robot_name: PR2
-start_mode: 1
-
-### version_03_update_param.cpp
-Should print:
-Original start_mode: 1
-Updated start_mode: <new value>
+**Expected Outcome**
+The solution uses ROS2 parameter mechanisms rather than ROS1 infrastructure.
 
 ---
 
-## Docker Usage
+### Test B — Cache + subscription state
 
-### Build the image
-```bash
-cd docker
-docker build -t param_task_001 .```
-### Run container
-docker run -it --name param001 param_task_001
-Inside container: set environment
-source /opt/ros/noetic/setup.sh
-source /ros1_ws/devel/setup.sh
-source /opt/ros/foxy/setup.sh
-source /ros2_ws/install/setup.sh
+**Checks**
+- Presence of a cache container (map/unordered_map)
+- Presence of a subscribed-key set
+- Use of mutex/locking
 
-### Run each test
-rosrun task_001_basic_param version_01_read_param
-rosrun task_001_basic_param version_02_log_param
-rosrun task_001_basic_param version_03_update_param
-
+**Expected Outcome**
+The solution maintains local state similar to ROS1 cached parameters.
 
 ---
 
-# 7️⃣ **expected_ros2/expected_conversion_notes.md**
+### Test C — Real parameter event subscription
 
-```markdown
-# Expected ROS2 Conversions
+**Checks**
+- Uses `ParameterEvent` or `ParameterEventHandler`
+- Actually constructs a subscription/handler object
 
-- Parameters must be declared using `declare_parameter()`.
-- Parameter retrieval must use `get_parameter("name").as_<type>()`.
-- Logging must use `RCLCPP_INFO(node->get_logger(), ...)`.
-- Runtime parameter updates must use `set_parameters()`.
+**Expected Outcome**
+The solution replaces ROS1 `subscribeParam` with ROS2 event-driven updates.
+
+---
+
+### Test D — update() semantics
+
+**Checks**
+- update() locks shared state
+- update() checks whether a key is subscribed before updating cache
+- update() mutates cache
+- update() calls invalidateParentParams()
+
+**Expected Outcome**
+Only subscribed parameters influence the cache, matching ROS1 gating logic.
+
+---
+
+### Test E — invalidateParentParams() semantics
+
+**Checks**
+- Iterates over parent namespaces
+- Computes parent keys
+- Erases parent entries from cache
+
+**Expected Outcome**
+Hierarchical parameter consistency is preserved.
+
+---
+
+### Test F — getImpl() semantics
+
+**Checks**
+- Branches on `use_cache`
+- Attempts cache lookup
+- Registers interest/subscription on first access
+- Has a remote query path using ROS2 parameter APIs
+
+**Expected Outcome**
+The function supports both cached and uncached retrieval paths.
+
+---
+
+## Summary
+
+This task measures whether a model can reconstruct ROS1’s subscription-backed parameter cache semantics using ROS2 parameter mechanisms.
+
+It emphasizes:
+
+- event-driven cache updates,
+- hierarchical invalidation,
+- subscription-aware caching behavior.

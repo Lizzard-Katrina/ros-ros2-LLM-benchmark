@@ -12,29 +12,26 @@ public:
         right_sub_.reset(new message_filters::Subscriber<sensor_msgs::Image>(
             nh, "/right/image", 1));
 
-        // TODO: define ApproximateTime or ExactTime policy
-        // TODO: create synchronizer
-        // TODO: register callback
+        // TODO: create ApproximateTime synchronizer and register syncCallback
+        // end: this is the end of the todo
     }
 
     void syncCallback(
         const sensor_msgs::ImageConstPtr& left,
         const sensor_msgs::ImageConstPtr& right)
     {
-        // TODO: handle synchronized messages
+        ROS_INFO("Left stamp: %u, Right stamp: %u", left->header.stamp.sec, right->header.stamp.sec);
     }
 
 private:
     boost::shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> left_sub_;
     boost::shared_ptr<message_filters::Subscriber<sensor_msgs::Image>> right_sub_;
-
-    // TODO: synchronizer object
+    boost::shared_ptr<message_filters::Synchronizer<
+        message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image>>> sync_;
 };
 
 int main(int argc, char** argv) {
-    // TODO: initialize node
-    // TODO: create NodeHandle
-    // TODO: instantiate StereoSync
-    // TODO: spin
+    // TODO: initialize ROS node, create NodeHandle, instantiate StereoSync and spin
+    // end: this is the end of the todo
     return 0;
 }

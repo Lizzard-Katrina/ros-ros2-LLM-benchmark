@@ -1,0 +1,12 @@
+{
+  "task_id": "odom_tracker_009_ultra_strict",
+  "task_type": "cpp_ros2_migration",
+  "component": "smacc2_move_base_z_client",
+  "description": "High-complexity migration of a realtime-safe odometry tracker. Tests Node inheritance, RealtimePublisher API (NodeBaseInterface), and ROS 2 parameter lifecycle.",
+  "difficulty": "hard",
+  "tags": ["ROS2", "Realtime", "C++", "Migration", "Navigation"],
+  "oracle_config": {
+    "test_file": "test/test_oracle_ros2.py",
+    "framework": "pytest",
+  }
+}

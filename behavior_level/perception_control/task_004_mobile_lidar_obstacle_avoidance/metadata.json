@@ -13,22 +13,5 @@
     "tests": "tests/",
     "docker": "docker/"
   },
-  "todos": [
-    {
-      "file": "ros1_code/src/constructor_init.cpp",
-      "description": "Initialize obstacle avoidance parameters",
-      "expected_outcome": "Node parameters set; subscribers/publishers ready; node compiles"
-    },
-    {
-      "file": "ros1_code/src/obstacle_detection.cpp",
-      "description": "Process LiDAR scan to detect obstacles",
-      "expected_outcome": "obstacle_detected_ true if any scan < min_distance_"
-    },
-    {
-      "file": "ros1_code/src/velocity_publisher.cpp",
-      "description": "Generate velocity commands based on obstacle detection",
-      "expected_outcome": "Robot avoids obstacles or moves forward; commands published to /cmd_vel"
-    }
-  ],
   "readme_file": "README.md"
 }

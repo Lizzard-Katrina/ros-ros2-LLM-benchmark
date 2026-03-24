@@ -7,12 +7,8 @@
     "github": "https://github.com/ros-visualization/rqt_reconfigure"
   },
   "ros1_files": [
-    "version01_dynamic_reconfigure.py"
+    "param_api.py"
   ],
   "num_holes": 1,
   "difficulty": "easy",
-  "expected_ros2_changes": [
-    "Replace rospy.get_param and dynamic_reconfigure.Server usage with ROS2 parameters and parameter events",
-    "Ensure parameter updates are reflected in node logic in real-time"
-  ]
 }

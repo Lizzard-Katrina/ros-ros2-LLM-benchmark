@@ -3,7 +3,7 @@
     "task_name": "ROS1 to ROS2 Bridge Publisher/Listener",
     "description": "Convert ROS1 talker and ROS2 listener nodes for a cross-system communication task using ros1_bridge.",
     "category": "interface_level/publisher_subscriber",
-    "difficulty": "medium",
+    "difficulty": "easy",
     "ros1_version": "noetic",
     "ros2_version": "foxy",
     "language": "python",

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="7" time="0.126" timestamp="2026-02-26T06:46:25.195717" hostname="e923a09cdc46"><testcase classname="src.task_001_basic_param.tests.test_oracle_ros2" name="test_no_ros1_master_xmlrpc" time="0.001" /><testcase classname="src.task_001_basic_param.tests.test_oracle_ros2" name="test_has_cache_map_and_subscribed_set" time="0.006"><failure message="AssertionError: Must define a cache map keyed by std::string&#10;assert None&#10; +  where None = &lt;function search at 0x7fb84e419f30&gt;('\\b(std::)?(unordered_)?map\\s*&lt;\\s*std::string\\s*,', '/*\n * Copyright (C) 2009, Willow Garage, Inc.\n *\n * Redistribution and use in source and binary forms, with or wit....hpp&quot;\n#include &quot;rclcpp/parameter_events_filter.hpp&quot;\n#include &quot;rclcpp/parameter_events_filter.hpp&quot;\n#include &quot;rclcpp/')&#10; +    where &lt;function search at 0x7fb84e419f30&gt; = re.search">def test_has_cache_map_and_subscribed_set():
+        code = read_file(CLIENT_FILE)
+    
+        # Cache map: key-&gt;value
+&gt;       assert re.search(r"\b(std::)?(unordered_)?map\s*&lt;\s*std::string\s*,", code), \
+            "Must define a cache map keyed by std::string"
+E       AssertionError: Must define a cache map keyed by std::string
+E       assert None
+E        +  where None = &lt;function search at 0x7fb84e419f30&gt;('\\b(std::)?(unordered_)?map\\s*&lt;\\s*std::string\\s*,', '/*\n * Copyright (C) 2009, Willow Garage, Inc.\n *\n * Redistribution and use in source and binary forms, with or wit....hpp"\n#include "rclcpp/parameter_events_filter.hpp"\n#include "rclcpp/parameter_events_filter.hpp"\n#include "rclcpp/')
+E        +    where &lt;function search at 0x7fb84e419f30&gt; = re.search
+
+src/task_001_basic_param/tests/test_oracle_ros2.py:38: AssertionError</failure></testcase><testcase classname="src.task_001_basic_param.tests.test_oracle_ros2" name="test_parameter_event_subscription_is_real" time="0.003"><failure message="AssertionError: Must use ROS2 parameter event mechanism&#10;assert None&#10; +  where None = &lt;function search at 0x7fb84e419f30&gt;('rcl_interfaces::msg::ParameterEvent|ParameterEventHandler', '/*\n * Copyright (C) 2009, Willow Garage, Inc.\n *\n * Redistribution and use in source and binary forms, with or wit....hpp&quot;\n#include &quot;rclcpp/parameter_events_filter.hpp&quot;\n#include &quot;rclcpp/parameter_events_filter.hpp&quot;\n#include &quot;rclcpp/')&#10; +    where &lt;function search at 0x7fb84e419f30&gt; = re.search">def test_parameter_event_subscription_is_real():
+        code = read_file(CLIENT_FILE)
+    
+        # Must use ParameterEvent or ParameterEventHandler
+&gt;       assert re.search(r"rcl_interfaces::msg::ParameterEvent|ParameterEventHandler", code), \
+            "Must use ROS2 parameter event mechanism"
+E       AssertionError: Must use ROS2 parameter event mechanism
+E       assert None
+E        +  where None = &lt;function search at 0x7fb84e419f30&gt;('rcl_interfaces::msg::ParameterEvent|ParameterEventHandler', '/*\n * Copyright (C) 2009, Willow Garage, Inc.\n *\n * Redistribution and use in source and binary forms, with or wit....hpp"\n#include "rclcpp/parameter_events_filter.hpp"\n#include "rclcpp/parameter_events_filter.hpp"\n#include "rclcpp/')
+E        +    where &lt;function search at 0x7fb84e419f30&gt; = re.search
+
+src/task_001_basic_param/tests/test_oracle_ros2.py:54: AssertionError</failure></testcase><testcase classname="src.task_001_basic_param.tests.test_oracle_ros2" name="test_update_is_gated_by_subscribed_set_and_mutates_cache" time="0.004"><failure message="AssertionError: Function 'update' not found&#10;assert None">def test_update_is_gated_by_subscribed_set_and_mutates_cache():
+        code = read_file(CLIENT_FILE)
+&gt;       blk = extract_fn(code, "update")
+
+src/task_001_basic_param/tests/test_oracle_ros2.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = '/*\n * Copyright (C) 2009, Willow Garage, Inc.\n *\n * Redistribution and use in source and binary forms, with or wit....hpp"\n#include "rclcpp/parameter_events_filter.hpp"\n#include "rclcpp/parameter_events_filter.hpp"\n#include "rclcpp/'
+name = 'update'
+
+    def extract_fn(code: str, name: str) -&gt; str:
+        m = re.search(rf"(?s)\b{name}\s*\([^)]*\)\s*\{{", code)
+&gt;       assert m, f"Function '{name}' not found"
+E       AssertionError: Function 'update' not found
+E       assert None
+
+src/task_001_basic_param/tests/test_oracle_ros2.py:15: AssertionError</failure></testcase><testcase classname="src.task_001_basic_param.tests.test_oracle_ros2" name="test_invalidate_parent_walks_up_namespaces_and_erases_parents" time="0.005"><failure message="AssertionError: Function 'invalidateParentParams' not found&#10;assert None">def test_invalidate_parent_walks_up_namespaces_and_erases_parents():
+        code = read_file(CLIENT_FILE)
+&gt;       blk = extract_fn(code, "invalidateParentParams")
+
+src/task_001_basic_param/tests/test_oracle_ros2.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = '/*\n * Copyright (C) 2009, Willow Garage, Inc.\n *\n * Redistribution and use in source and binary forms, with or wit....hpp"\n#include "rclcpp/parameter_events_filter.hpp"\n#include "rclcpp/parameter_events_filter.hpp"\n#include "rclcpp/'
+name = 'invalidateParentParams'
+
+    def extract_fn(code: str, name: str) -&gt; str:
+        m = re.search(rf"(?s)\b{name}\s*\([^)]*\)\s*\{{", code)
+&gt;       assert m, f"Function '{name}' not found"
+E       AssertionError: Function 'invalidateParentParams' not found
+E       assert None
+
+src/task_001_basic_param/tests/test_oracle_ros2.py:15: AssertionError</failure></testcase><testcase classname="src.task_001_basic_param.tests.test_oracle_ros2" name="test_getImpl_has_cache_hit_shortcut_and_subscribe_on_miss" time="0.004"><failure message="AssertionError: Function 'getImpl' not found&#10;assert None">def test_getImpl_has_cache_hit_shortcut_and_subscribe_on_miss():
+        code = read_file(CLIENT_FILE)
+&gt;       blk = extract_fn(code, "getImpl")
+
+src/task_001_basic_param/tests/test_oracle_ros2.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = '/*\n * Copyright (C) 2009, Willow Garage, Inc.\n *\n * Redistribution and use in source and binary forms, with or wit....hpp"\n#include "rclcpp/parameter_events_filter.hpp"\n#include "rclcpp/parameter_events_filter.hpp"\n#include "rclcpp/'
+name = 'getImpl'
+
+    def extract_fn(code: str, name: str) -&gt; str:
+        m = re.search(rf"(?s)\b{name}\s*\([^)]*\)\s*\{{", code)
+&gt;       assert m, f"Function '{name}' not found"
+E       AssertionError: Function 'getImpl' not found
+E       assert None
+
+src/task_001_basic_param/tests/test_oracle_ros2.py:15: AssertionError</failure></testcase><testcase classname="src.task_001_basic_param.tests.test_oracle_ros2" name="test_event_callback_calls_update_or_equivalent" time="0.001"><failure message="AssertionError: Solution must route parameter events into cache update logic (call update(...))&#10;assert None&#10; +  where None = &lt;function search at 0x7fb84e419f30&gt;('update\\s*\\(', '/*\n * Copyright (C) 2009, Willow Garage, Inc.\n *\n * Redistribution and use in source and binary forms, with or wit....hpp&quot;\n#include &quot;rclcpp/parameter_events_filter.hpp&quot;\n#include &quot;rclcpp/parameter_events_filter.hpp&quot;\n#include &quot;rclcpp/')&#10; +    where &lt;function search at 0x7fb84e419f30&gt; = re.search">def test_event_callback_calls_update_or_equivalent():
+        code = read_file(CLIENT_FILE)
+    
+        # Enforce that parameter event callback leads to cache update function.
+        # Look for lambda/callback that references update(...
+&gt;       assert re.search(r"update\s*\(", code), \
+            "Solution must route parameter events into cache update logic (call update(...))"
+E       AssertionError: Solution must route parameter events into cache update logic (call update(...))
+E       assert None
+E        +  where None = &lt;function search at 0x7fb84e419f30&gt;('update\\s*\\(', '/*\n * Copyright (C) 2009, Willow Garage, Inc.\n *\n * Redistribution and use in source and binary forms, with or wit....hpp"\n#include "rclcpp/parameter_events_filter.hpp"\n#include "rclcpp/parameter_events_filter.hpp"\n#include "rclcpp/')
+E        +    where &lt;function search at 0x7fb84e419f30&gt; = re.search
+
+src/task_001_basic_param/tests/test_oracle_ros2.py:139: AssertionError</failure></testcase></testsuite></testsuites>

@@ -5,11 +5,10 @@
   "source": {
     "laser_filters": "https://github.com/ros-perception/laser_filters"
   },
-  "ros1_files": [
-    "version01_load_filter_params.py"
   ],
   "num_holes": 1,
   "difficulty": "easy",
+  "language":"C++",
   "expected_ros2_changes": [
     "Replace rospy.get_param usage with ROS2 declare_parameter",
     "Ensure dynamic reconfigure parameters are correctly migrated if applicable",

@@ -1,0 +1,16 @@
+{
+  "task_id": "006",
+  "name": "point_cloud_xyzrgb_radial_migration",
+  "language": "cpp",
+  "difficulty": "median",
+  "framework": "ROS 2 Humble",
+  "category": "sensor_process",
+  "description": "Migrate a radial depth-to-RGB pointcloud converter. Focuses on CameraInfo scaling, CV-bridge robustness, and PointCloud2 binary construction.",
+  "keywords": [
+    "ROS 2",
+    "Perception",
+    "PointCloud2",
+    "cv_bridge",
+    "Camera Calibration"
+  ]
+}

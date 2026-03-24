@@ -1,0 +1,47 @@
+{
+  "task_id": "task_006_gazebo_set_get_state",
+  "task_name": "Gazebo Set/Get State ROS1 to ROS2 Translation",
+  "category": "ros_migration",
+  "level": "interface",
+  "primary_interface": "service_client",
+  "secondary_interfaces": ["subscription"],
+
+  "difficulty": "easy-moderate",
+
+  "source_framework": "ROS1",
+  "target_framework": "ROS2",
+
+  "domain": "gazebo_simulation",
+
+  "skills_tested": [
+    "ros1_to_ros2_migration",
+    "ros2_service_client_usage",
+    "ros2_subscription_patterns",
+    "async_service_call_handling",
+    "gazebo_message_and_service_types"
+  ],
+
+  "key_concepts": [
+    "create_client",
+    "wait_for_service_retry",
+    "async_send_request",
+    "spin_until_future_complete",
+    "service_response_handling",
+    "model_states_subscription",
+    "link_states_subscription"
+  ],
+
+  "evaluation": {
+    "method": "static_analysis",
+    "requires_compilation": false,
+    "requires_runtime": false,
+    "oracle_type": "regex_semantic"
+  },
+
+  "expected_output_language": "C++",
+  "expected_output_framework": "ROS2",
+
+  "task_focus": "service_client_semantics",
+
+  "notes": "Focuses on correct ROS2 service client workflow and Gazebo interfaces rather than runtime simulation correctness."
+}

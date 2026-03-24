@@ -1,0 +1,36 @@
+{
+  "task_id": "task_010_controller_manager",
+  "task_name": "Controller Manager Service Client Migration",
+  "category": "ros_migration",
+  "difficulty": "medium",
+  "language": "python",
+  "source_framework": "ROS1",
+  "target_framework": "ROS2",
+  "interface_type": "service_client",
+  "domain": "robotics",
+  "focus": [
+    "semantic_preservation",
+    "service_client_migration",
+    "behavioral_equivalence"
+  ],
+  "functions_to_implement": [
+    "list_controllers",
+    "start_stop_controllers",
+    "reload_libraries"
+  ],
+  "evaluation": {
+    "type": "oracle_static_analysis",
+    "checks": [
+      "ros2_service_client_usage",
+      "response_based_return_values",
+      "restore_behavior_preserved"
+    ]
+  },
+  "allowed_tools": [
+    "rclpy",
+    "controller_manager_msgs"
+  ],
+  "forbidden_tools": [
+    "rospy"
+  ],
+}

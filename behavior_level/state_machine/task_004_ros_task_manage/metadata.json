@@ -1,0 +1,25 @@
+{
+  "task_id": "task_manager_004",
+  "task_type": "architectural_migration",
+  "component": "task_manager_lib",
+  "source_file": "task_manager_lib/TaskSmach.py",
+  "description": "High-difficulty migration of a system-level SMACH wrapper. Evaluates LLM ability to handle ROS 2 MultiThreadedExecutors, rclpy lifecycle safety, and complex state-to-service mapping.",
+  "difficulty": "very_hard",
+  "tags": [
+    "ros2_migration",
+    "concurrency_models",
+    "deadlock_prevention",
+    "lifecycle_safety",
+    "smach_ros2"
+  ],
+  "requirements": {
+    "ros_distro": "humble/jazzy",
+    "language": "python",
+    "style_restriction": "no_type_hints",
+    "concurrency_requirement": "non_blocking_executor"
+  },
+  "oracle_config": {
+    "test_file": "test/test_oracle_ros2.py",
+    "framework": "pytest",
+  }
+}

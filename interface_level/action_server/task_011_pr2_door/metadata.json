@@ -1,0 +1,30 @@
+
+---
+
+### metadata.json (simple version)
+
+```json
+{
+  "task_name": "task_011_ros1_to_ros2_action_clients",
+  "description": "Translate PR2 doors demo from ROS1 to ROS2 with action client semantics preserved. Oracle tests validate semantic equivalence.",
+  "difficulty": "medium",
+  "category": "ros_translation",
+  "timeout_seconds": 60,
+  "num_oracle_tests": 6,
+  "target_language": "python",
+  "llm_focus": ["ROS1->ROS2 translation", "ActionClient usage", "Goal message initialization", "Subscriber creation"],
+  "oracle_type": "regex_semantic_check",
+  "fill_in_blank_region": {
+    "start_marker": "# TODO: initialize Door and MoveBase ActionClients and wait for servers",
+    "end_marker": "# END_TODO",
+    "description": "Fill in the ROS2 ActionClient initialization and wait logic"
+  },
+  "expected_concepts": [
+    "Door ActionClient exists",
+    "MoveBase ActionClient exists",
+    "wait_for_server() called for both clients",
+    "Subscriber to /test_output exists",
+    "DoorGoal and MoveBaseGoal initialized",
+    "Goals sent using send_goal_and_wait()"
+  ]
+}

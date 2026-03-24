@@ -1,24 +1,63 @@
 {
-  "task_id": "parameter_server_001_basic_param",
-  "benchmark_layer": "interface_level",
-  "category": "parameter_server",
-  "description": "Tests the LLM's ability to translate ROS1 parameter server usage into correct ROS2 equivalents.",
-  "difficulty": "easy",
-  "source": "https://wiki.ros.org/rosparam",
-  "ros1_files": [
-    "version_01_read_param.cpp",
-    "version_02_log_param.cpp",
+  "task_id": "task_001_param_server",
+  "task_name": "Parameter Cache with Subscription Semantics",
+  "category": "ros_migration",
+  "difficulty": "median",
+  "language": "cpp",
+  "source_framework": "ROS1",
+  "target_framework": "ROS2",
+  "interface_type": "parameter_server",
+  "domain": "robotics",
+
+  "focus": [
+    "semantic_preservation",
+    "stateful_parameter_caching",
+    "event_driven_updates",
+    "hierarchical_invalidation"
   ],
-  "holes": [
-    {
-      "id": "TODO_1",
-      "file": "version_01_read_param.cpp",
-      "description": "Load parameters from ROS1 parameter server using getParam or param API."
-    },
-    {
-      "id": "TODO_2",
-      "file": "version_02_log_param.cpp",
-      "description": "Log parameter values using ROS_INFO."
-    },
-  ]
+
+  "source_artifact": {
+    "type": "library_component",
+    "origin": "roscpp/param.cpp",
+    "role": "parameter_client_cache"
+  },
+
+  "functions_to_implement": [
+    "getImpl",
+    "update",
+    "invalidateParentParams"
+  ],
+
+  "key_semantics": [
+    "cached parameter retrieval",
+    "subscription-backed updates",
+    "update gating by subscribed keys",
+    "parent namespace invalidation",
+    "event-driven consistency"
+  ],
+
+  "evaluation": {
+    "type": "oracle_static_analysis",
+    "checks": [
+      "ros2_parameter_usage",
+      "cache_and_subscription_state",
+      "parameter_event_subscription",
+      "update_gating_logic",
+      "parent_invalidation_logic",
+      "cached_vs_remote_get_paths"
+    ],
+    "notes": "Evaluation focuses on semantic signals and structural patterns rather than runtime behavior."
+  },
+
+  "forbidden_dependencies": [
+    "ros::master",
+    "XMLRPCManager"
+  ],
+
+  "allowed_dependencies": [
+    "rclcpp",
+    "rcl_interfaces"
+  ],
+
+  "description": "Reconstruct ROS1-style subscription-backed parameter caching semantics in ROS2 using parameter services and parameter events."
 }

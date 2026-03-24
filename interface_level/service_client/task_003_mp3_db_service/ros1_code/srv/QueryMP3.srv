@@ -1,4 +1,0 @@
-string query_type
-string query_value
----
-string[] results

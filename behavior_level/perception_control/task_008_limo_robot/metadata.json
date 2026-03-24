@@ -1,0 +1,26 @@
+{
+  "task_id": "task_008",
+  "task_name": "limo_multimodal_kinematics_control",
+  "language":"C++", 
+ "difficulty": "difficult",
+  "category": "perception_control",
+  "framework": "ros2_humble_cpp",
+  "description": "Implement multimodal robot kinematics (Ackermann/Mecanum) and spatial odometry integration for the LIMO driver.",
+  "oracle_tests": [
+    {
+      "test_name": "test_ackermann_inverse_kinematics",
+    },
+    {
+      "test_name": "test_odom_integration_frames",
+    },
+    {
+      "test_name": "test_mecanum_lateral_awareness",
+    },
+    {
+      "test_name": "test_time_differential_consistency",
+    },
+    {
+      "test_name": "test_protocol_bit_shifting",
+    }
+  ]
+}

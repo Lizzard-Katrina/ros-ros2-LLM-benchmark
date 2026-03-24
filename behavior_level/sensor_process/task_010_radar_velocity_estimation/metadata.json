@@ -1,0 +1,10 @@
+{
+    "task_id": "task_007_hector_slam_mapping",
+    "level": "behavior_level",
+    "category": "sensor_process",
+    "difficulty":"medium",
+    "language":"C++",
+    "description": "Subscribe to /scan and run Hector SLAM to produce /map and /pose.",
+    "source": "https://github.com/christopherdoer/reve/blob/master/radar_ego_velocity_estimator/src/radar_ego_velocity_estimator_ros.cpp",
+    "expected_ros2_behavior": "A ROS2 node should subscribe to /scan, launch Hector SLAM (ported version), and publish /map and /pose topics."
+}

@@ -3,15 +3,12 @@ import rospy
 from std_msgs.msg import String
 
 def main():
-    rospy.init_node('latched_publisher_node')
+    rospy.init_node('latched_pub_sub_node')
 
-    # TODO: fill in latch parameter
-    pub = rospy.Publisher('latched_topic', String, queue_size=10, latch=_____)
-
-    msg = String()
-    msg.data = "Hello, I am latched!"
-    pub.publish(msg)
-    rospy.loginfo("Message published. Publisher will now exit.")
+    # TODO: Create a Publisher on 'latched_topic', define a Subscriber with a callback,
+    #       and implement the publish loop with rospy.is_shutdown().
+    #       The callback should log received messages.
+    # end: TODO block ends here
 
 if __name__ == "__main__":
     main()

@@ -7,12 +7,6 @@
     "ros1_topics": [
         "/sonar/raw"
     ],
-    "ros2_equivalence": "Not included. Expected ROS2 outcome is a filtering node publishing /distance_filtered.",
-    "language": "Python",
-    "difficulty": "easy",
-    "directories": {
-        "ros1_code": "Contains ROS1 Python code with a single TODO per file for LLM completion.",
-        "tests": "Empty directory for later validation.",
-        "dockerfile": "Dockerfile placed in task root."
-    }
+    "language": "C++",
+    "difficulty": "median",
 }

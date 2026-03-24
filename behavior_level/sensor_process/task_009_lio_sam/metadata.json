@@ -1,14 +1,24 @@
 {
-  "task_id": "task_009",
-  "name": "LiDAR + IMU to Pose Estimation (LIO-SAM)",
-  "description": "ROS1 C++ skeleton for LIO-SAM pose estimation. LLM to convert to ROS2.",
-  "ros_versions": ["ROS1 Noetic", "ROS2 Humble"],
-  "language": "C++",
-  "difficulty": "very high",
-  "directories": {
-    "ros1_code": "ros1_code",
-    "tests": "tests",
-    "docker": "docker"
-  }
+  "task_id": "009",
+  "name": "lio_sam_map_optimization_migration",
+  "language": "cpp",
+  "difficulty": "Expert",
+  "framework": "ROS 2 Humble",
+  "category": "slam_localization",
+  "description": "Migrate the LIO-SAM backend optimizer. Focuses on TF2 synchronization logic, multi-threaded callback groups, and asynchronous service implementation.",
+  "keywords": [
+    "LIO-SAM",
+    "SLAM",
+    "TF2",
+    "CallbackGroups",
+    "Concurrency",
+    "PCL"
+  ],
+  "requirements": [
+    "rclcpp",
+    "tf2_ros",
+    "sensor_msgs",
+    "pcl_conversions",
+    "lio_sam_interfaces"
+  ]
 }
-x

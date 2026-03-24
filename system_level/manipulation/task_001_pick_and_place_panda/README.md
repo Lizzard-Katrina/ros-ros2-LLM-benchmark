@@ -57,3 +57,16 @@ Each TODO can be validated independently by checking:
 - Launch Panda in simulation
 - Run task
 - Observe pick → place → return behavior
+---
+
+## Tests
+
+### for the execute file
+A solution is considered correct if it:
+- Invokes MoveIt Task Constructor planning
+- Executes without runtime crash
+- Emits observable planning success signals
+
+tests:
+- test_static.sh: static API usage verification
+- test_plan_runtime.sh: runtime planning verification

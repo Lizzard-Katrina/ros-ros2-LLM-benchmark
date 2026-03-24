@@ -1,0 +1,24 @@
+{
+  "task_id": "smach_ros_001",
+  "task_type": "behavior_level_migration",
+  "component": "smach_ros",
+  "source_file": "smach_ros/src/smach_ros/service_state.py",
+  "description": "Migrate SMACH ServiceState from ROS1 (rospy) to ROS2 (rclpy) including async execution logic.",
+  "difficulty": "easy",
+  "tags": [
+    "ros2_migration",
+    "state_machine",
+    "service_client",
+    "async_spinning"
+  ],
+  "requirements": {
+    "ros_distro": "humble",
+    "language": "python",
+    "min_rclpy_version": "3.3.4"
+  },
+  "oracle_config": {
+    "test_file": "test/test_oracle_ros2.py",
+    "framework": "pytest",
+    "expected_pass_count": 8
+  }
+}

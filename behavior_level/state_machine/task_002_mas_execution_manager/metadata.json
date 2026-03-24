@@ -1,0 +1,25 @@
+{
+  "task_id": "mas_execution_002",
+  "task_type": "architectural_base_class_migration",
+  "component": "mas_execution_manager",
+  "source_file": "src/mas_execution_manager/scenario_state_base.py",
+  "description": "Migrate a scenario manager base class to ROS 2. Focuses on strict dependency injection, parameter declaration, and preserving complex data flow to external interfaces.",
+  "difficulty": "medium",
+  "tags": [
+    "ros2_migration",
+    "dependency_injection",
+    "qos_transient_local",
+    "parameter_server",
+    "smach_ros2"
+  ],
+  "requirements": {
+    "ros_distro": "humble",
+    "language": "python",
+    "style_restriction": "no_type_hints"
+  },
+  "oracle_config": {
+    "test_file": "test/test_oracle_scenario_base.py",
+    "framework": "pytest",
+    "expected_pass_count": 7
+  }
+}

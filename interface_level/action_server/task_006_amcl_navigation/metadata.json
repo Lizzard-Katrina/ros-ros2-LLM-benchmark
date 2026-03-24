@@ -1,0 +1,26 @@
+{
+  "task_id": "task_006",
+  "domain": "ROS2 Action Servers",
+  "type": "Code Translation / Fill-in-the-Blank",
+  "difficulty": "Medium",
+  "concepts": [
+    "ROS2 action server creation",
+    "handle_goal callback",
+    "handle_cancel callback",
+    "handle_accepted callback",
+    "asynchronous execution",
+    "feedback/result handling",
+    "TODO placeholders"
+  ],
+  "oracle_tests": [
+    "test_action_server_creation",
+    "test_handle_goal_defined",
+    "test_handle_cancel_defined",
+    "test_handle_accepted_defined",
+    "test_todo_comment_present",
+    "test_thread_usage_for_async",
+    "test_feedback_or_result_mentioned"
+  ],
+  "execution_requirement": "Static code analysis (regex + string search), no compilation or runtime needed",
+  "expected_student_outcome": "Semantically correct ROS2 action server implementation corresponding to original ROS1 code"
+}

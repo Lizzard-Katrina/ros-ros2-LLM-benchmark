@@ -1,3 +1,0 @@
-<launch>
-    <node pkg="your_pkg" type="filter_node.py" name="sonar_filter" output="screen"/>
-</launch>

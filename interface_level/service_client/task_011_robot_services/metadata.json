@@ -1,0 +1,50 @@
+{
+  "task_id": "task_011_robot_services",
+  "task_name": "Camera Reconfigure Client Migration",
+  "category": "ros_migration",
+  "difficulty": "easy",
+  "language": "python",
+  "source_framework": "ROS1",
+  "target_framework": "ROS2",
+  "interface_type": "parameter_client",
+  "domain": "robotics",
+  "focus": [
+    "semantic_preservation",
+    "configuration_migration",
+    "ros1_to_ros2_interface_translation"
+  ],
+  "source_artifact": {
+    "type": "script",
+    "entrypoint_role": "client_utility",
+    "primary_target_namespace": "head_camera/driver"
+  },
+  "functions_to_implement": [
+    "CameraReconfigure.__init__",
+    "CameraReconfigure.disable_auto",
+    "CameraReconfigure.enable_auto"
+  ],
+  "key_semantics": [
+    "disable_auto sets auto_exposure=false and auto_white_balance=false on target camera driver",
+    "enable_auto sets auto_exposure=true and auto_white_balance=true on target camera driver",
+    "uses ROS2 parameter mechanism rather than ROS1 dynamic_reconfigure"
+  ],
+  "evaluation": {
+    "type": "oracle_static_analysis",
+    "checks": [
+      "ros2_only_no_ros1_dependencies",
+      "target_namespace_preserved",
+      "parameter_mechanism_present",
+      "init_creates_configuration_interface",
+      "enable_disable_parameter_values_correct"
+    ],
+    "notes": "Oracle focuses on semantic signals and interface-level migration constraints rather than exact formatting."
+  },
+  "forbidden_dependencies": [
+    "rospy",
+    "dynamic_reconfigure"
+  ],
+  "allowed_dependencies": [
+    "rclpy"
+  ],
+  "description": "Migrate a ROS1 dynamic_reconfigure-based camera configuration client to ROS2 using parameter-based configuration while preserving target namespace and enable/disable semantics."
+}

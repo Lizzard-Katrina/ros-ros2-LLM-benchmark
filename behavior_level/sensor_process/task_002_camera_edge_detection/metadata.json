@@ -5,9 +5,4 @@
   "ros_version": "ROS1 Noetic",
   "language": "Python",
   "difficulty": "Easy",
-  "has_multiple_fill_in_files": true,
-  "files_with_blanks": [
-    "edge_detection_node_part1.py",
-    "edge_detection_node_part2.py"
-  ]
 }

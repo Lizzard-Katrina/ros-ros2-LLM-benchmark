@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>motion_planning</name>
+  <version>0.0.1</version>
+  <description>System-level oracle tests for IK translation benchmark</description>
+
+  <maintainer email="you@example.com">benchmark</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Runtime -->
+  <depend>rclcpp</depend>
+  <depend>geometry_msgs</depend>
+
+  <!-- Test -->
+  <test_depend>ament_cmake_gtest</test_depend>
+
+</package>

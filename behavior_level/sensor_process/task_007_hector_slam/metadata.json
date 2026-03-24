@@ -1,0 +1,17 @@
+{
+  "task_id": "010",
+  "name": "hector_mapping_scan_callback_migration",
+  "language": "cpp",
+  "difficulty": "median",
+  "framework": "ROS 2 Humble",
+  "category": "slam_localization",
+  "description": "Migrate the core Hector SLAM callback. Requires advanced TF2 chain math, ROS 2 QoS durability configuration, and standard time conversion handling.",
+  "keywords": [
+    "ROS 2",
+    "SLAM",
+    "TF2",
+    "QoS",
+    "Hector Mapping",
+    "Coordinate Transforms"
+  ]
+}

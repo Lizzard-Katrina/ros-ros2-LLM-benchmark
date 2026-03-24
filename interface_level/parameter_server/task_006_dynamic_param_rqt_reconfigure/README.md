@@ -1,45 +1,29 @@
-# 006 Dynamic Parameter Change via rqt_reconfigure
+# Task 006: Dynamic Parameter Async-Sync Bridge
 
-## Task Overview
-This benchmark task evaluates the ability of a model to migrate ROS1-style
-dynamic parameter reconfigure nodes to ROS2 parameters. The key migration
-challenge is replacing `dynamic_reconfigure.Server` callbacks with ROS2
-parameter events so that node logic updates in real-time.
+## 🎯 Brief Description
+This task involves implementing the core communication bridge in `rqt_reconfigure` for ROS 2. Unlike ROS 1, ROS 2 parameter operations are asynchronous services. To maintain a responsive GUI while providing a predictable programming interface, the model must implement a "synchronous-wrapper" around asynchronous service calls using Python threading primitives.
+---
+source code file:
+```https://github.com/ros-visualization/rqt_reconfigure/blob/rolling/src/rqt_reconfigure/param_api.py```
+## 🕳️ The "Hole" Strategy: Why this was removed?
+The method `_call_service` in `param_api.py` was selected for excavation because it represents a critical **concurrency pattern** in ROS 2:
+1.  **Deadlock Prevention**: It tests whether the model understands that `client.call()` (synchronous) should be avoided in GUI executors to prevent deadlocks.
+2.  **Thread Synchronization**: It forces the model to use a `threading.Event` to bridge the gap between a `rclpy` `Future` and a blocking return.
+3.  **Error Propagation**: It requires the model to map asynchronous failures (timeouts, null results) into a specific exception class (`AsyncServiceCallFailed`) with mandatory semantic hints.
 
-## Directory Structure
-006_dynamic_param_rqt_reconfigure/
-├── metadata.json
-├── README.md
-├── docker/
-│   ├── Dockerfile
-│   └── run.sh
-└── ros1_code/
-    └── version01_dynamic_reconfigure.py
+## ✅ Oracle Test Design & Expected Outcomes
 
-## Holes and Purpose
-### version01_dynamic_reconfigure.py
-- **Hole:** Setup dynamic parameter reconfigure callbacks
-- **Reason:** This is the key migration point to ROS2 parameter events
-- **Expected outcome:** Model should replace dynamic_reconfigure usage with ROS2 parameter callbacks and update node logic in real-time
+The Oracle tests use pattern matching to verify the architectural integrity and instruction following of the generated code.
 
-## Docker Instructions
-1. Build and run Docker image:
-```bash
-cd docker
-chmod +x run.sh
-./run.sh
-```
+| Test Case | Design Rationale | Expected Outcome |
+| :--- | :--- | :--- |
+| `test_deadlock_avoidance` | Ensures the model uses the non-blocking `call_async()` and avoids the dangerous `.call()`. | Code must contain `call_async` and MUST NOT contain `.call(`. |
+| `test_sync_primitive_choice` | Validates the choice of `threading.Event` as the bridge, which is the standard pattern for this tool. | Presence of `Event()` and `.wait()`. |
+| `test_service_readiness` | Checks for ROS 2 service discovery logic to prevent calling non-existent services. | Presence of `wait_for_service` and/or `service_is_ready`. |
+| `test_future_callback_logic` | Verifies the model knows how to unblock the waiting thread via a callback. | Presence of `add_done_callback` and `.set()` inside the logic. |
+| `test_instruction_hints` | Validates strict adherence to the provided strings in the TODO for UI error reporting. | Exact matches for `"timed out waiting for service"` and `"the target node may not be spinning"`. |
+| `test_no_ros1_legacy` | Scans for "lazy" migration artifacts like `rospy` or ROS 1 specific threading styles. | **Total absence** of `rospy`, `dynamic_reconfigure`, or `ServiceProxy`. |
+| `test_future_result_access` | Ensures the final service response is actually retrieved from the future object. | Presence of `future.result()`. |
 
-2. Launches a ROS1 environment with code ready for testing.
-
-## source
-
-https://wiki.ros.org/rqt_reconfigure
-
-https://github.com/ros-visualization/rqt_reconfigure
-
-## notes
-
-Only ROS1 code is provided.
-
-The file contains one TODO for model to complete.
+## 🛠️ Usage for Benchmarking
+To pass this task, the model must not only generate functional code but also adhere to the **specific technical constraints** that prevent UI freezes. A model that implements a simple `while not future.done(): pass` loop will fail the "Style" checks, as busy-waiting is an anti-pattern in high-quality ROS 2 development.

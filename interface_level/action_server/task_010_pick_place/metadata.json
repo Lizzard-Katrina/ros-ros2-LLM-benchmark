@@ -1,0 +1,65 @@
+{
+  "task_id": "task_010",
+  "name": "ROS1 Pick-Place Pipeline Translation to ROS2",
+  "description": "Translate a ROS1 pick-and-place pipeline using MoveIt into ROS2 code while preserving key semantics such as node initialization, MoveGroupInterface, gripper operations, pick/place pipeline, and collision objects.",
+  "difficulty": "medium",
+  "skills": [
+    "ROS1",
+    "ROS2",
+    "MoveIt",
+    "robot motion planning",
+    "gripper control",
+    "code translation",
+    "semantic preservation"
+  ],
+  "language": "C++",
+  "framework": ["ROS1", "ROS2", "MoveIt"],
+  "dependencies": [
+    "roscpp",
+    "moveit_core",
+    "moveit_ros_planning_interface",
+    "trajectory_msgs",
+    "geometry_msgs",
+    "tf2_geometry_msgs"
+  ],
+  "oracle_testcases": [
+    {
+      "id": "test_ros2_node_and_spinner",
+      "description": "Check that a ROS2 node is initialized and spinning asynchronously",
+      "type": "semantic",
+      "expected_outcome": "rclcpp::init() and AsyncSpinner present"
+    },
+    {
+      "id": "test_move_group_interface_created",
+      "description": "Verify MoveGroupInterface is created for panda_arm",
+      "type": "semantic",
+      "expected_outcome": "MoveGroupInterface object instantiated with 'panda_arm'"
+    },
+    {
+      "id": "test_pre_grasp_open_gripper",
+      "description": "Ensure openGripper is called for pre_grasp_posture",
+      "type": "semantic",
+      "expected_outcome": "openGripper(pre_grasp_posture) present"
+    },
+    {
+      "id": "test_grasp_closed_gripper",
+      "description": "Ensure closedGripper is called for grasp_posture",
+      "type": "semantic",
+      "expected_outcome": "closedGripper(grasp_posture) present"
+    },
+    {
+      "id": "test_post_place_open_gripper",
+      "description": "Ensure openGripper is called after place() for post_place_posture",
+      "type": "semantic",
+      "expected_outcome": "openGripper(post_place_posture) present"
+    },
+    {
+      "id": "test_pick_place_pipeline",
+      "description": "Check that pick and place pipeline is called with collision objects",
+      "type": "semantic",
+      "expected_outcome": "addCollisionObjects(), pick(), place() calls present"
+    }
+  ],
+  "timeout": 5,
+  "notes": "This metadata file defines the key semantics and expected outcomes for benchmarking LLM ROS1->ROS2 translation for pick-place tasks."
+}

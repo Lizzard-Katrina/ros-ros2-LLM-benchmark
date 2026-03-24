@@ -1,0 +1,25 @@
+{
+  "task_id": "nrp_sim_003",
+  "task_type": "synchronous_loop_migration",
+  "component": "exd_backend",
+  "source_file": "tutorials/state_machines/sim_monitor_state.py",
+  "description": "Migrate a simulation monitor state. Tests the LLM's ability to handle ROS 2 Duration math (nanoseconds to seconds), executor spinning within a while loop, and strict constructor ordering.",
+  "difficulty": "easy",
+  "tags": [
+    "ros2_migration",
+    "simulation_time",
+    "nanosecond_conversion",
+    "executor_spinning",
+    "async_service_call"
+  ],
+  "requirements": {
+    "ros_distro": "humble",
+    "language": "python",
+    "style_restriction": "no_type_hints"
+  },
+  "oracle_config": {
+    "test_file": "test/test_oracle_nrp_sim.py",
+    "framework": "pytest",
+    "expected_pass_count": 7
+  }
+}

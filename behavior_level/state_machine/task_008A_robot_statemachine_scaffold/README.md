@@ -1,45 +1,25 @@
-# Task 008A — Robot Statemachine (RSM) scaffold
+# Task 008A: Robot Control Mux Ultra-Strict Migration (C++)
 
-## Purpose
-Advanced scaffold to test LLM translation & reconstruction for state-machines (from MarcoStb1993/robot_statemachine). Variants remove core logic; LLM must restore it preserving interface and runtime semantics.
+## 1. Brief Description
+This task involves migrating the `RobotControlMux` node from ROS 1 to ROS 2. This node is a critical "traffic controller" that switches a robot's velocity commands between autonomous navigation and manual teleoperation. 
+---
+source code file:
+```https://github.com/MarcoStb1993/robot_statemachine/blob/master/rsm_core/src/RobotControlMux.cpp#L78```
 
-## Included files
-- `ros1_code/src/original/` — ORIGINAL modules (state, transitions, state_machine, robot_node) used as ground truth.
-- `rsm_core/*` — variant files (state.py, transitions.py, state_machine.py) with TODO blocks to fill.
-- `rsm_nodes/robot_node.py` — variant node containing TODO to instantiate states/transitions.
+## 2. Hollowing Strategy
+- **Hole A (Node Infrastructure)**: Removes the constructor. The model must implement the ROS 2 Node pattern, including **mandatory parameter declaration**, QoS object instantiation, and subscription/publisher setup.
+- **Hole B (Service Logic)**: Removes the `setOperationMode` service callback. This tests the specific ROS 2 `std::shared_ptr` service signature and pointer-based member access.
 
-## Expected outcome (per-variant)
-When a variant's TODO is correctly filled (and the module is run with the provided demo parameters), the runtime must:
+## 3. Oracle Test Design (Ultra-Strict)
+The test suite is designed to catch "lazy" migrations where a model might hardcode values instead of migrating the configuration interface.
 
-1. **State lifecycle**  
-   - On starting the state machine, the active state's `on_enter` is called and logs a message containing the state name and start time.  
-   - When transitioning away, `on_exit` is called and it logs the duration the state was active.
+| Test Case | Requirement | Failure Trigger |
+| :--- | :--- | :--- |
+| `test_parameter_lifecycle` | Declare at least 3 parameters. | Fails if topic names or timeouts are hardcoded as strings. |
+| `test_ros2_qos_instantiation` | Explicit `rclcpp::QoS` object. | Fails if only a '10' (integer) is passed to publishers. |
+| `test_ros2_service_signature` | Exact `request->` / `response->` naming. | Fails if the model ignores the [STYLE] guide or uses `req/res`. |
+| `test_no_ros1_remnants` | Zero ROS 1 symbols. | Fails if `NodeHandle` or `ros::Timer` appears in code/comments. |
+| `test_timer_chrono_strict` | `create_wall_timer` + `std::chrono`. | Fails if legacy timing or integer durations are used. |
 
-2. **Transition evaluation**  
-   - `Transition.evaluate(state_machine)` returns `True` only if `condition` is `None` (treated as unconditional) or `condition(state_machine)` returns truthy.  
-   - Conditions must be executed in a safe manner (try/except) and must not modify unrelated state_machine fields.
-
-3. **Run & transition semantics**  
-   - `StateMachine.run()` must:
-     - call `current_state.execute()` each loop iteration,
-     - read the outcome string and look up transitions for the current state name,
-     - evaluate transitions in insertion order,
-     - on first matching transition, call `current_state.on_exit()`, switch the active state to the transition target, call `new_state.on_enter()` and continue.
-
-4. **RobotNode construction**  
-   - `RobotNode` must instantiate state objects exactly matching the original demo (state classes and outcomes), add transitions appropriately, set the start state, and call `sm.run()`.
-
-## Validation checklist (how you will check LLM output)
-- Run ORIGINAL module and capture logs for a deterministic demo (set userdata so transitions are deterministic).
-- Run LLM-filled variant module with same userdata and compare:
-  - Sequence of "[StateMachine] Transition" log lines (same source & target order).
-  - Active state name after each event or after N iterations (should match original).
-  - Presence of `on_enter`/`on_exit` logs and approximate durations (>0).
-- For `Transition.evaluate`, add a test condition where the condition reads `sm.userdata.counter` and only fires if `counter >= 1`. The variant implementation should match that behavior.
-
-## How to run (quick)
-1. Put `ros1_code/src` into a reachable PYTHONPATH or catkin package.  
-2. Start ROS: `roscore &`.  
-3. Run original demo: `python3 ros1_code/src/original/robot_node__ORIGINAL.py`. Capture logs.  
-4. Replace original with variant file (fill TODO), run variant, compare logs.
-
+## 4. Key Challenge
+The model must not only fix the syntax but also preserve the **programmability** of the node by declaring parameters for all configurable topics, ensuring the ROS 2 version remains as flexible as the ROS 1 original.

@@ -1,0 +1,26 @@
+{
+  "task_id": "ros1_ros2_clear_costmap_service_client",
+  "task_type": "code_translation",
+  "domain": "robotics",
+  "subdomain": "ROS_migration",
+  "source_framework": "ROS1",
+  "target_framework": "ROS2",
+  "language": "C++",
+  "difficulty": "medium",
+  "translation_level": "behavioral",
+  "hollowed_function": "testClearBehavior",
+  "core_concepts": [
+    "ROS2 service client",
+    "parameter vs request mapping",
+    "behavioral equivalence",
+    "conditional logic preservation",
+    "costmap layer selection"
+  ],
+  "evaluation": {
+    "method": "static_regex_oracle",
+    "num_tests": 6,
+    "requires_compilation": false,
+    "requires_runtime": false
+  },
+  ]
+}

@@ -1,0 +1,15 @@
+FROM osrf/ros:humble-desktop
+RUN apt-get update && apt-get install -y \
+    python3-pip \
+    python3-colcon-common-extensions \
+    git \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --no-cache-dir pytest numpy pyquaternion
+
+WORKDIR /ros2_ws
+SHELL ["/bin/bash", "-c"]
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+
+CMD ["/bin/bash"]

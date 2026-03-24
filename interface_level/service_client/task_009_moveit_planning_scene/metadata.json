@@ -1,0 +1,32 @@
+{
+  "task_id": "task_009_moveit_planning_scene",
+  "task_type": "code_translation",
+  "domain": "robotics",
+  "subdomain": "motion_planning",
+  "source_framework": "ROS1",
+  "target_framework": "ROS2",
+  "library": "MoveIt",
+  "language": "C++",
+  "difficulty": "basic",
+  "translation_level": "behavioral",
+  "hollowed_function": "step_attach_object_and_remove_from_world__TODO",
+  "core_concepts": [
+    "MoveIt PlanningScene diff",
+    "CollisionObject lifecycle",
+    "attached vs world objects",
+    "semantic translation",
+    "ROS2 planning scene publishing"
+  ],
+  "evaluation": {
+    "method": "static_regex_oracle",
+    "failure_categories": 4,
+    "requires_compilation": false,
+    "requires_runtime": false
+  },
+  "skills_tested": [
+    "context-aware translation",
+    "API migration",
+    "semantic preservation",
+    "robotics domain knowledge"
+  ]
+}

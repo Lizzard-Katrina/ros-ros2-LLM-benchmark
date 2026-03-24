@@ -1,0 +1,16 @@
+{
+  "task_id": "011",
+  "name": "yolo_darknet_bridge_migration",
+  "language": "cpp",
+  "difficulty": "median",
+  "framework": "ROS 2 Humble",
+  "category": "computer_vision",
+  "description": "Migrate a multi-threaded YOLO inference bridge. Focuses on CV-Bridge, timestamp synchronization, and C++11 mutex migration from Boost.",
+  "keywords": [
+    "Computer Vision",
+    "YOLO",
+    "Multithreading",
+    "cv_bridge",
+    "Time Sync"
+  ]
+}

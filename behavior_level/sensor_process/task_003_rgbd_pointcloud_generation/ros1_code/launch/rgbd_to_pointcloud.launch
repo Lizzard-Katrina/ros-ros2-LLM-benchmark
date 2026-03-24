@@ -1,3 +1,0 @@
-<launch>
-    <node pkg="your_pkg" type="rgbd_processor.py" name="rgbd_processor" output="screen"/>
-</launch>

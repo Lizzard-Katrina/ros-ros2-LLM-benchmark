@@ -1,3 +1,0 @@
-<launch>
-  <node pkg="stretch_pipeline" type="stretch_main" name="stretch_pipeline" output="screen"/>
-</launch>

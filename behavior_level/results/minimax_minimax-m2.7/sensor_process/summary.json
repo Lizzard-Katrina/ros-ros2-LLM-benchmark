@@ -1,0 +1,187 @@
+[
+    {
+        "task_id": "sensor_process/task_001_laser_obstacle_detection",
+        "status": "FAILED",
+        "score": "3/4",
+        "pass_rate": "75.00%",
+        "tokens": 2604,
+        "failed_cases": [
+            {
+                "test_function": "test_member_variable_consistency",
+                "error_message": "AssertionError: Failure: Use the correct class member 'output_pub_' for publishing.\nassert ('output_pub_' in '#include \"scan_to_scan_filter_chain.hpp\"\\n\\n\\nScanToScanFilterChain::ScanToScanFilterChain(\\n  const rclcpp::NodeOpti...\\n#include \"rclcpp_components/register_node_macro.hpp\"\\n\\n\\n\\n\\nRCLCPP_COMPONENTS_REGISTER_NODE(ScanToScanFilterChain)' or 'output_pub_->publish' in '#include \"scan_to_scan_filter_chain.hpp\"\\n\\n\\nScanToScanFilterChain::ScanToScanFilterChain(\\n  const rclcpp::NodeOpti...\\n#include \"rclcpp_components/register_node_macro.hpp\"\\n\\n\\n\\n\\nRCLCPP_COMPONENTS_REGISTER_NODE(ScanToScanFilterChain)')"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_002_camera_edge_detection",
+        "status": "SUCCESS",
+        "score": "6/6",
+        "pass_rate": "100.00%",
+        "tokens": 1477,
+        "failed_cases": []
+    },
+    {
+        "task_id": "sensor_process/task_003_rgbd_pointcloud_generation",
+        "status": "FAILED",
+        "score": "3/6",
+        "pass_rate": "50.00%",
+        "tokens": 7982,
+        "failed_cases": [
+            {
+                "test_function": "test_intrinsic_scaling_math",
+                "error_message": "AssertionError: Failure: Scaling Defect. You resized the image but didn't scale the focal length (fx/fy). The 3D world will be distorted.\nassert None\n +  where None = <function search at 0x7f6a8af55f30>('(?:\\\\.k|k|p|P|fx|fy|K)\\\\[?[0-9]?\\\\]?\\\\s*\\\\*=\\\\s*ratio', 'void PointCloudXyzrgbNode::imageCb(\\n  const Image::ConstSharedPtr & depth_msg,\\n  const Image::ConstSharedPtr & rgb_...loud_msg->header.stamp = rclcpp::Time(depth_msg->header.stamp);\\n  pub_point_cloud_->publish(std::move(cloud_msg));\\n}')\n +    where <function search at 0x7f6a8af55f30> = re.search"
+            },
+            {
+                "test_function": "test_header_and_frame_sync",
+                "error_message": "AssertionError: Failure: Sync Error. The PointCloud must inherit the header from the depth_msg for TF accuracy.\nassert None\n +  where None = <function search at 0x7f6a8af55f30>('cloud_msg->header\\\\s*=\\\\s*depth_msg->header', 'void PointCloudXyzrgbNode::imageCb(\\n  const Image::ConstSharedPtr & depth_msg,\\n  const Image::ConstSharedPtr & rgb_...loud_msg->header.stamp = rclcpp::Time(depth_msg->header.stamp);\\n  pub_point_cloud_->publish(std::move(cloud_msg));\\n}')\n +    where <function search at 0x7f6a8af55f30> = re.search"
+            },
+            {
+                "test_function": "test_dispatch_logic_16uc1_32fc1",
+                "error_message": "AssertionError: Failure: Incomplete support. You must handle both 16-bit and 32-bit depth encodings.\nassert ('TYPE_16UC1' in 'void PointCloudXyzrgbNode::imageCb(\\n  const Image::ConstSharedPtr & depth_msg,\\n  const Image::ConstSharedPtr & rgb_...loud_msg->header.stamp = rclcpp::Time(depth_msg->header.stamp);\\n  pub_point_cloud_->publish(std::move(cloud_msg));\\n}')"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_004_imu_odometry_estimation",
+        "status": "FAILED",
+        "score": "3/6",
+        "pass_rate": "50.00%",
+        "tokens": 6517,
+        "failed_cases": [
+            {
+                "test_function": "test_3d_rotation_coupling",
+                "error_message": "AssertionError: Failure: Under-determined Physics. X-axis projection must account for both Yaw and Pitch.\nassert None\n +  where None = <function search at 0x7fb848ca9f30>('cy\\\\s*\\\\*\\\\s*cp\\\\s*\\\\*\\\\s*delta_sec', 'void Ukf::projectSigmaPoint(Eigen::VectorXd & sigma_point, const rclcpp::Duration & delta)\\n{\\n  double cr = cos(sigm...) * dt;\\n  sigma_point(StateMemberPitch) += euler_dot(1) * dt;\\n  sigma_point(StateMemberYaw) += euler_dot(2) * dt;\\n}')\n +    where <function search at 0x7fb848ca9f30> = re.search"
+            },
+            {
+                "test_function": "test_acceleration_3d_projection",
+                "error_message": "AssertionError: Failure: Kinematic Error. Acceleration must be rotated into the global frame using the same RZYX logic.\nassert None\n +  where None = <function search at 0x7fb848ca9f30>('0\\\\.5\\\\s*\\\\*.*?(?:cy|cp|sy|sp).*?delta_sec\\\\s*\\\\*\\\\s*delta_sec', 'void Ukf::projectSigmaPoint(Eigen::VectorXd & sigma_point, const rclcpp::Duration & delta)\\n{\\n  double cr = cos(sigm...) * dt;\\n  sigma_point(StateMemberPitch) += euler_dot(1) * dt;\\n  sigma_point(StateMemberYaw) += euler_dot(2) * dt;\\n}')\n +    where <function search at 0x7fb848ca9f30> = re.search"
+            },
+            {
+                "test_function": "test_state_member_coverage",
+                "error_message": "AssertionError: Failure: Implementation did not reference mandatory state member StateMemberVpitch.\nassert 'StateMemberVpitch' in 'void Ukf::projectSigmaPoint(Eigen::VectorXd & sigma_point, const rclcpp::Duration & delta)\\n{\\n  double cr = cos(sigm...) * dt;\\n  sigma_point(StateMemberPitch) += euler_dot(1) * dt;\\n  sigma_point(StateMemberYaw) += euler_dot(2) * dt;\\n}'"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_005_sonar_distance_estimation",
+        "status": "FAILED",
+        "score": "2/6",
+        "pass_rate": "33.33%",
+        "tokens": 7930,
+        "failed_cases": [
+            {
+                "test_function": "test_sonar_geometry_robust_v4",
+                "error_message": "AssertionError: Failure: Geometric Error. Could not find analytical distance calculation (delta / projection).\nassert (None)\n +  where None = <function search at 0x7fbf90a9df30>('/\\\\s*(?:dx|dy|(?:std::)?(?:cos|sin)\\\\()', '\\n#include \"turtlesim/turtle.hpp\"\\n\\n#include <QColor>\\n#include <QRgb>\\n\\n#include <cmath>\\n#include <functional>\\n#... 0.5 * turtle_rotated_image_.height();\\n  painter.drawImage(p, turtle_rotated_image_);\\n}\\n\\n}  // namespace turtlesim')\n +    where <function search at 0x7fbf90a9df30> = re.search"
+            },
+            {
+                "test_function": "test_numerical_stability_epsilon",
+                "error_message": "AssertionError: Failure: Stability Error. Missing epsilon guard. division-by-zero will occur when rays are axial.\nassert None\n +  where None = <function search at 0x7fbf90a9df30>('(?:std::)?(?:abs|fabs)\\\\(d[xy]\\\\)\\\\s*>\\\\s*(?:0|1e-|0\\\\.)', '\\n#include \"turtlesim/turtle.hpp\"\\n\\n#include <QColor>\\n#include <QRgb>\\n\\n#include <cmath>\\n#include <functional>\\n#... 0.5 * turtle_rotated_image_.height();\\n  painter.drawImage(p, turtle_rotated_image_);\\n}\\n\\n}  // namespace turtlesim')\n +    where <function search at 0x7fbf90a9df30> = re.search"
+            },
+            {
+                "test_function": "test_sonar_max_range_limit",
+                "error_message": "AssertionError: Failure: Sensor Range Error. Sonar must have a finite maximum range limit.\nassert (None)\n +  where None = <function search at 0x7fbf90a9df30>('(?:sonar_distance_|sonar_dist).*?=\\\\s*.*?(?:\\\\d+\\\\.\\\\d+|range_max|max_range)', '\\n#include \"turtlesim/turtle.hpp\"\\n\\n#include <QColor>\\n#include <QRgb>\\n\\n#include <cmath>\\n#include <functional>\\n#... 0.5 * turtle_rotated_image_.height();\\n  painter.drawImage(p, turtle_rotated_image_);\\n}\\n\\n}  // namespace turtlesim')\n +    where <function search at 0x7fbf90a9df30> = re.search"
+            },
+            {
+                "test_function": "test_sonar_y_mirroring_fix",
+                "error_message": "AssertionError: Failure: Mapping Error. Sonar Y-direction must be inverted for Qt coordinates.\nassert None\n +  where None = <function search at 0x7fbf90a9df30>('dy\\\\s*=\\\\s*-\\\\s*(?:std::)?sin', '\\n#include \"turtlesim/turtle.hpp\"\\n\\n#include <QColor>\\n#include <QRgb>\\n\\n#include <cmath>\\n#include <functional>\\n#... 0.5 * turtle_rotated_image_.height();\\n  painter.drawImage(p, turtle_rotated_image_);\\n}\\n\\n}  // namespace turtlesim')\n +    where <function search at 0x7fbf90a9df30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_006_image_pipeline",
+        "status": "FAILED",
+        "score": "5/9",
+        "pass_rate": "55.56%",
+        "tokens": 7142,
+        "failed_cases": [
+            {
+                "test_function": "test_camera_info_scaling_logic",
+                "error_message": "AssertionError: assert ('k[0] *= ratio' in '// Copyright (c) 2008, Willow Garage, Inc.\\n// All rights reserved.\\n//\\n// Redistribution and use in source and bina...gister the component with class_loader.\\nRCLCPP_COMPONENTS_REGISTER_NODE(depth_image_proc::PointCloudXyzrgbRadialNode)' or 'k[0] * ratio' in '// Copyright (c) 2008, Willow Garage, Inc.\\n// All rights reserved.\\n//\\n// Redistribution and use in source and bina...gister the component with class_loader.\\nRCLCPP_COMPONENTS_REGISTER_NODE(depth_image_proc::PointCloudXyzrgbRadialNode)')"
+            },
+            {
+                "test_function": "test_cv_bridge_exception_safety",
+                "error_message": "AssertionError: Failure: Missing try-catch block for cv_bridge conversion.\nassert None\n +  where None = <function search at 0x7fc4d7249f30>('try\\\\s*\\\\{[\\\\s\\\\S]*cv_bridge::toCv(?:Copy|Share)[\\\\s\\\\S]*\\\\}\\\\s*catch\\\\s*\\\\(\\\\s*cv_bridge::Exception', '// Copyright (c) 2008, Willow Garage, Inc.\\n// All rights reserved.\\n//\\n// Redistribution and use in source and bina...gister the component with class_loader.\\nRCLCPP_COMPONENTS_REGISTER_NODE(depth_image_proc::PointCloudXyzrgbRadialNode)')\n +    where <function search at 0x7fc4d7249f30> = re.search"
+            },
+            {
+                "test_function": "test_template_dispatch_completeness",
+                "error_message": "AssertionError: assert 'convertDepthRadial<uint16_t>' in '// Copyright (c) 2008, Willow Garage, Inc.\\n// All rights reserved.\\n//\\n// Redistribution and use in source and bina...gister the component with class_loader.\\nRCLCPP_COMPONENTS_REGISTER_NODE(depth_image_proc::PointCloudXyzrgbRadialNode)'"
+            },
+            {
+                "test_function": "test_radial_transform_update_check",
+                "error_message": "AssertionError: Failure: Should check for dimension changes before re-init.\nassert ('width_' in '// Copyright (c) 2008, Willow Garage, Inc.\\n// All rights reserved.\\n//\\n// Redistribution and use in source and bina...gister the component with class_loader.\\nRCLCPP_COMPONENTS_REGISTER_NODE(depth_image_proc::PointCloudXyzrgbRadialNode)' or 'height_' in '// Copyright (c) 2008, Willow Garage, Inc.\\n// All rights reserved.\\n//\\n// Redistribution and use in source and bina...gister the component with class_loader.\\nRCLCPP_COMPONENTS_REGISTER_NODE(depth_image_proc::PointCloudXyzrgbRadialNode)')"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_007_hector_slam",
+        "status": "SUCCESS",
+        "score": "7/7",
+        "pass_rate": "100.00%",
+        "tokens": 14348,
+        "failed_cases": []
+    },
+    {
+        "task_id": "sensor_process/task_008_darknet",
+        "status": "FAILED",
+        "score": "5/6",
+        "pass_rate": "83.33%",
+        "tokens": 11402,
+        "failed_cases": [
+            {
+                "test_function": "test_flexible_logging_macros",
+                "error_message": "AssertionError: assert 'this->get_logger()' in '/*\\n * YoloObjectDetector.cpp\\n *\\n *  Created on: Dec 19, 2016\\n *      Author: Marko Bjelonic\\n *   Institute: ETH ...));\\n  objectPublisher_->publish(std::move(objectCountMsg));\\n  \\n  return nullptr;\\n}\\n\\n} /* namespace darknet_ros*/'"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_009_lio_sam",
+        "status": "FAILED",
+        "score": "5/6",
+        "pass_rate": "83.33%",
+        "tokens": 38029,
+        "failed_cases": [
+            {
+                "test_function": "test_callback_group_initialization",
+                "error_message": "AssertionError: Error: LIO-SAM migration should use Callback Groups for concurrent execution.\nassert ('create_callback_group' in '#include \"utility.h\"\\n#include \"lio_sam/cloud_info.h\"\\n#include \"lio_sam/save_map.h\"\\n\\n#include <gtsam/geometry/Rot3...::spin(node);\\n\\n    loopthread.join();\\n    visualizeMapThread.join();\\n\\n    rclcpp::shutdown();\\n\\n    return 0;\\n}' or 'callback_group_' in '#include \"utility.h\"\\n#include \"lio_sam/cloud_info.h\"\\n#include \"lio_sam/save_map.h\"\\n\\n#include <gtsam/geometry/Rot3...::spin(node);\\n\\n    loopthread.join();\\n    visualizeMapThread.join();\\n\\n    rclcpp::shutdown();\\n\\n    return 0;\\n}')"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_010_radar_velocity_estimation",
+        "status": "FAILED",
+        "score": "5/8",
+        "pass_rate": "62.50%",
+        "tokens": 4391,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_logging_migration",
+                "error_message": "AssertionError: Failure: Did not use node-based RCLCPP logging macros.\nassert None\n +  where None = <function search at 0x7f1087861f30>('RCLCPP_(?:WARN|ERROR|INFO)(?:_THROTTLE)?\\\\s*\\\\(\\\\s*(?:this->)?get_logger\\\\(\\\\)', '// This file is part of REVE - Radar Ego Velocity Estimator\\n// Copyright (C) 2021  Christopher Doer <christopher.doe...ConstSharedPtr& trigger_msg)\\n{\\n  std::lock_guard<std::mutex> lock(mutex_);\\n  trigger_stamp = trigger_msg->stamp;\\n}')\n +    where <function search at 0x7f1087861f30> = re.search"
+            },
+            {
+                "test_function": "test_ros2_clock_usage",
+                "error_message": "AssertionError: Failure: Should use node clock (this->now()).\nassert None\n +  where None = <function search at 0x7f1087861f30>('this->(?:get_clock\\\\(\\\\)->)?now\\\\(\\\\)', '// This file is part of REVE - Radar Ego Velocity Estimator\\n// Copyright (C) 2021  Christopher Doer <christopher.doe...ConstSharedPtr& trigger_msg)\\n{\\n  std::lock_guard<std::mutex> lock(mutex_);\\n  trigger_stamp = trigger_msg->stamp;\\n}')\n +    where <function search at 0x7f1087861f30> = re.search"
+            },
+            {
+                "test_function": "test_zero_timestamp_handling",
+                "error_message": "AssertionError: Failure: Did not use the required '.sec == 0' syntax for timestamp checking.\nassert None\n +  where None = <function search at 0x7f1087861f30>('\\\\.sec\\\\s*==\\\\s*0', '// This file is part of REVE - Radar Ego Velocity Estimator\\n// Copyright (C) 2021  Christopher Doer <christopher.doe...ConstSharedPtr& trigger_msg)\\n{\\n  std::lock_guard<std::mutex> lock(mutex_);\\n  trigger_stamp = trigger_msg->stamp;\\n}')\n +    where <function search at 0x7f1087861f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_011_camera_lidar_fusion",
+        "status": "FAILED",
+        "score": "4/6",
+        "pass_rate": "66.67%",
+        "tokens": 15657,
+        "failed_cases": [
+            {
+                "test_function": "test_tf2_geometry_msgs_include",
+                "error_message": "AssertionError: Failure: Missing required header for tf2::fromMsg conversion.\nassert 'tf2_geometry_msgs/tf2_geometry_msgs.hpp' in '/*\\n * Copyright 2018-2019 Autoware Foundation. All rights reserved.\\n *\\n * Licensed under the Apache License, Versi... staticClassification();\\n  makeOutput(input, matching_vec, detected_objects_output);\\n  removeUnnecessaryTarget();\\n}'"
+            },
+            {
+                "test_function": "test_namespace_full_compliance",
+                "error_message": "AssertionError: Failure: DetectedObjectArray must be in '::msg::' namespace.\nassert None\n +  where None = <function search at 0x7fa98d6ddf30>('autoware_msgs::msg::DetectedObjectArray', '/*\\n * Copyright 2018-2019 Autoware Foundation. All rights reserved.\\n *\\n * Licensed under the Apache License, Versi... staticClassification();\\n  makeOutput(input, matching_vec, detected_objects_output);\\n  removeUnnecessaryTarget();\\n}')\n +    where <function search at 0x7fa98d6ddf30> = re.search"
+            }
+        ]
+    }
+]

@@ -1,0 +1,120 @@
+[
+    {
+        "task_id": "multi_node/task_001_rosserial_python_integration",
+        "status": "FAILED",
+        "score": "8/10",
+        "pass_rate": "80.00%",
+        "tokens": 17399,
+        "failed_cases": [
+            {
+                "test_function": "test_executor_spin",
+                "error_message": "AssertionError: Failure: Missing rclpy.spin() to keep the node and its callbacks alive.\nassert None\n +  where None = <function search at 0x7f241e9b5f30>('rclpy\\\\.spin\\\\s*\\\\(', '__author__ = \"mferguson@willowgarage.com (Michael Ferguson)\"\\n\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom seria...ode.get_logger().info(\\'Keyboard interrupt received\\')\\n    finally:\\n        node.destroy()\\n        rclpy.shutdown()')\n +    where <function search at 0x7f241e9b5f30> = re.search"
+            },
+            {
+                "test_function": "test_absence_of_global_node_init",
+                "error_message": "AssertionError: Failure: SerialClient should use the injected node, not create its own global node.\nassert not <re.Match object; span=(10369, 10386), match='rclpy.create_node'>\n +  where <re.Match object; span=(10369, 10386), match='rclpy.create_node'> = <function search at 0x7f241e9b5f30>('rclpy\\\\.create_node', '#####################################################################\\n# Software License Agreement (BSD License)\\n#\\...conds / 1e9)\\n        else:\\n            status.values[1].value = \"never\"\\n\\n        self.pub_diagnostics.publish(msg)')\n +    where <function search at 0x7f241e9b5f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "multi_node/task_002_sm_rosbag_recorder",
+        "status": "FAILED",
+        "score": "6/7",
+        "pass_rate": "85.71%",
+        "tokens": 12799,
+        "failed_cases": [
+            {
+                "test_function": "test_absence_of_legacy_ros1",
+                "error_message": "AssertionError: Legacy artifact '\\brospy\\b' detected.\nassert not <re.Match object; span=(3245, 3250), match='rospy'>\n +  where <re.Match object; span=(3245, 3250), match='rospy'> = <function search at 0x7f796460df30>('\\\\brospy\\\\b', \"#!/usr/bin/env python3\\n# Software License Agreement (BSD License)\\n#\\n# Copyright (c) 2008, Willow Garage, Inc.\\n# A...    finally:\\n        talker_node.destroy_node()\\n        rclpy.shutdown()\\n\\nif __name__ == '__main__':\\n    talker()\")\n +    where <function search at 0x7f796460df30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "multi_node/task_004_talker_relay_listener",
+        "status": "FAILED",
+        "score": "7/8",
+        "pass_rate": "87.50%",
+        "tokens": 3785,
+        "failed_cases": [
+            {
+                "test_function": "test_babbler_timer_paradigm",
+                "error_message": "AssertionError: Babbler must use a Timer for periodic publishing in ROS2.\nassert 'create_wall_timer' in '#include \"rclcpp/rclcpp.hpp\"\\n#include \"std_msgs/msg/string.hpp\"\\n\\n#include <sstream>\\n\\nint main(int argc, char **a...);\\n\\n    rclcpp::spin_some(node);\\n    loop_rate.sleep();\\n    ++count;\\n  }\\n\\n  rclcpp::shutdown();\\n  return 0;\\n}'"
+            }
+        ]
+    },
+    {
+        "task_id": "multi_node/task_005_KIE_multiagent_model",
+        "status": "SUCCESS",
+        "score": "11/11",
+        "pass_rate": "100.00%",
+        "tokens": 27889,
+        "failed_cases": []
+    },
+    {
+        "task_id": "multi_node/task_006_swarm_ros_bridge",
+        "status": "TRANSLATION_FAILED",
+        "score": "0/0",
+        "pass_rate": "0.00%",
+        "tokens": 0,
+        "failed_cases": []
+    },
+    {
+        "task_id": "multi_node/task_007_aws_les",
+        "status": "TRANSLATION_FAILED",
+        "score": "0/0",
+        "pass_rate": "0.00%",
+        "tokens": 0,
+        "failed_cases": []
+    },
+    {
+        "task_id": "multi_node/task_009_fleet_system",
+        "status": "FAILED",
+        "score": "1/5",
+        "pass_rate": "20.00%",
+        "tokens": 8645,
+        "failed_cases": [
+            {
+                "test_function": "test_time_struct_field_sync",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_009_fleet_system/schema.fbs'"
+            },
+            {
+                "test_function": "test_header_schema_no_seq",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_009_fleet_system/schema.fbs'"
+            },
+            {
+                "test_function": "test_namespace_conversion_logic",
+                "error_message": "AssertionError: The Type class must convert ROS paths to dot-separated namespaces.\nassert ('.replace(\"/\", \".\")' in '#! /usr/bin/env python3\\n\"\"\"\\nUtilities for generating Flatbuffers schemas for ROS message types. \\n\\nSchema formats ...ma(ns.message_type, args=ns)\\n    output_file.writelines(line + os.linesep for line in lines)\\n    output_file.close()' or \".replace('/', '.')\" in '#! /usr/bin/env python3\\n\"\"\"\\nUtilities for generating Flatbuffers schemas for ROS message types. \\n\\nSchema formats ...ma(ns.message_type, args=ns)\\n    output_file.writelines(line + os.linesep for line in lines)\\n    output_file.close()')"
+            },
+            {
+                "test_function": "test_no_ros1_naming_leakage",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_009_fleet_system/schema.fbs'"
+            }
+        ]
+    },
+    {
+        "task_id": "multi_node/task_011_amr_interop",
+        "status": "FAILED",
+        "score": "5/6",
+        "pass_rate": "83.33%",
+        "tokens": 10618,
+        "failed_cases": [
+            {
+                "test_function": "test_no_ros1_terminology_leakage",
+                "error_message": "re.error: missing ), unterminated subpattern at position 11"
+            }
+        ]
+    },
+    {
+        "task_id": "multi_node/task_012_multimaster_flie",
+        "status": "FAILED",
+        "score": "7/8",
+        "pass_rate": "87.50%",
+        "tokens": 31587,
+        "failed_cases": [
+            {
+                "test_function": "test_absence_of_hardcoded_names",
+                "error_message": "AssertionError: The migrated code should use dynamic node name retrieval (e.g., rospy.get_name()) rather than hardcoded strings.\nassert not <re.Match object; span=(42953, 42967), match=\"'/master_sync'\">"
+            }
+        ]
+    }
+]

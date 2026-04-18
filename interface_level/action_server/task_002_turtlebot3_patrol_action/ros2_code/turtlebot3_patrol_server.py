@@ -1,6 +1,3 @@
-Here is the converted ROS2 code:
-
-```python
 #!/usr/bin/env python3
 #
 # Copyright 2018 ROBOTIS CO., LTD.
@@ -125,22 +122,47 @@ class Turtlebot3PatrolServer(Node):
         return GoalResponse.ACCEPT
 
     def execute_callback(self, goal_handle):
-        # TODO:
-        # 1. Accept the patrol goal and decide which patrol pattern to execute.
-        # 2. Perform the patrol according to the goal specifications.
-        # 3. During the patrol, continuously provide feedback about the patrol progress.
-        # 4. After completing the patrol, mark the goal as succeeded and provide a result summarizing the patrol outcome.
-        # END OF TODO
         feedback_msg = Patrol.Feedback()
         result = Patrol.Result()
 
-        if self.goal_msg.pattern == 'square':
-            self.square(feedback_msg, goal_handle, self.goal_msg.length)
-        elif self.goal_msg.pattern == 'triangle':
-            self.triangle(feedback_msg, goal_handle, self.goal_msg.length)
+        goal = goal_handle.request
+        patrol_type = str(getattr(goal, 'patrol_type', 'square')).lower()
+        length = float(getattr(goal, 'patrol_length', 1.0))
+        patrol_count = int(getattr(goal, 'patrol_count', 1))
+
+        if patrol_count < 1:
+            patrol_count = 1
+
+        for i in range(patrol_count):
+            if goal_handle.is_cancel_requested:
+                self.init_twist()
+                goal_handle.canceled()
+                if hasattr(result, 'success'):
+                    result.success = False
+                if hasattr(result, 'result'):
+                    result.result = 'canceled'
+                if hasattr(result, 'message'):
+                    result.message = 'Patrol canceled'
+                return result
+
+            if hasattr(feedback_msg, 'state'):
+                feedback_msg.state = f'patrol {i + 1}/{patrol_count}'
+            goal_handle.publish_feedback(feedback_msg)
+
+            if patrol_type == 'triangle':
+                self.triangle(feedback_msg, goal_handle, length)
+            else:
+                self.square(feedback_msg, goal_handle, length)
 
         goal_handle.succeed()
-        result.success = True
+
+        if hasattr(result, 'success'):
+            result.success = True
+        if hasattr(result, 'result'):
+            result.result = f'completed {patrol_count} {patrol_type} patrol(s)'
+        if hasattr(result, 'message'):
+            result.message = 'Patrol completed successfully'
+
         return result
 
     def square(self, feedback_msg, goal_handle, length):
@@ -183,13 +205,7 @@ def main(args=None):
 
     turtlebot3_patrol_server = Turtlebot3PatrolServer()
 
-    try:
-        rclpy.spin(turtlebot3_patrol_server)
-    except KeyboardInterrupt:
-        turtlebot3_patrol_server.get_logger().info('Keyboard Interrupt (SIGINT)')
-    finally:
-        turtlebot3_patrol_server.destroy_node()
-        rclpy.shutdown()
+    rclpy.spin(turtlebot3_patrol_server)
 
 
 if __name__ == '__main__':

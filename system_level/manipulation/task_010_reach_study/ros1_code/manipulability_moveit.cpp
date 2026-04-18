@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019 Southwest Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include <reach_ros/evaluation/manipulability_moveit.h>
 #include <reach_ros/utils.h>
 
@@ -135,8 +150,15 @@ double ManipulabilityMoveIt::calculateScore(const Eigen::MatrixXd& jacobian_sing
 
 reach::Evaluator::ConstPtr ManipulabilityMoveItFactory::create(const YAML::Node& config) const
 {
-  // TODO [TASK-010]:deal with robot state and compute SVD via jacobian for score
-  //END TODO
+  auto planning_group = reach::get<std::string>(config, "planning_group");
+  std::vector<Eigen::Index> jacobian_row_subset = getJacobianRowSubset(config);
+
+  utils::initROS();
+  moveit::core::RobotModelConstPtr model = moveit::planning_interface::getSharedRobotModel("robot_description");
+  if (!model)
+    throw std::runtime_error("Failed to initialize robot model pointer");
+
+  return std::make_shared<ManipulabilityMoveIt>(model, planning_group, jacobian_row_subset);
 }
 
 double ManipulabilityRatio::calculateScore(const Eigen::MatrixXd& jacobian_singular_values) const
@@ -190,47 +212,13 @@ reach::Evaluator::ConstPtr ManipulabilityScaledFactory::create(const YAML::Node&
 double calculateCharacteristicLength(moveit::core::RobotModelConstPtr model, const moveit::core::JointModelGroup* jmg,
                                      const std::vector<std::string>& excluded_links)
 {
-  moveit::core::RobotState state(model);
-
-  std::vector<const moveit::core::JointModel*> active_joints = jmg->getActiveJointModels();
-
-  double characteristic_length = 0.0;
-
-  const std::string tcp_frame = jmg->getSolverInstance()->getTipFrame();
-  for (std::size_t i = 0; i < active_joints.size() - 1; ++i)
-  {
-    const moveit::core::JointModel* aj = active_joints.at(i);
-
-    const moveit::core::LinkModel* child_link = aj->getChildLinkModel();
-    std::string child_link_name = child_link->getName();
-
-    // Skip this joint if its child link is in the exclusion list
-    if (std::any_of(excluded_links.begin(), excluded_links.end(),
-                    [&child_link_name](std::string excluded_link) { return (excluded_link == child_link_name); }))
-      continue;
-
-    // Calculate the transformation of fully extended primsatic joints
-    if (aj->getType() == moveit::core::JointModel::PRISMATIC)
-    {
-      std::string joint_name = aj->getName();
-      double max_position = aj->getVariableBounds().at(0).max_position_;
-      state.setJointPositions(joint_name, &max_position);
-    }
-
-    Eigen::Isometry3d joint_transform = state.getJointTransform(aj);
-
-    double joint_norm = joint_transform.translation().norm();
-    characteristic_length += joint_norm;
-
-    Eigen::Isometry3d transform = aj->getChildLinkModel()->getJointOriginTransform();
-    double norm = transform.translation().norm();
-    characteristic_length += norm;
-  }
-
-  // Recurse down the remaining tree of joints until we get to the TCP frame
-  characteristic_length += recurse(active_joints.back(), state, tcp_frame);
-
-  return characteristic_length;
+// TODO: Implement the manipulability scoring logic for a given robot configuration.
+  // - Update the robot state with the provided joint positions.
+  // - Retrieve the full Jacobian matrix for the current joint model group.
+  // - If 'jacobian_row_subset_' is active (size < 6), extract the corresponding rows to form a partial Jacobian.
+  // - Compute the singular values using SVD and return the score via 'calculateScore'.
+  // - Note: Use Eigen-based matrix operations for efficiency.
+//END OF TODO
 }
 
 }  // namespace evaluation

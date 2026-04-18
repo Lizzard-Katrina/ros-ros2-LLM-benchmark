@@ -1,13 +1,41 @@
 {
-  "task_id": "task_003",
-  "name": "arm_ik_integration",
-  "description": "Integration-level correctness test for robotic arm IK and trajectory execution",
-  "ros_version": ["ROS1: noetic"],
-  "language": "C++",
-  "difficulty": "Basic",
-  "directories": {
-    "ros1_code": "ros1_code",
-    "tests": "tests",
-    "docker": "docker"
+  "task_id": "UR5_RED_BOX_003",
+  "task_name": "UR5 Service and Build System Migration",
+  "category": "Robotics",
+  "sub_category": "ROS2 Migration",
+  "difficulty": "Medium",
+  "tags": [
+    "ROS2-Humble",
+    "rclpy",
+    "Service-Client",
+    "ament_cmake",
+    "rosidl"
+  ],
+  "environment": {
+    "ros_distro": "humble",
+    "language": "python",
+    "required_packages": [
+      "rclpy",
+      "moveit_commander",
+      "rosidl_default_generators",
+      "geometry_msgs"
+    ]
+  },
+  "files": [
+    "robotic_arm_algorithms/scripts/set_joint_states_service.py",
+    "robotic_arm_algorithms/scripts/set_joint_states_client.py",
+    "robotic_arm_algorithms/CMakeLists.txt",
+    "robotic_arm_algorithms/package.xml"
+  ],
+  "oracle": {
+    "script": "test_oracle_ros2.py",
+    "type": "pytest",
+    "test_cases": [
+      "test_service_server_migration",
+      "test_service_client_async_integrity",
+      "test_cmakelists_rosidl_integrity",
+      "test_package_xml_modern_format",
+      "test_no_rospy_anywhere"
+    ]
   }
 }

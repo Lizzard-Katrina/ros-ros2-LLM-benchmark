@@ -37,9 +37,9 @@ ScanToScanFilterChain::ScanToScanFilterChain(
   const std::string & ns)
 : rclcpp::Node("scan_to_scan_filter_chain", ns, options),
   diagnostic_updater_(this),
-  tf_(nullptr),
+  tf_(NULL),
   buffer_(this->get_clock()),
-  tf_filter_(nullptr),
+  tf_filter_(NULL),
   filter_chain_("sensor_msgs::msg::LaserScan")
 {
   // Heartbeat diagnostics
@@ -70,61 +70,58 @@ ScanToScanFilterChain::ScanToScanFilterChain(
   this->get_parameter("tf_message_filter_tolerance", tf_filter_tolerance_);
   this->get_parameter("scan_filtered_history_depth", scan_filtered_history_depth_);
 
-  // 1. Establish the input 'scan' subscription using SensorDataQoS. 
-  rclcpp::SensorDataQoS sensor_qos;
-  sensor_qos.keep_last(scan_filtered_history_depth_);
-  sensor_qos.reliable();
-  sensor_qos.durability_volatile();
+  auto subscribe_scan = [this]() {
+    scan_sub_.subscribe(this, "scan", rclcpp::SensorDataQoS().get_rmw_qos_profile());
+  };
+  auto unsubscribe_scan = [this]() {
+    scan_sub_.unsubscribe();
+  };
 
-  // 2. Determine the synchronization strategy: If a target frame is provided, 
-  //    ensure the processing only triggers when TF transforms are ready. 
-  //    Otherwise, use a direct pass-through to the callback.
-  if (!tf_message_filter_target_frame_.empty())
-  {
-    tf_ = std::make_shared<tf2_ros::Buffer>(this->get_clock());
-    auto tf_listener = std::make_shared<tf2_ros::TransformListener>(*tf_);
-    (void)tf_listener;  // suppress unused variable warning
-
+  if (!tf_message_filter_target_frame_.empty()) {
+    tf_ = std::make_shared<tf2_ros::TransformListener>(buffer_);
     tf_filter_ = std::make_shared<tf2_ros::MessageFilter<sensor_msgs::msg::LaserScan>>(
-      *tf_, tf_message_filter_target_frame_, 10, this->get_node_logging_interface()->get_logger());
-
-    sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
-      "scan", sensor_qos,
-      [this](const sensor_msgs::msg::LaserScan::SharedPtr msg) {
-        tf_filter_->add(msg);
-      });
-
+      scan_sub_,
+      buffer_,
+      tf_message_filter_target_frame_,
+      static_cast<uint32_t>(scan_filtered_history_depth_),
+      this->get_node_logging_interface(),
+      this->get_node_clock_interface(),
+      std::chrono::duration<double>(tf_filter_tolerance_));
     tf_filter_->registerCallback(
       std::bind(&ScanToScanFilterChain::callback, this, std::placeholders::_1));
-    tf_filter_->setTolerance(tf_filter_tolerance_);
-  }
-  else
-  {
-    sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
-      "scan", sensor_qos,
+  } else {
+    scan_sub_.registerCallback(
       std::bind(&ScanToScanFilterChain::callback, this, std::placeholders::_1));
   }
 
-  // 3. Initialize the output publisher for "scan_filtered".
-  pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>("scan_filtered", rclcpp::SensorDataQoS());
-
-#ifdef RCLCPP_SUPPORTS_MATCHED_CALLBACKS
-  if (lazy_subscription_)
-  {
-    sub_->on_activate();
-    pub_->on_activate();
-
-    sub_->set_on_new_subscription_callback([this]() {
-      if (!sub_->get_subscription_count())
-        sub_->on_activate();
-    });
-
-    pub_->set_on_new_subscription_callback([this]() {
-      if (!pub_->get_subscription_count())
-        pub_->on_activate();
-    });
+  rclcpp::PublisherOptions pub_options;
+  #ifdef RCLCPP_SUPPORTS_MATCHED_CALLBACKS
+  if (lazy_subscription_) {
+    pub_options.event_callbacks.matched_callback =
+      [this, subscribe_scan, unsubscribe_scan](rclcpp::MatchedInfo &) {
+        if (this->count_subscribers("scan_filtered") == 0u) {
+          unsubscribe_scan();
+        } else {
+          subscribe_scan();
+        }
+      };
   }
-#endif
+  #endif
+
+  scan_pub_ = this->create_publisher<sensor_msgs::msg::LaserScan>(
+    "scan_filtered",
+    rclcpp::QoS(rclcpp::KeepLast(static_cast<size_t>(scan_filtered_history_depth_))),
+    pub_options);
+
+  #ifdef RCLCPP_SUPPORTS_MATCHED_CALLBACKS
+  if (!lazy_subscription_) {
+    subscribe_scan();
+  } else if (this->count_subscribers("scan_filtered") > 0u) {
+    subscribe_scan();
+  }
+  #else
+  subscribe_scan();
+  #endif
 }
 
 // Destructor
@@ -142,15 +139,12 @@ ScanToScanFilterChain::~ScanToScanFilterChain()
 void ScanToScanFilterChain::callback(
   const std::shared_ptr<const sensor_msgs::msg::LaserScan> & msg_in)
 {
-  sensor_msgs::msg::LaserScan msg_out = *msg_in;
-
-  if (!filter_chain_.update(msg_out))
-  {
-    RCLCPP_WARN(this->get_logger(), "Filter chain failed to update the scan message");
-    return;
+  sensor_msgs::msg::LaserScan msg_out;
+  if (filter_chain_.update(*msg_in, msg_out)) {
+    heartbeat_diagnostics_.tick();
+    scan_pub_->publish(msg_out);
   }
-
-  pub_->publish(msg_out);
+  diagnostic_updater_.update();
 }
 
 #include "rclcpp_components/register_node_macro.hpp"

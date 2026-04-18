@@ -30,30 +30,19 @@ namespace Aws {
 namespace Lex {
 
 /**
-* TODO(007-lex-node-role):
- * Describe and enforce the semantic responsibilities of this node, including:
- * - How ROS requests are serialized and forwarded to Lex
- * - How Lex intents and slots are interpreted
- * - How concurrency and request ordering are handled
-*/
+ * LexNode is responsible for providing ROS API's and configuration for Amazon Lex.
+ * The lex node will work on each incoming message serially and respond with the lex info.
+ * @todo decide how the lex node will handle multiple requests.
+ */
 class LexNode
 {
 private:
-  /**
-   * The ros server for lex requests.
-   */
-  ros::ServiceServer lex_server_;
-
-  /**
-   * Post content function.
-   */
-  std::shared_ptr<PostContentInterface> post_content_;
-
-  /**
-   * The ros node handle.
-   */
-  ros::NodeHandle node_handle_;
-
+/* * TODO [Task_007_A]: Define ROS 2 infrastructure and communication interfaces.
+ * - Refactor the class to manage ROS 2 node resources (e.g., inheriting from rclcpp::Node).
+ * - Declare the service server using 'rclcpp::Service<lex_common_msgs::srv::AudioTextConversation>::SharedPtr'.
+ * - IMPORTANT: The service server member must be named 'lex_server_'.
+ * END of TODO 
+*/
   /**
    * Service callback for lex. Only allow one interaction with Lex at a time. If a new request comes
    * in, fail the last request, then make a new request.
@@ -69,18 +58,12 @@ public:
   /**
    * Constructor.
    */
-  LexNode();
 
-  /**
-   * Destructor.
-   */
-  ~LexNode() = default;
-
-  /**
-   * Initialize the lex node.
-   *
-   * @param lex_interactor to use as the method to call lex.
-   */
+  /* * TODO [Task_007_B]: Update the service callback signature for ROS 2.
+ * - Ensure the signature matches the standard ROS 2 service callback pattern using SharedPtr.
+ * - Naming and types must be strictly consistent with the implementation in lex_node.cpp.
+ * END OF TODO 
+*/
   ErrorCode Init(std::shared_ptr<PostContentInterface> lex_interactor);
 
   /**

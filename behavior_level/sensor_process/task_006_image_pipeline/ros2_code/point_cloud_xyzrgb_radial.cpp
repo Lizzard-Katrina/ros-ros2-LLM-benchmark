@@ -1,5 +1,129 @@
+// Copyright (c) 2008, Willow Garage, Inc.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the copyright holder nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
+#include <functional>
+#include <memory>
+#include <mutex>
+#include <string>
+
+#include "cv_bridge/cv_bridge.hpp"
+
+#include <depth_image_proc/conversions.hpp>
+#include <depth_image_proc/point_cloud_xyzrgb_radial.hpp>
+#include <image_transport/camera_common.hpp>
+#include <image_transport/image_transport.hpp>
+#include <image_transport/subscriber_filter.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/image_encodings.hpp>
+#include <sensor_msgs/point_cloud2_iterator.hpp>
+#include <sensor_msgs/msg/point_cloud2.hpp>
+
 namespace depth_image_proc
 {
+
+PointCloudXyzrgbRadialNode::PointCloudXyzrgbRadialNode(const rclcpp::NodeOptions & options)
+: Node("PointCloudXyzrgbRadialNode", options)
+{
+  // TransportHints does not actually declare the parameter
+  this->declare_parameter<std::string>("image_transport", "raw");
+  this->declare_parameter<std::string>("depth_image_transport", "raw");
+
+  // Read parameters
+  int queue_size = this->declare_parameter<int>("queue_size", 5);
+  bool use_exact_sync = this->declare_parameter<bool>("exact_sync", false);
+
+  // Synchronize inputs. Topic subscriptions happen on demand in the connection callback.
+  if (use_exact_sync) {
+    exact_sync_ = std::make_unique<ExactSynchronizer>(
+      ExactSyncPolicy(queue_size),
+      sub_depth_,
+      sub_rgb_,
+      sub_info_);
+    exact_sync_->registerCallback(
+      std::bind(
+        &PointCloudXyzrgbRadialNode::imageCb,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3));
+  } else {
+    sync_ =
+      std::make_unique<Synchronizer>(SyncPolicy(queue_size), sub_depth_, sub_rgb_, sub_info_);
+    sync_->registerCallback(
+      std::bind(
+        &PointCloudXyzrgbRadialNode::imageCb,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3));
+  }
+
+  // Create publisher with connect callback
+  rclcpp::PublisherOptions pub_options;
+  pub_options.event_callbacks.matched_callback =
+    [this](rclcpp::MatchedInfo & s)
+    {
+      std::lock_guard<std::mutex> lock(connect_mutex_);
+      if (s.current_count == 0) {
+        sub_depth_.unsubscribe();
+        sub_rgb_.unsubscribe();
+        sub_info_.unsubscribe();
+      } else if (!sub_depth_.getSubscriber()) {
+        // For compressed topics to remap appropriately, we need to pass a
+        // fully expanded and remapped topic name to image_transport
+        auto node_base = this->get_node_base_interface();
+        std::string depth_topic =
+          node_base->resolve_topic_or_service_name("depth/image_raw", false);
+        std::string rgb_topic =
+          node_base->resolve_topic_or_service_name("rgb/image_raw", false);
+        // Allow also remapping camera_info to something different than default
+        std::string rgb_info_topic =
+          node_base->resolve_topic_or_service_name(
+          image_transport::getCameraInfoTopic(rgb_topic), false);
+
+        // depth image can use different transport.(e.g. compressedDepth)
+        image_transport::TransportHints depth_hints(*this, "raw", "depth_image_transport");
+        sub_depth_.subscribe(*this, depth_topic, depth_hints.getTransport(),
+          rclcpp::SystemDefaultsQoS());
+
+        // rgb uses normal ros transport hints.
+        image_transport::TransportHints hints(*this, "raw");
+        sub_rgb_.subscribe(*this, rgb_topic, hints.getTransport(), rclcpp::SystemDefaultsQoS());
+        sub_info_.subscribe(this, rgb_info_topic, rclcpp::QoS(10));
+      }
+    };
+  // Allow overriding QoS settings (history, depth, reliability)
+  pub_options.qos_overriding_options = rclcpp::QosOverridingOptions::with_default_policies();
+  pub_point_cloud_ = create_publisher<PointCloud2>("points", rclcpp::SystemDefaultsQoS(),
+      pub_options);
+}
 
 void PointCloudXyzrgbRadialNode::imageCb(
   const Image::ConstSharedPtr & depth_msg,
@@ -15,85 +139,131 @@ void PointCloudXyzrgbRadialNode::imageCb(
   }
 
   // Update camera model
-  model_.fromCameraInfo(info_msg);
+  auto info_to_use = std::make_shared<CameraInfo>(*info_msg);
+  cv_bridge::CvImagePtr rgb_msg = cv_bridge::toCvCopy(rgb_msg_in, rgb_msg_in->encoding);
 
-  // Scale intrinsics if resolutions differ
-  double ratio_x = static_cast<double>(rgb_msg_in->width) / static_cast<double>(depth_msg->width);
-  double ratio_y = static_cast<double>(rgb_msg_in->height) / static_cast<double>(depth_msg->height);
-  if (ratio_x != 1.0 || ratio_y != 1.0) {
-    model_.fx() *= ratio_x;
-    model_.cx() *= ratio_x;
-    model_.fy() *= ratio_y;
-    model_.cy() *= ratio_y;
+  if (depth_msg->width != rgb_msg_in->width || depth_msg->height != rgb_msg_in->height) {
+    const double ratio = static_cast<double>(depth_msg->width) / static_cast<double>(rgb_msg_in->width);
+    info_to_use->k[0] *= ratio;
+    info_to_use->k[2] *= ratio;
+    info_to_use->k[4] *= ratio;
+    info_to_use->k[5] *= ratio;
+    cv::resize(
+      rgb_msg->image, rgb_msg->image,
+      cv::Size(static_cast<int>(depth_msg->width), static_cast<int>(depth_msg->height)),
+      0.0, 0.0, cv::INTER_LINEAR);
   }
 
-  // Update transform_ only if CameraInfo or image dimensions changed
-  if (info_msg->header.frame_id != last_frame_id_ ||
-      depth_msg->width != last_width_ || depth_msg->height != last_height_) {
-    transform_.initMatrix(model_);
-    last_frame_id_ = info_msg->header.frame_id;
-    last_width_ = depth_msg->width;
-    last_height_ = depth_msg->height;
+  model_.fromCameraInfo(info_to_use);
+
+  static bool have_cached_info = false;
+  static CameraInfo cached_info;
+  static uint32_t cached_width = 0;
+  static uint32_t cached_height = 0;
+
+  const bool camera_info_changed =
+    !have_cached_info ||
+    (cached_info.k != info_to_use->k) ||
+    (cached_info.d != info_to_use->d) ||
+    (cached_info.r != info_to_use->r) ||
+    (cached_info.p != info_to_use->p) ||
+    (cached_width != depth_msg->width) ||
+    (cached_height != depth_msg->height);
+
+  if (camera_info_changed) {
+    initMatrix(model_, depth_msg->width, depth_msg->height, transform_);
+    cached_info = *info_to_use;
+    cached_width = depth_msg->width;
+    cached_height = depth_msg->height;
+    have_cached_info = true;
   }
 
-  // Prepare point cloud message
-  std::unique_ptr<PointCloud2> cloud_msg = std::make_unique<PointCloud2>();
-  cloud_msg->header = depth_msg->header;
+  auto cloud_msg = std::make_unique<PointCloud2>();
+  cloud_msg->header.stamp = depth_msg->header.stamp;
+  cloud_msg->header.frame_id = depth_msg->header.frame_id;
   cloud_msg->height = depth_msg->height;
   cloud_msg->width = depth_msg->width;
   cloud_msg->is_dense = false;
 
-  sensor_msgs::PointCloud2Modifier pcd_modifier(*cloud_msg);
-  pcd_modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
-  pcd_modifier.resize(cloud_msg->height * cloud_msg->width);
+  sensor_msgs::PointCloud2Modifier modifier(*cloud_msg);
+  modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
+  modifier.resize(static_cast<size_t>(cloud_msg->width) * static_cast<size_t>(cloud_msg->height));
 
-  sensor_msgs::PointCloud2Iterator<float> iter_x(*cloud_msg, "x");
-  sensor_msgs::PointCloud2Iterator<float> iter_y(*cloud_msg, "y");
-  sensor_msgs::PointCloud2Iterator<float> iter_z(*cloud_msg, "z");
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_r(*cloud_msg, "r");
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_g(*cloud_msg, "g");
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(*cloud_msg, "b");
+  if (depth_msg->encoding == sensor_msgs::image_encodings::TYPE_16UC1) {
+    convertDepthRadial<uint16_t>(depth_msg, *cloud_msg, transform_);
+  } else if (depth_msg->encoding == sensor_msgs::image_encodings::TYPE_32FC1) {
+    convertDepthRadial<float>(depth_msg, *cloud_msg, transform_);
+  } else {
+    RCLCPP_ERROR(
+      get_logger(),
+      "Depth image has unsupported encoding [%s]", depth_msg->encoding.c_str());
+    return;
+  }
 
-  // Color mapping offsets and step
-  const int red_offset = 2;
-  const int green_offset = 1;
-  const int blue_offset = 0;
-  const int color_step = rgb_msg_in->step;
+  int red_offset = 0;
+  int green_offset = 0;
+  int blue_offset = 0;
+  int color_step = 0;
 
-  // Convert depth and RGB to point cloud
-  cv::Mat depth_image = cv_bridge::toCvShare(depth_msg, sensor_msgs::image_encodings::TYPE_32FC1)->image;
-  cv::Mat rgb_image = cv_bridge::toCvShare(rgb_msg_in, sensor_msgs::image_encodings::RGB8)->image;
+  if (rgb_msg->encoding == sensor_msgs::image_encodings::RGB8) {
+    red_offset = 0;
+    green_offset = 1;
+    blue_offset = 2;
+    color_step = 3;
+  } else if (rgb_msg->encoding == sensor_msgs::image_encodings::BGR8) {
+    red_offset = 2;
+    green_offset = 1;
+    blue_offset = 0;
+    color_step = 3;
+  } else if (rgb_msg->encoding == sensor_msgs::image_encodings::RGBA8) {
+    red_offset = 0;
+    green_offset = 1;
+    blue_offset = 2;
+    color_step = 4;
+  } else if (rgb_msg->encoding == sensor_msgs::image_encodings::BGRA8) {
+    red_offset = 2;
+    green_offset = 1;
+    blue_offset = 0;
+    color_step = 4;
+  } else if (rgb_msg->encoding == sensor_msgs::image_encodings::MONO8) {
+    red_offset = 0;
+    green_offset = 0;
+    blue_offset = 0;
+    color_step = 1;
+  } else {
+    RCLCPP_ERROR(
+      get_logger(),
+      "RGB image has unsupported encoding [%s]", rgb_msg->encoding.c_str());
+    return;
+  }
 
-  for (int v = 0; v < static_cast<int>(depth_msg->height); ++v) {
-    const float* depth_row = depth_image.ptr<float>(v);
-    const uint8_t* rgb_row = rgb_image.ptr<uint8_t>(static_cast<int>(v * ratio_y));
-    for (int u = 0; u < static_cast<int>(depth_msg->width); ++u, ++iter_x, ++iter_y, ++iter_z, ++iter_r, ++iter_g, ++iter_b) {
-      float depth = depth_row[u];
-      if (std::isnan(depth) || depth <= 0.001f) {
-        *iter_x = *iter_y = *iter_z = std::numeric_limits<float>::quiet_NaN();
-        *iter_r = *iter_g = *iter_b = 0;
-        continue;
-      }
-      // Compute 3D point
-      float x = (u - model_.cx()) * depth / model_.fx();
-      float y = (v - model_.cy()) * depth / model_.fy();
-      float z = depth;
+  const int r_field = sensor_msgs::getPointCloud2FieldIndex(*cloud_msg, "r");
+  const int g_field = sensor_msgs::getPointCloud2FieldIndex(*cloud_msg, "g");
+  const int b_field = sensor_msgs::getPointCloud2FieldIndex(*cloud_msg, "b");
 
-      // Apply radial transform
-      Eigen::Vector3f pt(x, y, z);
-      pt = transform_ * pt;
+  if (r_field == -1 || g_field == -1 || b_field == -1) {
+    RCLCPP_ERROR(get_logger(), "PointCloud2 RGB fields are missing");
+    return;
+  }
 
-      *iter_x = pt.x();
-      *iter_y = pt.y();
-      *iter_z = pt.z();
+  const size_t r_offset = cloud_msg->fields[static_cast<size_t>(r_field)].offset;
+  const size_t g_offset = cloud_msg->fields[static_cast<size_t>(g_field)].offset;
+  const size_t b_offset = cloud_msg->fields[static_cast<size_t>(b_field)].offset;
 
-      // Map color
-      int rgb_u = static_cast<int>(u * ratio_x);
-      int rgb_v = static_cast<int>(v * ratio_y);
-      const uint8_t* pixel_ptr = &rgb_image.ptr<uint8_t>(rgb_v)[rgb_u * 3];
-      *iter_r = pixel_ptr[red_offset];
-      *iter_g = pixel_ptr[green_offset];
-      *iter_b = pixel_ptr[blue_offset];
+  const uint32_t width = cloud_msg->width;
+  const uint32_t height = cloud_msg->height;
+  const size_t point_step = cloud_msg->point_step;
+
+  for (uint32_t v = 0; v < height; ++v) {
+    const uint8_t * rgb_row = &rgb_msg->image.data[static_cast<size_t>(v) * rgb_msg->image.step];
+    for (uint32_t u = 0; u < width; ++u) {
+      const size_t idx = static_cast<size_t>(v) * width + u;
+      uint8_t * point = &cloud_msg->data[idx * point_step];
+      const uint8_t * color = rgb_row + static_cast<size_t>(u) * static_cast<size_t>(color_step);
+
+      point[r_offset] = color[red_offset];
+      point[g_offset] = color[green_offset];
+      point[b_offset] = color[blue_offset];
     }
   }
 
@@ -101,3 +271,8 @@ void PointCloudXyzrgbRadialNode::imageCb(
 }
 
 }  // namespace depth_image_proc
+
+#include "rclcpp_components/register_node_macro.hpp"
+
+// Register the component with class_loader.
+RCLCPP_COMPONENTS_REGISTER_NODE(depth_image_proc::PointCloudXyzrgbRadialNode)

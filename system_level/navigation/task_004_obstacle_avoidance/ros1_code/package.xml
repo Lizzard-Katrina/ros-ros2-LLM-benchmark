@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>turtlesim</name>
+  <version>1.10.7</version>
+  <description>
+    turtlesim is a tool made for teaching ROS and ROS packages.
+  </description>
+
+  <maintainer email="alejandro@openrobotics.org">Alejandro Hernandez Cordero</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://www.ros.org/wiki/turtlesim</url>
+  <url type="bugtracker">https://github.com/ros/ros_tutorials/issues</url>
+  <url type="repository">https://github.com/ros/ros_tutorials</url>
+
+  <author email="audrow@openrobotics.org">Audrow Nash</author>
+  <author email="dthomas@osrfoundation.org">Dirk Thomas</author>
+  <author>Josh Faust</author>
+  <author email="mabel@openrobotics.org">Mabel Zhang</author>
+  <author email="michael.jeronimo@openrobotics.org">Michael Jeronimo</author>
+  <author email="sloretz@openrobotics.org">Shane Loretz</author>
+
+"TODO:"
+"Identify and declare the complete set of dependencies required for a ROS 2 Humble node that utilizes rclcpp, actionlib (optional but recommended for consistency), custom message packages, and the Qt6 framework."
+"END OF TODO"
+</package>

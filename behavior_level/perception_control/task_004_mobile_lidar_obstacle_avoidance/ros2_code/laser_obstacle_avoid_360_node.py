@@ -1,201 +1,219 @@
 #!/usr/bin/env python3
 
+import math
 import rclpy
-from rclpy.node import Node
-from geometry_msgs.msg import Twist #ros msg that deals with moving the robot
-from sensor_msgs.msg import LaserScan #ros msg that gets the laser scans
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import LaserScan
 
+# obstacle threshhold, objects a this distance or below it
+# are considered obstacles
 OBSTACLE_DIST = 0.5
+# the angle in which each region extends
 REGIONAL_ANGLE = 30
 PI = 3.141592653
 
-NORMAL_LIN_VEL = 0.50
+# when there's no obstacles, the robot will move with this linear velocity
+NORMAL_LIN_VEL = 0.50  # meters/second
+# after detecting an obstacle, the robot shall back up a bit (negative) while
+# rotating to help in case it can't perform a stationary rotation
 TRANS_LIN_VEL = -0.08
+# the robot always rotates with the same value of angular velocity
 TRANS_ANG_VEL = 1.75
 
+# this list keeps track of the order in which the regions' readings are obtained
 REGIONS = [
-             "front_C", "front_L", "left_R",
-             "left_C", "left_L", "back_R",
-             "back_C", "back_L", "right_R",
-             "right_C", "right_L", "front_R",
-          ]
-
-Urgency_Report = {
-                    "act": False, "angular_vel": 0.0, "sleep": 0
-                 }
-
+    "front_C",
+    "front_L",
+    "left_R",
+    "left_C",
+    "left_L",
+    "back_R",
+    "back_C",
+    "back_L",
+    "right_R",
+    "right_C",
+    "right_L",
+    "front_R",
+]
+# this is a global variable that keeps handles the orders for the robot to follow
+# if there's a detected object, "act" is turned to True
+# and the angular_vel and sleep values are calculated appropriately
+Urgency_Report = {"act": False, "angular_vel": 0.0, "sleep": 0.0}
+# this dict keeps track of the distance measures for each region
 Regions_Report = {
-                     "front_C":[], "front_L":[], "left_R":[],
-                     "left_C":[], "left_L":[], "back_R":[],
-                     "back_C":[], "back_L":[], "right_R":[],
-                     "right_C":[], "right_L":[], "front_R":[],
-                 }
-
+    "front_C": [],
+    "front_L": [],
+    "left_R": [],
+    "left_C": [],
+    "left_L": [],
+    "back_R": [],
+    "back_C": [],
+    "back_L": [],
+    "right_R": [],
+    "right_C": [],
+    "right_L": [],
+    "front_R": [],
+}
+# These are the costs to deviate from each region to the goal region (front_C)
 Regions_Distances = {
-                     "front_C": 0, "front_L": 1, "left_R": 2,
-                     "left_C": 3, "left_L": 4, "back_R": 5,
-                     "back_C": 6, "back_L": -5, "right_R": -4,
-                     "right_C": -3, "right_L": -2, "front_R": -1,
-                 }
+    "front_C": 0,
+    "front_L": 1,
+    "left_R": 2,
+    "left_C": 3,
+    "left_L": 4,
+    "back_R": 5,
+    "back_C": 6,
+    "back_L": -5,
+    "right_R": -4,
+    "right_C": -3,
+    "right_L": -2,
+    "front_R": -1,
+}
 
+
+# in this function the clearest paths are calculated and the appropriate
+# values for the angular_vel and the execution times are assigned
 def ClearanceTest():
-    # Determine if any region has obstacles closer than OBSTACLE_DIST
-    # If so, decide a safer heading by choosing the region with the farthest minimum distance
-    min_distances = {}
+    """
+    TODO: Decide whether to act and update Urgency_Report accordingly.
+    - Use Regions_Report / Regions_Distances to choose a safer heading if needed.
+    - Update: Urgency_Report["act"], ["angular_vel"], ["sleep"].
+    END OF TODO
+    """
+    global Urgency_Report
+
+    region_min = {}
     for region in REGIONS:
-        if Regions_Report[region]:
-            min_distances[region] = min(Regions_Report[region])
-        else:
-            min_distances[region] = float('inf')
+        readings = Regions_Report[region]
+        region_min[region] = min(readings) if readings else float("inf")
 
-    # Check if any region has obstacle closer than threshold
-    obstacle_regions = [r for r, dist in min_distances.items() if dist <= OBSTACLE_DIST]
+    forward_blocked = any(
+        region_min[r] <= OBSTACLE_DIST for r in ("front_C", "front_L", "front_R")
+    )
 
-    if not obstacle_regions:
+    if not forward_blocked:
         Urgency_Report["act"] = False
         Urgency_Report["angular_vel"] = 0.0
-        Urgency_Report["sleep"] = 0
+        Urgency_Report["sleep"] = 0.0
         return
 
-    # Find the region with the maximum clearance (largest min distance)
-    safest_region = max(min_distances, key=min_distances.get)
-    safest_distance = min_distances[safest_region]
+    best_region = max(
+        REGIONS,
+        key=lambda r: (
+            region_min[r] > OBSTACLE_DIST,          # prefer clear sectors
+            region_min[r],                          # then largest clearance
+            -abs(Regions_Distances[r]),            # then closest to forward
+        ),
+    )
 
-    # Calculate angular velocity to steer away from obstacles towards safest region
-    # Use Regions_Distances to determine direction and magnitude
-    deviation = Regions_Distances[safest_region]
-    angular_vel = TRANS_ANG_VEL * (deviation / max(abs(v) for v in Regions_Distances.values()))
+    steps = Regions_Distances[best_region]
+    if steps == 0:
+        # if forward was chosen but blocked/noisy, bias to clearer side
+        left_score = min(region_min["front_L"], region_min["left_R"], region_min["left_C"])
+        right_score = min(region_min["front_R"], region_min["right_L"], region_min["right_C"])
+        steps = 1 if left_score >= right_score else -1
 
     Urgency_Report["act"] = True
-    Urgency_Report["angular_vel"] = angular_vel
-    Urgency_Report["sleep"] = 0.1  # small sleep time to allow maneuver
+    Urgency_Report["angular_vel"] = TRANS_ANG_VEL if steps > 0 else -TRANS_ANG_VEL
+    Urgency_Report["sleep"] = abs(steps) * (REGIONAL_ANGLE * PI / 180.0) / TRANS_ANG_VEL
+
 
 def IdentifyRegions(scan):
-    # Clear previous readings
-    for region in REGIONS:
-        Regions_Report[region] = []
+    """
+    TODO: Update Regions_Report using the latest LaserScan.
+    - Split the 360° scan into named regions in REGIONS.
+    - For each region, record obstacle-relevant range readings.
+    END OF TODO
+    """
+    for k in REGIONS:
+        Regions_Report[k] = []
 
-    # LaserScan angle range is from scan.angle_min to scan.angle_max
-    # Usually angle_min = -pi, angle_max = pi, with increments scan.angle_increment
-    # We'll map each reading to a region based on its angle
+    sector_rad = math.radians(REGIONAL_ANGLE)
+    half_sector = sector_rad / 2.0
 
-    angle = scan.angle_min
-    for r in scan.ranges:
-        # Normalize angle to [0, 360) degrees
-        deg = (angle * 180.0 / PI) % 360
+    for i, r in enumerate(scan.ranges):
+        if not math.isfinite(r):
+            continue
+        if r < scan.range_min or r > scan.range_max:
+            continue
 
-        # Assign to region based on deg
-        # Regions are 12 sectors of 30 degrees each starting at front_C at 0 deg
-        # The order in REGIONS corresponds to sectors starting at front_C (0 deg) and moving CCW
-        # front_C: -15 to 15 deg (345 to 15)
-        # front_L: 15 to 45
-        # left_R: 45 to 75
-        # left_C: 75 to 105
-        # left_L: 105 to 135
-        # back_R: 135 to 165
-        # back_C: 165 to 195
-        # back_L: 195 to 225
-        # right_R: 225 to 255
-        # right_C: 255 to 285
-        # right_L: 285 to 315
-        # front_R: 315 to 345
+        angle = scan.angle_min + i * scan.angle_increment
+        shifted = (angle + half_sector) % (2.0 * math.pi)
+        idx = int(shifted / sector_rad) % len(REGIONS)
+        Regions_Report[REGIONS[idx]].append(r)
 
-        if deg >= 345 or deg < 15:
-            region = "front_C"
-        elif 15 <= deg < 45:
-            region = "front_L"
-        elif 45 <= deg < 75:
-            region = "left_R"
-        elif 75 <= deg < 105:
-            region = "left_C"
-        elif 105 <= deg < 135:
-            region = "left_L"
-        elif 135 <= deg < 165:
-            region = "back_R"
-        elif 165 <= deg < 195:
-            region = "back_C"
-        elif 195 <= deg < 225:
-            region = "back_L"
-        elif 225 <= deg < 255:
-            region = "right_R"
-        elif 255 <= deg < 285:
-            region = "right_C"
-        elif 285 <= deg < 315:
-            region = "right_L"
-        elif 315 <= deg < 345:
-            region = "front_R"
-        else:
-            region = None
-
-        if region is not None:
-            # Only consider valid range readings (non-inf, non-zero)
-            if r > 0.0 and r < float('inf'):
-                Regions_Report[region].append(r)
-
-        angle += scan.angle_increment
 
 def Steer(velocity):
     global Urgency_Report
 
-    vel = Twist()
-    # If acting, back up and rotate with angular velocity from Urgency_Report
+    """
+    TODO: Fill a Twist command consistent with Urgency_Report and transition motion.
+    - Return the updated Twist.
+    END OF TODO
+    """
     if Urgency_Report["act"]:
-        vel.linear.x = TRANS_LIN_VEL
-        vel.angular.z = Urgency_Report["angular_vel"]
+        velocity.linear.x = TRANS_LIN_VEL
+        velocity.linear.y = 0.0
+        velocity.linear.z = 0.0
+        velocity.angular.x = 0.0
+        velocity.angular.y = 0.0
+        velocity.angular.z = Urgency_Report["angular_vel"]
     else:
-        vel.linear.x = NORMAL_LIN_VEL
-        vel.angular.z = 0.0
+        velocity.linear.x = NORMAL_LIN_VEL
+        velocity.linear.y = 0.0
+        velocity.linear.z = 0.0
+        velocity.angular.x = 0.0
+        velocity.angular.y = 0.0
+        velocity.angular.z = 0.0
 
-    vel.linear.y = 0.0
-    vel.linear.z = 0.0
-    vel.angular.x = 0.0
-    vel.angular.y = 0.0
+    return velocity
 
-    return vel
 
-class LaserObsAvoidNode(Node):
-    def __init__(self):
-        super().__init__('Laser_Obs_Avoid_node')
-        self.pub = self.create_publisher(Twist, '/cmd_vel', 1)
-        self.sub = self.create_subscription(LaserScan, '/scan', self.scan_callback, 10)
-        self.vel = Twist()
-        self.timer = self.create_timer(0.1, self.timer_callback)  # 10Hz
+def main():
+    rclpy.init()
+    node = rclpy.create_node("Laser_Obs_Avoid_node")
 
-        self.done = True
+    # Subscribe to the "/scan" topic in order to read laser scans data from it
+    node.create_subscription(LaserScan, "/scan", IdentifyRegions, 10)
+    # create our publisher that'll publish to the "/cmd_vel" topic
+    pub = node.create_publisher(Twist, "/cmd_vel", 10)
+    vel = Twist()
+    # ros will try to run this code 10 times/second
+    rate = node.create_rate(10)  # 10Hz
 
-    def scan_callback(self, msg):
-        IdentifyRegions(msg)
-
-    def timer_callback(self):
-        global Urgency_Report
-
-        self.done = False
-        while not self.done:
-            ClearanceTest()
-            if Urgency_Report["act"]:
-                self.vel = Steer(self.vel)
-                self.pub.publish(self.vel)
-            else:
-                self.done = True
-
-        if not Urgency_Report["act"]:
-            self.vel.linear.x = NORMAL_LIN_VEL
-            self.vel.linear.y = 0.0
-            self.vel.linear.z = 0.0
-            self.vel.angular.x = 0.0
-            self.vel.angular.y = 0.0
-            self.vel.angular.z = 0.0
-            self.pub.publish(self.vel)
-
-def main(args=None):
-    rclpy.init(args=args)
-    node = LaserObsAvoidNode()
     try:
-        rclpy.spin(node)
+        # keep running while ROS2 is not shutdown
+        while rclpy.ok():
+            rclpy.spin_once(node, timeout_sec=0.0)
+
+            # Need a do{ ... }while(); here (C is awesome)
+            # Since I need to check at least once the clearance
+            done = False
+            while not done and rclpy.ok():
+                rclpy.spin_once(node, timeout_sec=0.0)
+                ClearanceTest()
+                if Urgency_Report["act"]:
+                    vel = Steer(vel)
+                    pub.publish(vel)
+                else:
+                    done = True
+            # This else belongs to the while(), and the code below it could be cleaned furthermore
+            else:
+                vel.linear.x = NORMAL_LIN_VEL
+                vel.linear.y = 0.0
+                vel.linear.z = 0.0
+                vel.angular.x = 0.0
+                vel.angular.y = 0.0
+                vel.angular.z = 0.0
+                pub.publish(vel)
+
+            rate.sleep()
     except KeyboardInterrupt:
         pass
-    node.destroy_node()
-    rclpy.shutdown()
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
 
 if __name__ == "__main__":
     main()

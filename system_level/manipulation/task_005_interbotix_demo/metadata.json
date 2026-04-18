@@ -1,38 +1,18 @@
 {
-  "name": "Task 005: Demo Manipulator Arms in ROS1",
-  "description": "Integration-level benchmark task for selecting and executing manipulator demos using Interbotix ROS1 packages.",
-  "version": "1.0",
-  "tags": ["ros1", "interbotix", "manipulator", "integration", "launch"],
-  "subtasks": [
-    {
-      "id": "task_005_1",
-      "name": "Select demo entrypoint",
-      "file": "ros1_code/demo_launcher.py",
-      "expected_outcome": "Correct demo function is called."
-    },
-    {
-      "id": "task_005_2",
-      "name": "Configure control launch",
-      "file": "ros1_code/launch_control_config.launch",
-      "expected_outcome": "Control node launches with correct robot model and SDK type."
-    },
-    {
-      "id": "task_005_3",
-      "name": "Configure MoveIt execution mode",
-      "file": "ros1_code/launch_moveit_config.launch",
-      "expected_outcome": "MoveIt nodes launch in selected mode: gazebo, actual, or fake."
-    },
-    {
-      "id": "task_005_4",
-      "name": "Configure interface",
-      "file": "ros1_code/launch_interface_config.launch",
-      "expected_outcome": "Selected interface (C++, Python, GUI) launches successfully."
-    }
+  "id": "TASK_005",
+  "name": "System_Level_Python_Orchestration",
+  "file": "interbotix_xsarm_perception/scripts/pick_place.py",
+  "level": "System",
+  "stack": ["ROS1_Noetic", "ROS2_Humble"],
+  "language":"python",
+  "holes": [
+    "H1: Shared Node Initialization",
+    "H2: TF Frame Naming & Data Extraction"
+  ],
+  "metrics": [
+    "Node_Sharing",
+    "TF_No_Leading_Slash",
+    "API_Param_Mapping",
+    "No_Rospy_Leakage"
   ]
 }
-
-
-
-
-
-

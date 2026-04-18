@@ -19,18 +19,20 @@ RUN pip3 install pytest
 RUN mkdir -p /ros2_ws/ros2_code
 WORKDIR /ros2_ws
 
-COPY ./ros2_code /ros2_ws/src/task_008
+COPY ./ros2_code /ros2_ws/src
 COPY ./tests \
-     /ros2_ws/src/task_008/test
+     /ros2_ws/src/test
 #for this task
-RUN touch /ros2_ws/src/task_008/__init__.py
+RUN touch /ros2_ws/src/__init__.py
 
 	
 # Source ROS2
 SHELL ["/bin/bash", "-c"]
 RUN source /opt/ros/humble/setup.bash && \
     cd /ros2_ws && \
-    colcon build --symlink-install
+#This is important!!! added here for automated test
+    python3 -m pytest src/test/test_oracle_ros2.py
+#    colcon build --symlink-install
 
 
 

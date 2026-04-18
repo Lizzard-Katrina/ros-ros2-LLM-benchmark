@@ -1,14 +1,40 @@
 {
-  "task_id": "integration_nav_002",
-  "task_name": "Robot Navigation in Simulation (Husky)",
-  "level": "integration_level",
-  "category": "navigation",
-  "description": "Validate correct integration of Gazebo simulation with Husky robot and ROS navigation stack.",
-  "ros_version": "ROS1 Noetic",
-  "language": "Python",
-  "difficulty": "Basic",
-  "source": [
-    "https://www.clearpathrobotics.com/assets/guides/noetic/husky/HuskyMove.html",
-    "https://github.com/husky/husky"
-  ]
+  "task_id": "002",
+  "task_name": "husky_navigation_migration",
+  "category": "System_Migration",
+  "difficulty": "High",
+  "environment": {
+    "ros_distro": "humble",
+    "language": ["xml", "cmake", "python"],
+    "base_robot": "Clearpath_Husky"
+  },
+  "source_files": [
+    "husky_navigation/package.xml",
+    "husky_navigation/CMakeLists.txt",
+    "husky_navigation/launch/move_base.launch"
+  ],
+  "expected_outputs": [
+    "husky_navigation/package.xml",
+    "husky_navigation/CMakeLists.txt",
+    "husky_navigation/launch/move_base.launch.py"
+  ],
+  "oracle_script": "src/test/test_oracle_ros2.py",
+  "evaluation_metrics": [
+    {
+      "metric": "Architecture_Integrity",
+      "weight": 0.4,
+      "description": "Ability to link dependencies, installation rules, and launch logic into a working system."
+    },
+    {
+      "metric": "Logic_Preservation",
+      "weight": 0.3,
+      "description": "Ensures specific ROS 1 parameters (like no_static_map) are not lost during migration."
+    },
+    {
+      "metric": "Standard_Compliance",
+      "weight": 0.3,
+      "description": "Adherence to ROS 2 Humble coding standards (ament_cmake, Python Launch, etc.)."
+    }
+  ],
+  "tags": ["Husky", "Nav2", "System_Level", "Cross_File_Dependency"]
 }

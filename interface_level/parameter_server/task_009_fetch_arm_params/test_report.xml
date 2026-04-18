@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="6" time="0.037" timestamp="2026-04-10T13:24:18.582156" hostname="a327cec812b3"><testcase classname="src.task_009_fetch_arm_params.tests.test_oracle_ros2" name="test_ros2_param_declaration" time="0.001" /><testcase classname="src.task_009_fetch_arm_params.tests.test_oracle_ros2" name="test_snake_case_naming" time="0.001" /><testcase classname="src.task_009_fetch_arm_params.tests.test_oracle_ros2" name="test_logging_migration" time="0.006"><failure message="AssertionError: Legacy ROS 1 logging (ROS_ERROR) should be removed.&#10;assert 'ROS_ERROR' not in '/**********...maticsBase);'&#10;  'ROS_ERROR' is contained here:&#10;    &#10;    &#10;    #define ROS_ERROR(...) RCLCPP_ERROR(rclcpp::get_logger(&quot;ikfast_plugin&quot;), __VA_ARGS__)&#10;  ?         +++++++++&#10;    #define ROS_ERROR_NAMED(name, ...) RCLCPP_ERROR(rclcpp::get_logger(name), __VA_ARGS__)&#10;    #define ROS_DEBUG_NAMED(name, ...) RCLCPP_DEBUG(rclcpp::get_logger(name), __VA_ARGS__)...&#10;  &#10;  ...Full output truncated (1252 lines hidden), use '-vv' to show">E   AssertionError: Legacy ROS 1 logging (ROS_ERROR) should be removed.
+    assert 'ROS_ERROR' not in '/**********...maticsBase);'
+      'ROS_ERROR' is contained here:
+        
+        
+        #define ROS_ERROR(...) RCLCPP_ERROR(rclcpp::get_logger("ikfast_plugin"), __VA_ARGS__)
+      ?         +++++++++
+        #define ROS_ERROR_NAMED(name, ...) RCLCPP_ERROR(rclcpp::get_logger(name), __VA_ARGS__)
+        #define ROS_DEBUG_NAMED(name, ...) RCLCPP_DEBUG(rclcpp::get_logger(name), __VA_ARGS__)...
+      
+      ...Full output truncated (1252 lines hidden), use '-vv' to show</failure></testcase><testcase classname="src.task_009_fetch_arm_params.tests.test_oracle_ros2" name="test_frame_consistency" time="0.001" /><testcase classname="src.task_009_fetch_arm_params.tests.test_oracle_ros2" name="test_moveit2_api_usage" time="0.001" /><testcase classname="src.task_009_fetch_arm_params.tests.test_oracle_ros2" name="test_tip_frame_validation" time="0.001" /></testsuite></testsuites>

@@ -3,19 +3,27 @@
  * https://docs.ros.org/en/kinetic/api/moveit_tutorials/html/doc/pick_place/pick_place_tutorial.html
  *********************************************************************/
 
+#include <cmath>
+#include <chrono>
+#include <memory>
+#include <thread>
+#include <vector>
+
 #include <rclcpp/rclcpp.hpp>
 
-// MoveIt2
+// MoveIt
 #include <moveit/move_group_interface/move_group_interface.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 
 // Messages
 #include <moveit_msgs/msg/collision_object.hpp>
 #include <moveit_msgs/msg/grasp.hpp>
+#include <moveit_msgs/msg/place_location.hpp>
+#include <shape_msgs/msg/solid_primitive.hpp>
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 
 // TF2
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
 const double tau = 2 * M_PI;
 
@@ -29,7 +37,7 @@ void openGripper(trajectory_msgs::msg::JointTrajectory& posture)
   posture.points[0].positions.resize(2);
   posture.points[0].positions[0] = 0.04;
   posture.points[0].positions[1] = 0.04;
-  posture.points[0].time_from_start = rclcpp::Duration::from_seconds(0.5);
+  posture.points[0].time_from_start = rclcpp::Duration::from_seconds(0.5).to_builtin_msg();
 }
 
 void closedGripper(trajectory_msgs::msg::JointTrajectory& posture)
@@ -42,7 +50,7 @@ void closedGripper(trajectory_msgs::msg::JointTrajectory& posture)
   posture.points[0].positions.resize(2);
   posture.points[0].positions[0] = 0.00;
   posture.points[0].positions[1] = 0.00;
-  posture.points[0].time_from_start = rclcpp::Duration::from_seconds(0.5);
+  posture.points[0].time_from_start = rclcpp::Duration::from_seconds(0.5).to_builtin_msg();
 }
 
 void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& planning_scene_interface)
@@ -50,154 +58,148 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
   std::vector<moveit_msgs::msg::CollisionObject> collision_objects;
   collision_objects.resize(3);
 
-  // Table1
+  // table1
   collision_objects[0].id = "table1";
   collision_objects[0].header.frame_id = "panda_link0";
 
-  shape_msgs::msg::SolidPrimitive table1_primitive;
-  table1_primitive.type = table1_primitive.BOX;
-  table1_primitive.dimensions = {0.5, 1.5, 0.35};
+  collision_objects[0].primitives.resize(1);
+  collision_objects[0].primitives[0].type = shape_msgs::msg::SolidPrimitive::BOX;
+  collision_objects[0].primitives[0].dimensions.resize(3);
+  collision_objects[0].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_X] = 0.2;
+  collision_objects[0].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_Y] = 0.4;
+  collision_objects[0].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_Z] = 0.4;
 
-  geometry_msgs::msg::Pose table1_pose;
-  table1_pose.orientation.w = 1.0;
-  table1_pose.position.x = 0.5;
-  table1_pose.position.y = 0.0;
-  table1_pose.position.z = 0.175;
+  collision_objects[0].primitive_poses.resize(1);
+  collision_objects[0].primitive_poses[0].position.x = 0.5;
+  collision_objects[0].primitive_poses[0].position.y = 0.0;
+  collision_objects[0].primitive_poses[0].position.z = 0.2;
+  collision_objects[0].primitive_poses[0].orientation.w = 1.0;
+  collision_objects[0].operation = moveit_msgs::msg::CollisionObject::ADD;
 
-  collision_objects[0].primitives.push_back(table1_primitive);
-  collision_objects[0].primitive_poses.push_back(table1_pose);
-  collision_objects[0].operation = collision_objects[0].ADD;
-
-  // Table2
+  // table2
   collision_objects[1].id = "table2";
   collision_objects[1].header.frame_id = "panda_link0";
 
-  shape_msgs::msg::SolidPrimitive table2_primitive;
-  table2_primitive.type = table2_primitive.BOX;
-  table2_primitive.dimensions = {0.5, 0.5, 0.35};
+  collision_objects[1].primitives.resize(1);
+  collision_objects[1].primitives[0].type = shape_msgs::msg::SolidPrimitive::BOX;
+  collision_objects[1].primitives[0].dimensions.resize(3);
+  collision_objects[1].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_X] = 0.4;
+  collision_objects[1].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_Y] = 0.2;
+  collision_objects[1].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_Z] = 0.4;
 
-  geometry_msgs::msg::Pose table2_pose;
-  table2_pose.orientation.w = 1.0;
-  table2_pose.position.x = 0.0;
-  table2_pose.position.y = -0.7;
-  table2_pose.position.z = 0.175;
+  collision_objects[1].primitive_poses.resize(1);
+  collision_objects[1].primitive_poses[0].position.x = 0.0;
+  collision_objects[1].primitive_poses[0].position.y = 0.5;
+  collision_objects[1].primitive_poses[0].position.z = 0.2;
+  collision_objects[1].primitive_poses[0].orientation.w = 1.0;
+  collision_objects[1].operation = moveit_msgs::msg::CollisionObject::ADD;
 
-  collision_objects[1].primitives.push_back(table2_primitive);
-  collision_objects[1].primitive_poses.push_back(table2_pose);
-  collision_objects[1].operation = collision_objects[1].ADD;
-
-  // Object to pick
+  // object
   collision_objects[2].id = "object";
   collision_objects[2].header.frame_id = "panda_link0";
 
-  shape_msgs::msg::SolidPrimitive object_primitive;
-  object_primitive.type = object_primitive.BOX;
-  object_primitive.dimensions = {0.05, 0.05, 0.2};
+  collision_objects[2].primitives.resize(1);
+  collision_objects[2].primitives[0].type = shape_msgs::msg::SolidPrimitive::BOX;
+  collision_objects[2].primitives[0].dimensions.resize(3);
+  collision_objects[2].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_X] = 0.02;
+  collision_objects[2].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_Y] = 0.02;
+  collision_objects[2].primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_Z] = 0.2;
 
-  geometry_msgs::msg::Pose object_pose;
-  object_pose.orientation.w = 1.0;
-  object_pose.position.x = 0.5;
-  object_pose.position.y = 0.0;
-  object_pose.position.z = 0.6;
-
-  collision_objects[2].primitives.push_back(object_primitive);
-  collision_objects[2].primitive_poses.push_back(object_pose);
-  collision_objects[2].operation = collision_objects[2].ADD;
+  collision_objects[2].primitive_poses.resize(1);
+  collision_objects[2].primitive_poses[0].position.x = 0.5;
+  collision_objects[2].primitive_poses[0].position.y = 0.0;
+  collision_objects[2].primitive_poses[0].position.z = 0.5;
+  collision_objects[2].primitive_poses[0].orientation.w = 1.0;
+  collision_objects[2].operation = moveit_msgs::msg::CollisionObject::ADD;
 
   planning_scene_interface.applyCollisionObjects(collision_objects);
 }
 
 void pick(moveit::planning_interface::MoveGroupInterface& move_group)
 {
-  std::vector<moveit_msgs::msg::Grasp> grasps;
-  grasps.resize(1);
+  std::vector<moveit_msgs::msg::Grasp> grasps(1);
 
-  // Setting grasp pose
   grasps[0].grasp_pose.header.frame_id = "panda_link0";
   tf2::Quaternion orientation;
-  orientation.setRPY(-M_PI / 2, 0, -M_PI / 4);
+  orientation.setRPY(-tau / 4, -tau / 8, -tau / 4);
   grasps[0].grasp_pose.pose.orientation = tf2::toMsg(orientation);
-  grasps[0].grasp_pose.pose.position.x = 0.5;
+  grasps[0].grasp_pose.pose.position.x = 0.415;
   grasps[0].grasp_pose.pose.position.y = 0.0;
-  grasps[0].grasp_pose.pose.position.z = 0.6;
+  grasps[0].grasp_pose.pose.position.z = 0.5;
 
-  // Setting pre-grasp approach
   grasps[0].pre_grasp_approach.direction.header.frame_id = "panda_link0";
-  grasps[0].pre_grasp_approach.direction.vector.z = -1.0;
+  grasps[0].pre_grasp_approach.direction.vector.x = 1.0;
   grasps[0].pre_grasp_approach.min_distance = 0.095;
   grasps[0].pre_grasp_approach.desired_distance = 0.115;
 
-  // Setting post-grasp retreat
   grasps[0].post_grasp_retreat.direction.header.frame_id = "panda_link0";
   grasps[0].post_grasp_retreat.direction.vector.z = 1.0;
   grasps[0].post_grasp_retreat.min_distance = 0.1;
   grasps[0].post_grasp_retreat.desired_distance = 0.25;
 
-  // Open gripper before grasp
   openGripper(grasps[0].pre_grasp_posture);
-
-  // Closed gripper during grasp
   closedGripper(grasps[0].grasp_posture);
 
+  move_group.setSupportSurfaceName("table1");
   move_group.pick("object", grasps);
 }
 
 void place(moveit::planning_interface::MoveGroupInterface& move_group)
 {
-  std::vector<moveit_msgs::msg::PlaceLocation> place_locations;
-  place_locations.resize(1);
+  std::vector<moveit_msgs::msg::PlaceLocation> place_location(1);
 
-  // Setting place pose
-  place_locations[0].place_pose.header.frame_id = "panda_link0";
-  place_locations[0].place_pose.pose.orientation.w = 1.0;
-  place_locations[0].place_pose.pose.position.x = 0.0;
-  place_locations[0].place_pose.pose.position.y = -0.7;
-  place_locations[0].place_pose.pose.position.z = 0.6;
+  place_location[0].place_pose.header.frame_id = "panda_link0";
+  tf2::Quaternion orientation;
+  orientation.setRPY(0, 0, tau / 4);
+  place_location[0].place_pose.pose.orientation = tf2::toMsg(orientation);
+  place_location[0].place_pose.pose.position.x = 0.0;
+  place_location[0].place_pose.pose.position.y = 0.5;
+  place_location[0].place_pose.pose.position.z = 0.5;
 
-  // Setting pre-place approach
-  place_locations[0].pre_place_approach.direction.header.frame_id = "panda_link0";
-  place_locations[0].pre_place_approach.direction.vector.z = -1.0;
-  place_locations[0].pre_place_approach.min_distance = 0.095;
-  place_locations[0].pre_place_approach.desired_distance = 0.115;
+  place_location[0].pre_place_approach.direction.header.frame_id = "panda_link0";
+  place_location[0].pre_place_approach.direction.vector.z = -1.0;
+  place_location[0].pre_place_approach.min_distance = 0.095;
+  place_location[0].pre_place_approach.desired_distance = 0.115;
 
-  // Setting post-place retreat
-  place_locations[0].post_place_retreat.direction.header.frame_id = "panda_link0";
-  place_locations[0].post_place_retreat.direction.vector.y = -1.0;
-  place_locations[0].post_place_retreat.min_distance = 0.1;
-  place_locations[0].post_place_retreat.desired_distance = 0.25;
+  place_location[0].post_place_retreat.direction.header.frame_id = "panda_link0";
+  place_location[0].post_place_retreat.direction.vector.y = -1.0;
+  place_location[0].post_place_retreat.min_distance = 0.1;
+  place_location[0].post_place_retreat.desired_distance = 0.25;
 
-  // Open gripper after placing
-  openGripper(place_locations[0].post_place_posture);
+  openGripper(place_location[0].post_place_posture);
 
-  move_group.place("object", place_locations);
+  move_group.setSupportSurfaceName("table2");
+  move_group.place("object", place_location);
 }
 
 int main(int argc, char** argv)
 {
+  using namespace std::chrono_literals;
+
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("panda_arm_pick_place");
 
-  rclcpp::executors::MultiThreadedExecutor executor;
+  rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
+  std::thread spinner([&executor]() { executor.spin(); });
 
-  // Create MoveGroupInterface and PlanningSceneInterface with node
+  rclcpp::sleep_for(1s);
+
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
   moveit::planning_interface::MoveGroupInterface move_group(node, "panda_arm");
   move_group.setPlanningTime(45.0);
 
-  // Run async spinner in separate thread
-  std::thread([&executor]() { executor.spin(); }).detach();
-
-  rclcpp::sleep_for(std::chrono::seconds(1));
-
   addCollisionObjects(planning_scene_interface);
-  rclcpp::sleep_for(std::chrono::seconds(1));
+  rclcpp::sleep_for(1s);
 
   pick(move_group);
-  rclcpp::sleep_for(std::chrono::seconds(1));
+  rclcpp::sleep_for(1s);
 
   place(move_group);
 
   rclcpp::shutdown();
+  if (spinner.joinable())
+    spinner.join();
+
   return 0;
 }

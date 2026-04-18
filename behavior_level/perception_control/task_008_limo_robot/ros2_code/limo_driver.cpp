@@ -23,21 +23,28 @@
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "limo_driver.h"
-#include <tf2/LinearMath/Quaternion.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include <chrono>
 
-int flag=0; 
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+#include <functional>
+#include <memory>
+#include <thread>
+
+#include <tf2/LinearMath/Quaternion.h>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+
+int flag = 0;
 
 namespace AgileX {
 
-LimoDriver::LimoDriver() : Node("limo_driver"), x_(0.0), y_(0.0), theta_(0.0), last_time_(this->now()) {
+LimoDriver::LimoDriver() : Node("limo_driver") {
     std::string port_name;
     this->declare_parameter<std::string>("port_name", "ttyTHS1");
     this->declare_parameter<std::string>("odom_frame", "odom");
@@ -57,12 +64,16 @@ LimoDriver::LimoDriver() : Node("limo_driver"), x_(0.0), y_(0.0), theta_(0.0), l
     motion_cmd_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
         "/cmd_vel", 5, std::bind(&LimoDriver::twistCmdCallback, this, std::placeholders::_1));
 
+    if (pub_odom_tf_) {
+        tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
+    }
+
     // connect to the serial port
-    if (port_name.find("tty") != std::string::npos){
-        port_name= "/dev/" + port_name;
+    if (port_name.find("tty") != port_name.npos) {
+        port_name = "/dev/" + port_name;
         connect(port_name, B460800);
         enableCommandedMode();
-        if(use_mcnamu_) {
+        if (use_mcnamu_) {
             motion_mode_ = MODE_MCNAMU;
             enableMcMode();
         }
@@ -71,7 +82,6 @@ LimoDriver::LimoDriver() : Node("limo_driver"), x_(0.0), y_(0.0), theta_(0.0), l
 }
 
 LimoDriver::~LimoDriver() {
-
 }
 
 double LimoDriver::degToRad(double deg) {
@@ -89,25 +99,23 @@ double LimoDriver::normalizeAngle(double angle) {
 }
 
 void LimoDriver::connect(std::string dev_name, uint32_t bouadrate) {
-    port_ = std::make_shared<SerialPort>(dev_name, bouadrate);
+    port_ = std::shared_ptr<SerialPort>(new SerialPort(dev_name, bouadrate));
     if (port_->openPort() == 0) {
-        read_data_thread_ = std::make_shared<std::thread>(
-            std::bind(&LimoDriver::readData, this));
-    }   
-    else {
+        read_data_thread_ = std::shared_ptr<std::thread>(
+            new std::thread(std::bind(&LimoDriver::readData, this)));
+    } else {
         RCLCPP_ERROR(this->get_logger(), "Failed to open %s", port_->getDevPath().c_str());
         port_->closePort();
-        exit(-1);
+        rclcpp::shutdown();
+        std::exit(-1);
     }
 }
 
 void LimoDriver::readData() {
     uint8_t rx_data = 0;
-    rclcpp::Rate rate(1000);
     while (rclcpp::ok()) {
         auto len = port_->readByte(&rx_data);
         if (len < 1) {
-            rate.sleep();
             continue;
         }
         processRxData(rx_data);
@@ -131,8 +139,7 @@ void LimoDriver::processRxData(uint8_t data) {
         case LIMO_WAIT_LENGTH: {
             if (data == FRAME_LENGTH) {
                 state = LIMO_WAIT_ID_HIGH;
-            }
-            else {
+            } else {
                 state = LIMO_WAIT_HEADER;
             }
             break;
@@ -146,15 +153,13 @@ void LimoDriver::processRxData(uint8_t data) {
             frame.id |= static_cast<uint16_t>(data);
             state = LIMO_WAIT_DATA;
             data_num = 0;
-            checksum = 0;
             break;
         }
         case LIMO_WAIT_DATA: {
             if (data_num < 8) {
                 frame.data[data_num++] = data;
                 checksum += data;
-            }
-            else {
+            } else {
                 frame.count = data;
                 state = LIMO_CHECK;
                 data_num = 0;
@@ -164,14 +169,13 @@ void LimoDriver::processRxData(uint8_t data) {
         case LIMO_CHECK: {
             if (data == checksum) {
                 parseFrame(frame);
-            }
-            else {
+            } else {
                 RCLCPP_ERROR(this->get_logger(), "Invalid frame! Check sum failed!");
             }
 
             state = LIMO_WAIT_HEADER;
             checksum = 0;
-            memset(&frame.data[0], 0, 8);
+            std::memset(&frame.data[0], 0, 8);
             break;
         }
         default:
@@ -188,8 +192,7 @@ void LimoDriver::parseFrame(const LimoFrame& frame) {
             double steering_angle = static_cast<int16_t>((frame.data[7] & 0xff) | (frame.data[6] << 8)) / 1000.0;
             if (steering_angle > 0) {
                 steering_angle *= left_angle_scale_;
-            }
-            else {
+            } else {
                 steering_angle *= right_angle_scale_;
             }
             publishOdometry(frame.stamp, linear_velocity, angular_velocity,
@@ -241,6 +244,8 @@ void LimoDriver::parseFrame(const LimoFrame& frame) {
                                       (frame.data[1] << 16)  | (frame.data[0] << 24);
             int32_t right_wheel_odom = (frame.data[7] & 0xff) | (frame.data[6] << 8) |
                                        (frame.data[5] << 16)  | (frame.data[4] << 24);
+            (void)left_wheel_odom;
+            (void)right_wheel_odom;
             break;
         }
         case MSG_IMU_ACCEL_ID: { // accelerate
@@ -327,17 +332,16 @@ void LimoDriver::enableMcMode()
 
     sendFrame(frame);
     RCLCPP_INFO(this->get_logger(), "use_mcnamu");
-
 }
 
 void LimoDriver::setMotionCommand(double linear_vel, double angular_vel,
                                   double lateral_velocity, double steering_angle) {
     LimoFrame frame;
     frame.id = MSG_MOTION_COMMAND_ID;
-    int16_t linear_cmd = static_cast<int16_t>(linear_vel * 1000);
-    int16_t angular_cmd = static_cast<int16_t>(angular_vel * 1000);
-    int16_t lateral_cmd = static_cast<int16_t>(lateral_velocity * 1000);
-    int16_t steering_cmd = static_cast<int16_t>(steering_angle * 1000);
+    int16_t linear_cmd = linear_vel * 1000;
+    int16_t angular_cmd = angular_vel * 1000;
+    int16_t lateral_cmd = lateral_velocity * 1000;
+    int16_t steering_cmd = steering_angle * 1000;
 
     frame.data[0] = static_cast<uint8_t>(linear_cmd >> 8);
     frame.data[1] = static_cast<uint8_t>(linear_cmd & 0x00ff);
@@ -367,41 +371,37 @@ void LimoDriver::sendFrame(const LimoFrame& frame) {
 }
 
 void LimoDriver::twistCmdCallback(const geometry_msgs::msg::Twist::SharedPtr msg) {
-/* TODO: 
-Implement the kinematics conversion for Ackermann steering mode. 
-Calculate the corresponding steering angle based on the wheelbase 
-and track parameters to satisfy the non-holonomic constraints. 
-Ensure the resulting angle is normalized and clamped within the 
-mechanical limits of the vehicle. 
-END OF TODO*/
-    double linear_vel = msg->linear.x;
-    double angular_vel = msg->angular.z;
-    double lateral_vel = msg->linear.y;
+    double linear_cmd = msg->linear.x;
+    double angular_cmd = msg->angular.z;
+    double lateral_cmd = msg->linear.y;
+    double steering_cmd = 0.0;
 
-    double steering_angle = 0.0;
+    if (motion_mode_ != MODE_MCNAMU) {
+        lateral_cmd = 0.0;
 
-    // Ackermann steering kinematics
-    if (fabs(linear_vel) > 1e-6) {
-        steering_angle = std::atan(wheelbase_ * angular_vel / linear_vel);
+        if (std::fabs(linear_cmd) > 1e-6 && std::fabs(angular_cmd) > 1e-6) {
+            const double central_angle = std::atan((wheelbase_ * angular_cmd) / linear_cmd);
+            steering_cmd = convertCentralAngleToInner(normalizeAngle(central_angle));
+        } else {
+            steering_cmd = 0.0;
+        }
+
+        const double max_inner_angle = degToRad(30.0);
+        steering_cmd = std::clamp(steering_cmd, -max_inner_angle, max_inner_angle);
+        steering_cmd = normalizeAngle(steering_cmd);
+
+        angular_cmd = 0.0;
     } else {
-        steering_angle = 0.0;
+        steering_cmd = 0.0;
     }
 
-    // Clamp steering angle within mechanical limits
-    steering_angle = normalizeAngle(steering_angle);
-    if (steering_angle > max_steering_angle_) {
-        steering_angle = max_steering_angle_;
-    } else if (steering_angle < -max_steering_angle_) {
-        steering_angle = -max_steering_angle_;
-    }
-
-    setMotionCommand(linear_vel, angular_vel, lateral_vel, steering_angle);
+    setMotionCommand(linear_cmd, angular_cmd, lateral_cmd, steering_cmd);
 }
 
 void LimoDriver::publishIMUData(double stamp) {
     sensor_msgs::msg::Imu imu_msg;
-       
-    imu_msg.header.stamp = rclcpp::Time(static_cast<uint64_t>(stamp * 1e9));
+
+    imu_msg.header.stamp = rclcpp::Time(static_cast<int64_t>(stamp * 1e9));
     imu_msg.header.frame_id = "imu_link";
 
     imu_msg.linear_acceleration.x = imu_data_.accel_x;
@@ -415,19 +415,18 @@ void LimoDriver::publishIMUData(double stamp) {
     tf2::Quaternion q;
     q.setRPY(0.0, 0.0, degToRad(imu_data_.yaw));
 
-    if (flag==0)
-    {
+    if (flag == 0) {
         present_theta_ = last_theta_ = imu_data_.yaw;
-        flag=1;    
-        
+        flag = 1;
     }
-    //RCLCPP_INFO(this->get_logger(), "flag:%d",flag);
+
     present_theta_ = imu_data_.yaw;
     delta_theta_ = present_theta_ - last_theta_;
-    if(delta_theta_< 0.1 && delta_theta_> -0.1) delta_theta_=0;
+    if (delta_theta_ < 0.1 && delta_theta_ > -0.1) {
+        delta_theta_ = 0;
+    }
     real_theta_ = real_theta_ + delta_theta_;
     last_theta_ = present_theta_;
-    //RCLCPP_INFO(this->get_logger(), "present_theta_:%f;delta_theta_:%f;real_theta_:%f;last_theta_:%f",present_theta_,delta_theta_,real_theta_,last_theta_);
 
     imu_msg.orientation.x = q.x();
     imu_msg.orientation.y = q.y();
@@ -452,54 +451,62 @@ void LimoDriver::publishIMUData(double stamp) {
 void LimoDriver::publishOdometry(double stamp, double linear_velocity,
                                  double angular_velocity, double lateral_velocity,
                                  double steering_angle) {
-/* TODO: 
-Calculate the body-frame velocities (vx, vy, wz) specific to the 
-current motion mode. Then, perform Euler integration to update the 
-global odometry position by transforming these local velocities 
-using the robot's current heading. 
-END OF TODO*/
-    rclcpp::Time current_time(static_cast<uint64_t>(stamp * 1e9));
-    double dt = (current_time - last_time_).seconds();
-    if (dt <= 0.0) dt = 0.01;
+    static bool initialized = false;
+    static double last_stamp = 0.0;
+    static double x = 0.0;
+    static double y = 0.0;
+    static double theta = 0.0;
 
-    double vx = 0.0;
+    double vx = linear_velocity;
     double vy = 0.0;
-    double wz = 0.0;
+    double wz = angular_velocity;
 
     if (motion_mode_ == MODE_MCNAMU) {
-        // For MCNAMU mode, lateral velocity is zero, angular velocity is steering angle * linear velocity / wheelbase
-        vx = linear_velocity;
-        vy = 0.0;
-        wz = linear_velocity * std::tan(steering_angle) / wheelbase_;
-    } else {
-        // Default mode: use provided velocities directly
-        vx = linear_velocity;
         vy = lateral_velocity;
         wz = angular_velocity;
+    } else {
+        vy = 0.0;
+        if (std::fabs(std::cos(steering_angle)) > 1e-6) {
+            wz = linear_velocity * std::tan(steering_angle) / wheelbase_;
+        } else {
+            wz = angular_velocity;
+        }
     }
 
-    // Euler integration for pose update
-    double delta_x = (vx * std::cos(theta_) - vy * std::sin(theta_)) * dt;
-    double delta_y = (vx * std::sin(theta_) + vy * std::cos(theta_)) * dt;
-    double delta_theta = wz * dt;
+    if (!initialized) {
+        initialized = true;
+        last_stamp = stamp;
+    }
 
-    x_ += delta_x;
-    y_ += delta_y;
-    theta_ = normalizeAngle(theta_ + delta_theta);
+    double dt = stamp - last_stamp;
+    if (dt < 0.0) {
+        dt = 0.0;
+    }
 
-    // Publish odometry message
+    const double dx_world = (vx * std::cos(theta) - vy * std::sin(theta)) * dt;
+    const double dy_world = (vx * std::sin(theta) + vy * std::cos(theta)) * dt;
+
+    x += dx_world;
+    y += dy_world;
+    theta = normalizeAngle(theta + wz * dt);
+
+    last_stamp = stamp;
+
     nav_msgs::msg::Odometry odom_msg;
-    odom_msg.header.stamp = current_time;
+    odom_msg.header.stamp = rclcpp::Time(static_cast<int64_t>(stamp * 1e9));
     odom_msg.header.frame_id = odom_frame_;
     odom_msg.child_frame_id = base_frame_;
 
-    odom_msg.pose.pose.position.x = x_;
-    odom_msg.pose.pose.position.y = y_;
+    odom_msg.pose.pose.position.x = x;
+    odom_msg.pose.pose.position.y = y;
     odom_msg.pose.pose.position.z = 0.0;
 
     tf2::Quaternion q;
-    q.setRPY(0, 0, theta_);
-    odom_msg.pose.pose.orientation = tf2::toMsg(q);
+    q.setRPY(0.0, 0.0, theta);
+    odom_msg.pose.pose.orientation.x = q.x();
+    odom_msg.pose.pose.orientation.y = q.y();
+    odom_msg.pose.pose.orientation.z = q.z();
+    odom_msg.pose.pose.orientation.w = q.w();
 
     odom_msg.twist.twist.linear.x = vx;
     odom_msg.twist.twist.linear.y = vy;
@@ -507,27 +514,23 @@ END OF TODO*/
 
     odom_publisher_->publish(odom_msg);
 
-    if (pub_odom_tf_) {
-        geometry_msgs::msg::TransformStamped odom_tf;
-        odom_tf.header.stamp = current_time;
-        odom_tf.header.frame_id = odom_frame_;
-        odom_tf.child_frame_id = base_frame_;
-
-        odom_tf.transform.translation.x = x_;
-        odom_tf.transform.translation.y = y_;
-        odom_tf.transform.translation.z = 0.0;
-        odom_tf.transform.rotation = tf2::toMsg(q);
-
-        tf_broadcaster_->sendTransform(odom_tf);
+    if (pub_odom_tf_ && tf_broadcaster_) {
+        geometry_msgs::msg::TransformStamped tf_msg;
+        tf_msg.header.stamp = odom_msg.header.stamp;
+        tf_msg.header.frame_id = odom_frame_;
+        tf_msg.child_frame_id = base_frame_;
+        tf_msg.transform.translation.x = x;
+        tf_msg.transform.translation.y = y;
+        tf_msg.transform.translation.z = 0.0;
+        tf_msg.transform.rotation = odom_msg.pose.pose.orientation;
+        tf_broadcaster_->sendTransform(tf_msg);
     }
-
-    last_time_ = current_time;
 }
 
 void LimoDriver::publishLimoState(double stamp, uint8_t vehicle_state, uint8_t control_mode,
                                   double battery_voltage, uint16_t error_code, int8_t motion_mode) {
     limo_base::msg::LimoStatus status_msg;
-    status_msg.header.stamp = rclcpp::Time(static_cast<uint64_t>(stamp * 1e9));
+    status_msg.header.stamp = rclcpp::Time(static_cast<int64_t>(stamp * 1e9));
     status_msg.vehicle_state = vehicle_state;
     status_msg.control_mode = control_mode;
     status_msg.battery_voltage = battery_voltage;
@@ -538,7 +541,7 @@ void LimoDriver::publishLimoState(double stamp, uint8_t vehicle_state, uint8_t c
 }
 
 double LimoDriver::convertInnerAngleToCentral(double inner_angle) {
-    double r = wheelbase_ / std::tan(fabs(inner_angle)) + track_ / 2;
+    double r = wheelbase_ / std::tan(std::fabs(inner_angle)) + track_ / 2;
     double central_angle = std::atan(wheelbase_ / r);
 
     if (inner_angle < 0) {
@@ -549,9 +552,9 @@ double LimoDriver::convertInnerAngleToCentral(double inner_angle) {
 }
 
 double LimoDriver::convertCentralAngleToInner(double central_angle) {
-    double inner_angle = std::atan(2 * wheelbase_ * std::sin(fabs(central_angle)) /
-                                   (2 * wheelbase_ * std::cos(fabs(central_angle)) -
-                                    track_ * std::sin(fabs(central_angle))));
+    double inner_angle = std::atan(2 * wheelbase_ * std::sin(std::fabs(central_angle)) /
+                                   (2 * wheelbase_ * std::cos(std::fabs(central_angle)) -
+                                    track_ * std::sin(std::fabs(central_angle))));
 
     if (central_angle < 0) {
         inner_angle = -inner_angle;

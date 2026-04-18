@@ -1,53 +1,30 @@
-# Task 003: Waypoint Following (Multiple Goals)
+# Task 003: Actionlib to rclcpp_action Migration
 
-## Level
-Integration Level – Navigation Stack Correctness
-
-## Description
-This task evaluates sequential waypoint following using ROS Actionlib and the `move_base` stack in simulation.  
-The node framework is fully preserved, and the core logic for filling `MoveBaseGoal` is left as a TODO.
-
-### Task Flow
-1. Define a list of waypoints `(x, y, yaw)`  
-2. Fill `MoveBaseGoal` for each waypoint (TODO)  
-3. Send goal to `move_base` using ROS Action Client  
-4. Wait for result and handle goal state (success, abort, other)  
-5. Repeat for all waypoints
-
+## 1. Brief Description
+This task focuses on the migration of a ROS 1 Action Server to ROS 2 Humble. The original node `add_two_ints_server.cpp` uses the `actionlib` library to provide a preemptible service that sums two integers. In ROS 2, this requires a significant structural shift from simple callbacks to a managed asynchronous state machine using `rclcpp_action`.
 ---
+source code:
+```https://github.com/ros/actionlib/tree/noetic-devel```
 
-## TODO Files
+## 2. "Hole" Design Strategy
+We utilize coarse-grained logical block removal to test the model's ability to maintain system-wide consistency across multiple files:
 
-### 1. `TODO_fill_goal.py`
-**Goal:** Construct `MoveBaseGoal` from a waypoint `(x, y, yaw)`  
-**Expected Outcome:**
-- `frame_id` set to `"map"`  
-- Position (`x`, `y`) correctly assigned  
-- Orientation converted to quaternion correctly  
-- Goal ready to be sent to `move_base`  
+* **package.xml (Dependency Hole)**: 
+    * **Range**: Lines 22-38.
+    * **Logic**: Removes all ROS 1 buildtool and dependency tags. The model must provide the ROS 2 `ament_cmake` buildtool and the correct `rclcpp_action`, `action_msgs`, and `rosidl` dependencies.
+* **CMakeLists.txt (Build System Hole)**:
+    * **Range**: Line 4 to EOF.
+    * **Logic**: Removes the entire ROS 1 `catkin` configuration. The model must reconstruct the `rosidl_generate_interfaces` pipeline and link the generated C++ headers to the server executable.
+* **add_two_ints_server.cpp (Logic Hole)**:
+    * **Range**: Lines 37-58.
+    * **Logic**: Removes headers and the ROS 1 `ServiceServer` initialization. The model must implement the ROS 2 Action Server lifecycle, specifically handling `GoalResponse`, `CancelResponse`, and the `execute` logic using `ServerGoalHandle`.
 
-### 2. Status Handling in `waypoint_follower.py`
-**Goal:** Handle result state from the action client  
-**Expected Outcome:**
-- `GoalStatus.SUCCEEDED` → proceed to next waypoint  
-- `GoalStatus.ABORTED` → stop execution and log a warning  
-- Other states → log informative message
+## 3. Oracle Test Design & Expected Outcomes
+The Oracle script (`test_oracle_ros2.py`) validates the migration through four key checks:
 
----
-
-## Validation
-
-### Single TODO Validation
-- Call `fill_goal_from_waypoint()` with a mock waypoint  
-- Verify that `goal.position` and `goal.orientation` are correctly populated  
-
-### Full Pipeline Validation
-- Launch Gazebo simulation with Husky and navigation stack  
-- Run `waypoint_follower.py` node  
-- Verify that the robot sequentially navigates through all defined waypoints  
-
----
-
-## Notes
-- Only the core algorithm logic is evaluated as TODO; all ROS interfaces, Action Client setup, loops, and logging are preserved  
-- The benchmark ensures realistic context and algorithm complexity for LLM-based code completion
+| Test Case | Design Rationale | Expected Outcome to Pass |
+| :--- | :--- | :--- |
+| `test_dependency_sync` | Ensures manifest and build scripts are aligned. | `rclcpp_action` and `action_msgs` must exist in both `package.xml` and `CMakeLists.txt`. |
+| `test_interface_sync` | Verifies the IDL-to-C++ header bridge. | `CMakeLists.txt` must call `rosidl_generate_interfaces` for the `.action` files used in C++. |
+| `test_cpp_action_logic` | Validates the ROS 2 asynchronous pattern. | C++ code must use `ServerGoalHandle`, `ACCEPT_AND_EXECUTE`, and call `.succeed()` with the correct sum. |
+| `test_build_migration` | Confirms total removal of legacy middleware. | No `catkin` keywords should remain; `ament_package()` must be the final call in CMake. |

@@ -1,0 +1,186 @@
+[
+    {
+        "task_id": "perception_control/task_001_color_blob_tracking",
+        "status": "FAILED",
+        "score": "2/7",
+        "pass_rate": "28.57%",
+        "tokens": 1317,
+        "failed_cases": [
+            {
+                "test_function": "test_02_node_spin_and_image_subscription_pipeline",
+                "error_message": "AssertionError: Expected a ROS2 Node (subclass of rclcpp::Node or constructed via std::make_shared<...>()).\nMissing pattern:\n:\\s*public\\s+rclcpp::Node\\b|std::make_shared\\s*<\\s*\\w+\\s*>"
+            },
+            {
+                "test_function": "test_04_perception_scans_image_data_buffer",
+                "error_message": "AssertionError: Expected access to image data buffer (msg.data[...] or msg->data[...]).\nMissing pattern:\n(\\.|->)\\s*data\\s*\\["
+            },
+            {
+                "test_function": "test_05_rgb_triplet_check_present",
+                "error_message": "AssertionError: Expected adjacent channel access like data[i+1] (RGB triplet).\nMissing pattern:\ndata\\s*\\[\\s*\\w+\\s*\\+\\s*1\\s*\\]"
+            },
+            {
+                "test_function": "test_06_three_region_left_center_right_decision_with_geometry_thresholds",
+                "error_message": "AssertionError: Expected an if-branch for region decision.\nMissing pattern:\n\\bif\\s*\\([^)]*\\)\\s*\\{"
+            },
+            {
+                "test_function": "test_07_stop_and_motion_semantics_without_literal_numbers",
+                "error_message": "AssertionError: Expected turning mapping: an assignment that sets angular component to a NEGATED expression (turn one direction).\nMissing pattern:\n(request\\s*(->|\\.)\\s*(angular_z|angular)\\b|angular\\.\\w+)\\s*=\\s*-\\s*[^;]+;"
+            }
+        ]
+    },
+    {
+        "task_id": "perception_control/task_002_camera_depth_reach_target",
+        "status": "SUCCESS",
+        "score": "9/9",
+        "pass_rate": "100.00%",
+        "tokens": 4092,
+        "failed_cases": []
+    },
+    {
+        "task_id": "perception_control/task_003_multi_node_perception_control",
+        "status": "FAILED",
+        "score": "2/5",
+        "pass_rate": "40.00%",
+        "tokens": 2512,
+        "failed_cases": [
+            {
+                "test_function": "test_ds4_enum_mapping_present_and_used",
+                "error_message": "AssertionError: Must map L1 button via event.number == DS4_BUTTONS::L1 (reference behavior).\nMissing pattern:\nevent\\s*\\.\\s*number\\s*==\\s*DS4_BUTTONS::L1"
+            },
+            {
+                "test_function": "test_l1_toggle_semantics_fidelity",
+                "error_message": "AssertionError: Must check button-press event.value == 1 (reference enable on press).\nMissing pattern:\nevent\\s*\\.\\s*value\\s*==\\s*1"
+            },
+            {
+                "test_function": "test_axis_scaling_and_publish_gating_fidelity",
+                "error_message": "AssertionError: linear.x must be computed from -event.value/32767 * scale_linear (reference scaling).\nMissing pattern:\nlinear\\s*\\.\\s*x\\s*=\\s*-\\s*[^;]*event\\s*\\.\\s*value[^;]*/\\s*32767(?:\\.0+)?[^;]*\\*\\s*[^;]*scale_linear"
+            }
+        ]
+    },
+    {
+        "task_id": "perception_control/task_004_mobile_lidar_obstacle_avoidance",
+        "status": "FAILED",
+        "score": "5/9",
+        "pass_rate": "55.56%",
+        "tokens": 3499,
+        "failed_cases": [
+            {
+                "test_function": "test_partitions_ranges_by_slicing",
+                "error_message": "AssertionError: Must chunk ranges via slicing (ranges[a:b]) to form contiguous regions (fidelity to ROS1 partitioning).\nMissing pattern:\n(ranges|msg\\.ranges|scan\\.ranges)\\s*\\[\\s*[^:\\]]+\\s*:\\s*[^:\\]]+\\s*\\]"
+            },
+            {
+                "test_function": "test_identifyregions_filtering_strategy",
+                "error_message": "AssertionError: Must ignore/handle infinite LaserScan readings (ROS1 reference excludes 'inf').\nMissing pattern:\n(float\\('inf'\\))|(\\bmath\\.isfinite\\b)|(\\bisfinite\\b)|(\\binf\\b)|([\\\"']inf[\\\"'])"
+            },
+            {
+                "test_function": "test_decision_uses_signed_cost_table_and_abs_cost",
+                "error_message": "AssertionError: Regions_Distances should include both negative and positive integer costs (fidelity to reference).\nMissing pattern:\nRegions_Distances\\s*=\\s*\\{[^}]*:\\s*-\\d+[^}]*:\\s*\\d+"
+            },
+            {
+                "test_function": "test_control_laws_and_modes_match_reference_semantics",
+                "error_message": "AssertionError: angular_vel should depend on a signed regional_dist with normalization/sign logic (reference: regional_dist/max(1,abs(regional_dist))).\nMissing pattern:\n(regional_dist|max\\s*\\(\\s*1\\s*,\\s*abs\\s*\\(\\s*regional_dist\\s*\\)\\s*\\))|(\\bregional_dist\\b.*\\babs\\s*\\(\\s*regional_dist\\s*\\))"
+            }
+        ]
+    },
+    {
+        "task_id": "perception_control/task_005_ORBBEC",
+        "status": "FAILED",
+        "score": "8/12",
+        "pass_rate": "66.67%",
+        "tokens": 72889,
+        "failed_cases": [
+            {
+                "test_function": "test_frameset_applies_filters_before_downstream_use",
+                "error_message": "AssertionError: onNewFrameSetCallback should call processColorFrameFilter(...) on color frames (at least once).\nExpected pattern:\nprocessColorFrameFilter\\s*\\("
+            },
+            {
+                "test_function": "test_frameset_alignment_semantics_present",
+                "error_message": "AssertionError: onNewFrameSetCallback should reference align_filter_ (alignment filter) when alignment is supported.\nExpected pattern:\n\\balign_filter_\\b"
+            },
+            {
+                "test_function": "test_frameset_forwards_non_color_streams_through_common_handler",
+                "error_message": "AssertionError: onNewFrameSetCallback should iterate over IMAGE_STREAMS (range-for) to forward frames.\nExpected one of patterns:\nfor\\s*\\([^)]*:\\s*IMAGE_STREAMS\\s*\\)\nfor\\s*\\([^)]*IMAGE_STREAMS[^)]*\\)"
+            },
+            {
+                "test_function": "test_color_thread_consumes_fifo_and_processes_in_pipeline_order",
+                "error_message": "AssertionError: onNewColorFrameCallback should decode, then publish point cloud, then forward frame to onNewFrameCallback.\nExpected pattern:\ndecodeColorFrameToBuffer[\\s\\S]*publishPointCloud\\s*\\([\\s\\S]*\\)[\\s\\S]*onNewFrameCallback\\s*\\("
+            }
+        ]
+    },
+    {
+        "task_id": "perception_control/task_006_3d_sensor_moveit_arm_control",
+        "status": "FAILED",
+        "score": "3/4",
+        "pass_rate": "75.00%",
+        "tokens": 6731,
+        "failed_cases": [
+            {
+                "test_function": "test_4_async_fallback_mastery",
+                "error_message": "AssertionError: \u274c Failed to implement a perfect async fallback structure with result return.\nassert None\n +  where None = <function search at 0x7f99b7789f30>('await[\\\\s\\\\S]*?if\\\\s+[\\\\s\\\\S]*?[\\'\\\\\"]arm_torso[\\'\\\\\"][\\\\s\\\\S]*?await[\\\\s\\\\S]*?return\\\\s+.*?(?:code|val|result)', '\\n        self.get_logger().info(\"Clearing octomap\")\\n        clear_req = Empty.Request()\\n        self.clear_octomap...r().info(\"Place result: \" + str(moveit_error_dict[result.error_code.val]))\\n        return result.error_code.val\\n\\n\\n')\n +    where <function search at 0x7f99b7789f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "perception_control/task_007_autonomous_navigation",
+        "status": "FAILED",
+        "score": "1/4",
+        "pass_rate": "25.00%",
+        "tokens": 3827,
+        "failed_cases": [
+            {
+                "test_function": "test_turn_shortest_path_logic",
+                "error_message": "AssertionError: \u274c turn logic is fragile. Must use atan2(sin(error), cos(error)) for shortest path.\nassert None\n +  where None = <function search at 0x7ffbcbe7df30>('atan2\\\\(.*math\\\\.sin\\\\(.*?\\\\).*?math\\\\.cos\\\\(.*?\\\\).*?\\\\)', '\\n        target_angle_rad = target_angle * math.pi / 180.0\\n        start_angle = self.get_yaw()\\n        target_yaw...   \\n        # Stop rotation\\n        self.twist.angular.z = 0.0\\n        self.cmd_vel_pub.publish(self.twist)\\n\\n    ')\n +    where <function search at 0x7ffbcbe7df30> = re.search"
+            },
+            {
+                "test_function": "test_proportional_control_law",
+                "error_message": "AssertionError: \u274c Steady-state velocity detected. Use Proportional Control (Kp * error) for smoothness.\nassert None\n +  where None = <function search at 0x7ffbcbe7df30>('angular\\\\.z\\\\s*=\\\\s*.*?\\\\*.*?(diff|error)', '\\n        target_angle_rad = target_angle * math.pi / 180.0\\n        start_angle = self.get_yaw()\\n        target_yaw...   \\n        # Stop rotation\\n        self.twist.angular.z = 0.0\\n        self.cmd_vel_pub.publish(self.twist)\\n\\n    ')\n +    where <function search at 0x7ffbcbe7df30> = re.search"
+            },
+            {
+                "test_function": "test_emergency_safety_check",
+                "error_message": "AssertionError: \u274c Safety risk: loop lacks rclpy.ok() check or timeout protection.\nassert ('rclpy.ok()' in '\\n        target_angle_rad = target_angle * math.pi / 180.0\\n        start_angle = self.get_yaw()\\n        target_yaw...   \\n        # Stop rotation\\n        self.twist.angular.z = 0.0\\n        self.cmd_vel_pub.publish(self.twist)\\n\\n    ' or 'timeout' in '\\n        target_angle_rad = target_angle * math.pi / 180.0\\n        start_angle = self.get_yaw()\\n        target_yaw...   \\n        # stop rotation\\n        self.twist.angular.z = 0.0\\n        self.cmd_vel_pub.publish(self.twist)\\n\\n    ')\n +  where '\\n        target_angle_rad = target_angle * math.pi / 180.0\\n        start_angle = self.get_yaw()\\n        target_yaw...   \\n        # stop rotation\\n        self.twist.angular.z = 0.0\\n        self.cmd_vel_pub.publish(self.twist)\\n\\n    ' = <built-in method lower of str object at 0x560b7467d3c0>()\n +    where <built-in method lower of str object at 0x560b7467d3c0> = '\\n        target_angle_rad = target_angle * math.pi / 180.0\\n        start_angle = self.get_yaw()\\n        target_yaw...   \\n        # Stop rotation\\n        self.twist.angular.z = 0.0\\n        self.cmd_vel_pub.publish(self.twist)\\n\\n    '.lower"
+            }
+        ]
+    },
+    {
+        "task_id": "perception_control/task_008_limo_robot",
+        "status": "FAILED",
+        "score": "1/6",
+        "pass_rate": "16.67%",
+        "tokens": 12947,
+        "failed_cases": [
+            {
+                "test_function": "test_ackermann_inverse_kinematics",
+                "error_message": "AssertionError: Missing Ackermann geometry (atan/tan) using wheelbase.\nassert None"
+            },
+            {
+                "test_function": "test_steering_limit_clamping",
+                "error_message": "AssertionError: Steering angle must be clamped by max_inner_angle_.\nassert False"
+            },
+            {
+                "test_function": "test_odom_integration_frames",
+                "error_message": "AssertionError: Incorrect velocity projection into global frame.\nassert (None)"
+            },
+            {
+                "test_function": "test_mecanum_lateral_awareness",
+                "error_message": "AssertionError: Lateral velocity (vy) ignored in Mecanum odometry.\nassert False"
+            },
+            {
+                "test_function": "test_time_differential_consistency",
+                "error_message": "AssertionError: Pose update missing time delta (dt) scaling.\nassert ('dt' in '\\n    double dt = stamp - last_time_;\\n    if (dt == 0.0) return;\\n    last_time_ = stamp;\\n    \\n    // Calculate bo... vx = linear_velocity;\\n        vy = 0.0;\\n        wz = linear_velocity * std::tan(steering_angle) / wheelbase_;\\n    ' and None)\n +  where None = <function search at 0x7fd8b9901f30>('\\\\*.*?dt', '\\n    double dt = stamp - last_time_;\\n    if (dt == 0.0) return;\\n    last_time_ = stamp;\\n    \\n    // Calculate bo... vx = linear_velocity;\\n        vy = 0.0;\\n        wz = linear_velocity * std::tan(steering_angle) / wheelbase_;\\n    ')\n +    where <function search at 0x7fd8b9901f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "perception_control/task_009_stretch_pipeline",
+        "status": "FAILED",
+        "score": "5/6",
+        "pass_rate": "83.33%",
+        "tokens": 11038,
+        "failed_cases": [
+            {
+                "test_function": "test_ray_plane_analytical_solution",
+                "error_message": "AssertionError: Missing ray-plane intersection analytical math.\nassert (True and False)"
+            }
+        ]
+    }
+]

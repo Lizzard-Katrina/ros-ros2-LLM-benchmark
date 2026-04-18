@@ -8,15 +8,6 @@
     "Messages published to topics are queued and correctly written to a ROS bag file.",
     "Queue handling, subscription, and writing are properly benchmarked.",
     "Supports snapshot recording and multiple topics."
-  ],
-  "files": [
-    "src/recorder_queue.cpp",
-    "src/recorder_write.cpp",
-    "src/recorder_subscribe.cpp",
-    "CMakeLists.txt",
-    "package.xml",
-    "Dockerfile"
-  ],
   "framework": "ros",
   "ros_version": "1",
   "language": "cpp"

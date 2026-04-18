@@ -1,0 +1,183 @@
+[
+    {
+        "task_id": "sensor_process/task_001_laser_obstacle_detection",
+        "status": "FAILED",
+        "score": "3/4",
+        "pass_rate": "75.00%",
+        "tokens": 3158,
+        "failed_cases": [
+            {
+                "test_function": "test_member_variable_consistency",
+                "error_message": "AssertionError: Failure: Use the correct class member 'output_pub_' for publishing.\nassert ('output_pub_' in '\\n\\n\\n#include \"scan_to_scan_filter_chain.hpp\"\\n\\n\\n\\nScanToScanFilterChain::ScanToScanFilterChain(\\n  const rclcpp::...\\n#include \"rclcpp_components/register_node_macro.hpp\"\\n\\n\\n\\n\\nRCLCPP_COMPONENTS_REGISTER_NODE(ScanToScanFilterChain)' or 'output_pub_->publish' in '\\n\\n\\n#include \"scan_to_scan_filter_chain.hpp\"\\n\\n\\n\\nScanToScanFilterChain::ScanToScanFilterChain(\\n  const rclcpp::...\\n#include \"rclcpp_components/register_node_macro.hpp\"\\n\\n\\n\\n\\nRCLCPP_COMPONENTS_REGISTER_NODE(ScanToScanFilterChain)')"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_002_camera_edge_detection",
+        "status": "SUCCESS",
+        "score": "6/6",
+        "pass_rate": "100.00%",
+        "tokens": 908,
+        "failed_cases": []
+    },
+    {
+        "task_id": "sensor_process/task_003_rgbd_pointcloud_generation",
+        "status": "FAILED",
+        "score": "4/6",
+        "pass_rate": "66.67%",
+        "tokens": 5605,
+        "failed_cases": [
+            {
+                "test_function": "test_intrinsic_scaling_math",
+                "error_message": "AssertionError: Failure: Scaling Defect. You resized the image but didn't scale the focal length (fx/fy). The 3D world will be distorted.\nassert None\n +  where None = <function search at 0x7f42f1b1df30>('(?:\\\\.k|k|p|P|fx|fy|K)\\\\[?[0-9]?\\\\]?\\\\s*\\\\*=\\\\s*ratio', '\\n#include <functional>\\n#include <memory>\\n#include <mutex>\\n#include <string>\\n\\n#include \"cv_bridge/cv_bridge.hpp\"...\"rclcpp_components/register_node_macro.hpp\"\\n\\nRCLCPP_COMPONENTS_REGISTER_NODE(depth_image_proc::PointCloudXyzrgbNode)')\n +    where <function search at 0x7f42f1b1df30> = re.search"
+            },
+            {
+                "test_function": "test_dispatch_logic_16uc1_32fc1",
+                "error_message": "AssertionError: Failure: Incomplete support. You must handle both 16-bit and 32-bit depth encodings.\nassert ('TYPE_16UC1' in '\\n#include <functional>\\n#include <memory>\\n#include <mutex>\\n#include <string>\\n\\n#include \"cv_bridge/cv_bridge.hpp\"...\"rclcpp_components/register_node_macro.hpp\"\\n\\nRCLCPP_COMPONENTS_REGISTER_NODE(depth_image_proc::PointCloudXyzrgbNode)')"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_004_imu_odometry_estimation",
+        "status": "FAILED",
+        "score": "3/6",
+        "pass_rate": "50.00%",
+        "tokens": 12460,
+        "failed_cases": [
+            {
+                "test_function": "test_3d_rotation_coupling",
+                "error_message": "AssertionError: Failure: Under-determined Physics. X-axis projection must account for both Yaw and Pitch.\nassert None\n +  where None = <function search at 0x7fb88eee9f30>('cy\\\\s*\\\\*\\\\s*cp\\\\s*\\\\*\\\\s*delta_sec', '\\n#include \"robot_localization/ukf.hpp\"\\n\\n#include <vector>\\n\\n#include \"angles/angles.h\"\\n#include \"Eigen/Cholesky\"...ds() * world_accel(2);\\n\\n    sigma_point.applyOnTheLeft(transfer_function_);\\n}\\n\\n}  // namespace robot_localization')\n +    where <function search at 0x7fb88eee9f30> = re.search"
+            },
+            {
+                "test_function": "test_acceleration_3d_projection",
+                "error_message": "AssertionError: Failure: Kinematic Error. Acceleration must be rotated into the global frame using the same RZYX logic.\nassert None\n +  where None = <function search at 0x7fb88eee9f30>('0\\\\.5\\\\s*\\\\*.*?(?:cy|cp|sy|sp).*?delta_sec\\\\s*\\\\*\\\\s*delta_sec', '\\n#include \"robot_localization/ukf.hpp\"\\n\\n#include <vector>\\n\\n#include \"angles/angles.h\"\\n#include \"Eigen/Cholesky\"...ds() * world_accel(2);\\n\\n    sigma_point.applyOnTheLeft(transfer_function_);\\n}\\n\\n}  // namespace robot_localization')\n +    where <function search at 0x7fb88eee9f30> = re.search"
+            },
+            {
+                "test_function": "test_angular_singularity_mapping",
+                "error_message": "AssertionError: Failure: Mathematical Singularity. Missing 1/cos(pitch) mapping for angular rates.\nassert False\n +  where False = any(<generator object test_angular_singularity_mapping.<locals>.<genexpr> at 0x7fb88dac3140>)"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_005_sonar_distance_estimation",
+        "status": "FAILED",
+        "score": "1/6",
+        "pass_rate": "16.67%",
+        "tokens": 8697,
+        "failed_cases": [
+            {
+                "test_function": "test_holonomic_kinematics",
+                "error_message": "AssertionError: Failure: Incomplete kinematics. Missing X or Y velocity projection.\nassert (<re.Match object; span=(7641, 7684), match='pos_.rx() += std::cos(orient_) * lin_vel_x_'> and None)\n +  where <re.Match object; span=(7641, 7684), match='pos_.rx() += std::cos(orient_) * lin_vel_x_'> = <function search at 0x7f323d80df30>('pos_\\\\.rx\\\\(\\\\)\\\\s*\\\\+?=\\\\s*.*?(?:cos|sin).*?lin_vel_x_', '\\n#include \"turtlesim/turtle.hpp\"\\n\\n#include <QColor>\\n#include <QRgb>\\n\\n#include <cmath>\\n#include <functional>\\n#... 0.5 * turtle_rotated_image_.height();\\n  painter.drawImage(p, turtle_rotated_image_);\\n}\\n\\n}  // namespace turtlesim')\n +    where <function search at 0x7f323d80df30> = re.search\n +  and   None = <function search at 0x7f323d80df30>('pos_\\\\.ry\\\\(\\\\)\\\\s*[-+]=\\\\s*.*?(?:cos|sin).*?lin_vel_y_', '\\n#include \"turtlesim/turtle.hpp\"\\n\\n#include <QColor>\\n#include <QRgb>\\n\\n#include <cmath>\\n#include <functional>\\n#... 0.5 * turtle_rotated_image_.height();\\n  painter.drawImage(p, turtle_rotated_image_);\\n}\\n\\n}  // namespace turtlesim')\n +    where <function search at 0x7f323d80df30> = re.search"
+            },
+            {
+                "test_function": "test_sonar_geometry_robust_v4",
+                "error_message": "AssertionError: Failure: Geometric Error. Could not find analytical distance calculation (delta / projection).\nassert (None)\n +  where None = <function search at 0x7f323d80df30>('/\\\\s*(?:dx|dy|(?:std::)?(?:cos|sin)\\\\()', '\\n#include \"turtlesim/turtle.hpp\"\\n\\n#include <QColor>\\n#include <QRgb>\\n\\n#include <cmath>\\n#include <functional>\\n#... 0.5 * turtle_rotated_image_.height();\\n  painter.drawImage(p, turtle_rotated_image_);\\n}\\n\\n}  // namespace turtlesim')\n +    where <function search at 0x7f323d80df30> = re.search"
+            },
+            {
+                "test_function": "test_numerical_stability_epsilon",
+                "error_message": "AssertionError: Failure: Stability Error. Missing epsilon guard. division-by-zero will occur when rays are axial.\nassert None\n +  where None = <function search at 0x7f323d80df30>('(?:std::)?(?:abs|fabs)\\\\(d[xy]\\\\)\\\\s*>\\\\s*(?:0|1e-|0\\\\.)', '\\n#include \"turtlesim/turtle.hpp\"\\n\\n#include <QColor>\\n#include <QRgb>\\n\\n#include <cmath>\\n#include <functional>\\n#... 0.5 * turtle_rotated_image_.height();\\n  painter.drawImage(p, turtle_rotated_image_);\\n}\\n\\n}  // namespace turtlesim')\n +    where <function search at 0x7f323d80df30> = re.search"
+            },
+            {
+                "test_function": "test_sonar_max_range_limit",
+                "error_message": "AssertionError: Failure: Sensor Range Error. Sonar must have a finite maximum range limit.\nassert (None)\n +  where None = <function search at 0x7f323d80df30>('(?:sonar_distance_|sonar_dist).*?=\\\\s*.*?(?:\\\\d+\\\\.\\\\d+|range_max|max_range)', '\\n#include \"turtlesim/turtle.hpp\"\\n\\n#include <QColor>\\n#include <QRgb>\\n\\n#include <cmath>\\n#include <functional>\\n#... 0.5 * turtle_rotated_image_.height();\\n  painter.drawImage(p, turtle_rotated_image_);\\n}\\n\\n}  // namespace turtlesim')\n +    where <function search at 0x7f323d80df30> = re.search"
+            },
+            {
+                "test_function": "test_sonar_y_mirroring_fix",
+                "error_message": "AssertionError: Failure: Mapping Error. Sonar Y-direction must be inverted for Qt coordinates.\nassert None\n +  where None = <function search at 0x7f323d80df30>('dy\\\\s*=\\\\s*-\\\\s*(?:std::)?sin', '\\n#include \"turtlesim/turtle.hpp\"\\n\\n#include <QColor>\\n#include <QRgb>\\n\\n#include <cmath>\\n#include <functional>\\n#... 0.5 * turtle_rotated_image_.height();\\n  painter.drawImage(p, turtle_rotated_image_);\\n}\\n\\n}  // namespace turtlesim')\n +    where <function search at 0x7f323d80df30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_006_image_pipeline",
+        "status": "FAILED",
+        "score": "7/9",
+        "pass_rate": "77.78%",
+        "tokens": 5554,
+        "failed_cases": [
+            {
+                "test_function": "test_cv_bridge_exception_safety",
+                "error_message": "AssertionError: Failure: Missing try-catch block for cv_bridge conversion.\nassert None\n +  where None = <function search at 0x7fa5f6f81f30>('try\\\\s*\\\\{[\\\\s\\\\S]*cv_bridge::toCv(?:Copy|Share)[\\\\s\\\\S]*\\\\}\\\\s*catch\\\\s*\\\\(\\\\s*cv_bridge::Exception', '// Copyright (c) 2008, Willow Garage, Inc.\\n// All rights reserved.\\n//\\n// Redistribution and use in source and bina...gister the component with class_loader.\\nRCLCPP_COMPONENTS_REGISTER_NODE(depth_image_proc::PointCloudXyzrgbRadialNode)')\n +    where <function search at 0x7fa5f6f81f30> = re.search"
+            },
+            {
+                "test_function": "test_template_dispatch_completeness",
+                "error_message": "AssertionError: assert 'convertDepthRadial<uint16_t>' in '// Copyright (c) 2008, Willow Garage, Inc.\\n// All rights reserved.\\n//\\n// Redistribution and use in source and bina...gister the component with class_loader.\\nRCLCPP_COMPONENTS_REGISTER_NODE(depth_image_proc::PointCloudXyzrgbRadialNode)'"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_007_hector_slam",
+        "status": "SUCCESS",
+        "score": "7/7",
+        "pass_rate": "100.00%",
+        "tokens": 15737,
+        "failed_cases": []
+    },
+    {
+        "task_id": "sensor_process/task_008_darknet",
+        "status": "FAILED",
+        "score": "4/6",
+        "pass_rate": "66.67%",
+        "tokens": 13894,
+        "failed_cases": [
+            {
+                "test_function": "test_flexible_logging_macros",
+                "error_message": "AssertionError: assert 'this->get_logger()' in '/*\\n * YoloObjectDetector.cpp\\n *\\n *  Created on: Dec 19, 2016\\n *      Author: Marko Bjelonic\\n *   Institute: ETH ...    // TODO: Implement action server result handling for ROS2\\n  }\\n  \\n  return 0;\\n}\\n\\n} /* namespace darknet_ros*/'"
+            },
+            {
+                "test_function": "test_timestamp_synchronization",
+                "error_message": "AssertionError: assert ('header.stamp = imageHeader_.stamp' in '/*\\n * YoloObjectDetector.cpp\\n *\\n *  Created on: Dec 19, 2016\\n *      Author: Marko Bjelonic\\n *   Institute: ETH ...    // TODO: Implement action server result handling for ROS2\\n  }\\n  \\n  return 0;\\n}\\n\\n} /* namespace darknet_ros*/' or 'header.stamp = msg->header.stamp' in '/*\\n * YoloObjectDetector.cpp\\n *\\n *  Created on: Dec 19, 2016\\n *      Author: Marko Bjelonic\\n *   Institute: ETH ...    // TODO: Implement action server result handling for ROS2\\n  }\\n  \\n  return 0;\\n}\\n\\n} /* namespace darknet_ros*/')"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_009_lio_sam",
+        "status": "FAILED",
+        "score": "5/6",
+        "pass_rate": "83.33%",
+        "tokens": 48061,
+        "failed_cases": [
+            {
+                "test_function": "test_callback_group_initialization",
+                "error_message": "AssertionError: Error: LIO-SAM migration should use Callback Groups for concurrent execution.\nassert ('create_callback_group' in '#include \"utility.h\"\\n#include \"lio_sam/cloud_info.hpp\"\\n#include \"lio_sam/srv/save_map.hpp\"\\n\\n#include <gtsam/geome...in(node);\\n\\n    rclcpp::shutdown();\\n    \\n    loopthread.join();\\n    visualizeMapThread.join();\\n\\n    return 0;\\n}' or 'callback_group_' in '#include \"utility.h\"\\n#include \"lio_sam/cloud_info.hpp\"\\n#include \"lio_sam/srv/save_map.hpp\"\\n\\n#include <gtsam/geome...in(node);\\n\\n    rclcpp::shutdown();\\n    \\n    loopthread.join();\\n    visualizeMapThread.join();\\n\\n    return 0;\\n}')"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_010_radar_velocity_estimation",
+        "status": "FAILED",
+        "score": "5/8",
+        "pass_rate": "62.50%",
+        "tokens": 5230,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_logging_migration",
+                "error_message": "AssertionError: Failure: Did not use node-based RCLCPP logging macros.\nassert None\n +  where None = <function search at 0x7ff9d5215f30>('RCLCPP_(?:WARN|ERROR|INFO)(?:_THROTTLE)?\\\\s*\\\\(\\\\s*(?:this->)?get_logger\\\\(\\\\)', '// This file is part of REVE - Radar Ego Velocity Estimator\\n// Copyright (C) 2021  Christopher Doer <christopher.doe...ader::SharedPtr trigger_msg)\\n{\\n  std::lock_guard<std::mutex> lock(mutex_);\\n  trigger_stamp = trigger_msg->stamp;\\n}')\n +    where <function search at 0x7ff9d5215f30> = re.search"
+            },
+            {
+                "test_function": "test_ros2_clock_usage",
+                "error_message": "AssertionError: Failure: Should use node clock (this->now()).\nassert None\n +  where None = <function search at 0x7ff9d5215f30>('this->(?:get_clock\\\\(\\\\)->)?now\\\\(\\\\)', '// This file is part of REVE - Radar Ego Velocity Estimator\\n// Copyright (C) 2021  Christopher Doer <christopher.doe...ader::SharedPtr trigger_msg)\\n{\\n  std::lock_guard<std::mutex> lock(mutex_);\\n  trigger_stamp = trigger_msg->stamp;\\n}')\n +    where <function search at 0x7ff9d5215f30> = re.search"
+            },
+            {
+                "test_function": "test_zero_timestamp_handling",
+                "error_message": "AssertionError: Failure: Did not use the required '.sec == 0' syntax for timestamp checking.\nassert None\n +  where None = <function search at 0x7ff9d5215f30>('\\\\.sec\\\\s*==\\\\s*0', '// This file is part of REVE - Radar Ego Velocity Estimator\\n// Copyright (C) 2021  Christopher Doer <christopher.doe...ader::SharedPtr trigger_msg)\\n{\\n  std::lock_guard<std::mutex> lock(mutex_);\\n  trigger_stamp = trigger_msg->stamp;\\n}')\n +    where <function search at 0x7ff9d5215f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "sensor_process/task_011_camera_lidar_fusion",
+        "status": "FAILED",
+        "score": "4/6",
+        "pass_rate": "66.67%",
+        "tokens": 18354,
+        "failed_cases": [
+            {
+                "test_function": "test_tf2_geometry_msgs_include",
+                "error_message": "AssertionError: Failure: Missing required header for tf2::fromMsg conversion.\nassert 'tf2_geometry_msgs/tf2_geometry_msgs.hpp' in '/*\\n * Copyright 2018-2019 Autoware Foundation. All rights reserved.\\n *\\n * Licensed under the Apache License, Versi... output object array\\n  makeOutput(input, std::vector<bool>(input.objects.size(), false), detected_objects_output);\\n}'"
+            },
+            {
+                "test_function": "test_namespace_full_compliance",
+                "error_message": "AssertionError: Failure: DetectedObjectArray must be in '::msg::' namespace.\nassert None\n +  where None = <function search at 0x7fd59fb45f30>('autoware_msgs::msg::DetectedObjectArray', '/*\\n * Copyright 2018-2019 Autoware Foundation. All rights reserved.\\n *\\n * Licensed under the Apache License, Versi... output object array\\n  makeOutput(input, std::vector<bool>(input.objects.size(), false), detected_objects_output);\\n}')\n +    where <function search at 0x7fd59fb45f30> = re.search"
+            }
+        ]
+    }
+]

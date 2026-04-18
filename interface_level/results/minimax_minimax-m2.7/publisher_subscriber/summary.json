@@ -1,0 +1,140 @@
+[
+    {
+        "task_id": "publisher_subscriber/task_001_simple_pub_sub",
+        "status": "FAILED",
+        "score": "1/2",
+        "pass_rate": "50.00%",
+        "tokens": 1326,
+        "failed_cases": [
+            {
+                "test_function": "test_talker_ros2_translation",
+                "error_message": "AssertionError: Oracle 1 Failed: Talker must define a ROS2 Node subclass\nassert None\n +  where None = <function search at 0x7f1fd676df30>('class\\\\s+\\\\w+\\\\s*\\\\(\\\\s*(?:[\\\\w\\\\.]+\\\\.)?Node[\\\\s,]*\\\\)', \"#!/usr/bin/env python\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom std_msgs.msg import String\\n\\ndef talker():\\n ...clpy.shutdown()\\n\\nif __name__ == '__main__':\\n    try:\\n        talker()\\n    except KeyboardInterrupt:\\n        pass\")\n +    where <function search at 0x7f1fd676df30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "publisher_subscriber/task_002_custom_msg_basic",
+        "status": "SUCCESS",
+        "score": "2/2",
+        "pass_rate": "100.00%",
+        "tokens": 1789,
+        "failed_cases": []
+    },
+    {
+        "task_id": "publisher_subscriber/task_003_image_transport",
+        "status": "SUCCESS",
+        "score": "3/3",
+        "pass_rate": "100.00%",
+        "tokens": 1961,
+        "failed_cases": []
+    },
+    {
+        "task_id": "publisher_subscriber/task_004_laser_scan_origin",
+        "status": "FAILED",
+        "score": "2/3",
+        "pass_rate": "66.67%",
+        "tokens": 2763,
+        "failed_cases": [
+            {
+                "test_function": "test_lidar_publisher_translation",
+                "error_message": "AssertionError: Oracle 4 Failed: Missing rclpy.spin() for the node\nassert 'rclpy.spin' in '#!/usr/bin/env python3\\nimport rclpy\\nfrom rclpy.node import Node\\n# from sensor_msgs.msg import LaserScan\\n\\n# test/...leep()\\n    # END OF TODO\\n\\n    node.destroy_node()\\n    rclpy.shutdown()\\n\\n\\nif __name__ == \"__main__\":\\n    main()'"
+            }
+        ]
+    },
+    {
+        "task_id": "publisher_subscriber/task_005_ros1_ros2_bridge",
+        "status": "SUCCESS",
+        "score": "1/1",
+        "pass_rate": "100.00%",
+        "tokens": 765,
+        "failed_cases": []
+    },
+    {
+        "task_id": "publisher_subscriber/task_006_multi_topic_synchronization",
+        "status": "FAILED",
+        "score": "6/7",
+        "pass_rate": "85.71%",
+        "tokens": 1825,
+        "failed_cases": [
+            {
+                "test_function": "test_oracle_4_two_image_subscribers",
+                "error_message": "AssertionError: \u274c Missing two Image subscribers. Expected: message_filters::Subscriber<sensor_msgs::Image> for left and right\nassert 0 >= 2\n +  where 0 = len([])"
+            }
+        ]
+    },
+    {
+        "task_id": "publisher_subscriber/task_007_latched_publisher",
+        "status": "FAILED",
+        "score": "2/3",
+        "pass_rate": "66.67%",
+        "tokens": 962,
+        "failed_cases": [
+            {
+                "test_function": "test_latched_behavior_for_new_subscriber",
+                "error_message": "AssertionError: assert 'LATCH_2' in ['LATCH_0']"
+            }
+        ]
+    },
+    {
+        "task_id": "publisher_subscriber/task_009_nodelet_pubsub",
+        "status": "FAILED",
+        "score": "5/9",
+        "pass_rate": "55.56%",
+        "tokens": 1135,
+        "failed_cases": [
+            {
+                "test_function": "test_publisher_creation_ros2_style",
+                "error_message": "AssertionError: ROS2 create_publisher not found\nassert None\n +  where None = <function search at 0x7fa2f171df30>('create_publisher\\\\s*<\\\\s*std_msgs::msg::\\\\w+\\\\s*>', '#include <rclcpp/rclcpp.hpp>\\n#include <example_interfaces/msg/int64.hpp>\\n\\nclass Plus : public rclcpp::Node\\n{\\npub...rgv)\\n{\\n  rclcpp::init(argc, argv);\\n  rclcpp::spin(std::make_shared<Plus>());\\n  rclcpp::shutdown();\\n  return 0;\\n}')\n +    where <function search at 0x7fa2f171df30> = re.search"
+            },
+            {
+                "test_function": "test_subscription_creation_ros2_style",
+                "error_message": "AssertionError: ROS2 create_subscription not found\nassert None\n +  where None = <function search at 0x7fa2f171df30>('create_subscription\\\\s*<\\\\s*std_msgs::msg::\\\\w+\\\\s*>', '#include <rclcpp/rclcpp.hpp>\\n#include <example_interfaces/msg/int64.hpp>\\n\\nclass Plus : public rclcpp::Node\\n{\\npub...rgv)\\n{\\n  rclcpp::init(argc, argv);\\n  rclcpp::spin(std::make_shared<Plus>());\\n  rclcpp::shutdown();\\n  return 0;\\n}')\n +    where <function search at 0x7fa2f171df30> = re.search"
+            },
+            {
+                "test_function": "test_callback_uses_ros2_message_types",
+                "error_message": "AssertionError: ROS2 message namespace std_msgs::msg::* not found\nassert None\n +  where None = <function search at 0x7fa2f171df30>('std_msgs::msg::(Float64|Bool|Byte|Time)', '#include <rclcpp/rclcpp.hpp>\\n#include <example_interfaces/msg/int64.hpp>\\n\\nclass Plus : public rclcpp::Node\\n{\\npub...rgv)\\n{\\n  rclcpp::init(argc, argv);\\n  rclcpp::spin(std::make_shared<Plus>());\\n  rclcpp::shutdown();\\n  return 0;\\n}')\n +    where <function search at 0x7fa2f171df30> = re.search"
+            },
+            {
+                "test_function": "test_namespace_semantics_preserved",
+                "error_message": "AssertionError: Expected topic name not found: \"/global\"\nassert None\n +  where None = <function search at 0x7fa2f171df30>('\"/global\"', '#include <rclcpp/rclcpp.hpp>\\n#include <example_interfaces/msg/int64.hpp>\\n\\nclass Plus : public rclcpp::Node\\n{\\npub...rgv)\\n{\\n  rclcpp::init(argc, argv);\\n  rclcpp::spin(std::make_shared<Plus>());\\n  rclcpp::shutdown();\\n  return 0;\\n}')\n +    where <function search at 0x7fa2f171df30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "publisher_subscriber/task_010_husky_stress_test",
+        "status": "FAILED",
+        "score": "0/7",
+        "pass_rate": "0.00%",
+        "tokens": 0,
+        "failed_cases": [
+            {
+                "test_function": "test_translated_files_exist",
+                "error_message": "AssertionError: Translated file missing: husky.gazebo.xacro\nassert False\n +  where False = <bound method Path.exists of PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro')>()\n +    where <bound method Path.exists of PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro')> = PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro').exists"
+            },
+            {
+                "test_function": "test_no_ros1_artifacts_in_launch",
+                "error_message": "AssertionError: File not found: husky_empty_world.launch\nassert False\n +  where False = <bound method Path.exists of PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky_empty_world.launch')>()\n +    where <bound method Path.exists of PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky_empty_world.launch')> = PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky_empty_world.launch').exists"
+            },
+            {
+                "test_function": "test_robot_description_defined",
+                "error_message": "AssertionError: File not found: husky.gazebo.xacro\nassert False\n +  where False = <bound method Path.exists of PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro')>()\n +    where <bound method Path.exists of PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro')> = PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro').exists"
+            },
+            {
+                "test_function": "test_robot_description_consumed_in_launch",
+                "error_message": "AssertionError: File not found: husky_empty_world.launch\nassert False\n +  where False = <bound method Path.exists of PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky_empty_world.launch')>()\n +    where <bound method Path.exists of PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky_empty_world.launch')> = PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky_empty_world.launch').exists"
+            },
+            {
+                "test_function": "test_imu_interface_present",
+                "error_message": "AssertionError: File not found: husky.gazebo.xacro\nassert False\n +  where False = <bound method Path.exists of PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro')>()\n +    where <bound method Path.exists of PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro')> = PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro').exists"
+            },
+            {
+                "test_function": "test_gps_interface_present",
+                "error_message": "AssertionError: File not found: husky.gazebo.xacro\nassert False\n +  where False = <bound method Path.exists of PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro')>()\n +    where <bound method Path.exists of PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro')> = PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro').exists"
+            },
+            {
+                "test_function": "test_sensor_update_rate_semantics",
+                "error_message": "AssertionError: File not found: husky.gazebo.xacro\nassert False\n +  where False = <bound method Path.exists of PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro')>()\n +    where <bound method Path.exists of PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro')> = PosixPath('/ros2_ws/src/task_010_husky_stress_test/husky.gazebo.xacro').exists"
+            }
+        ]
+    }
+]

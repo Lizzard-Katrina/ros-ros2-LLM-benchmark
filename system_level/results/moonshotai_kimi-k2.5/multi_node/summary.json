@@ -1,0 +1,147 @@
+[
+    {
+        "task_id": "multi_node/task_001_rosserial_python_integration",
+        "status": "SUCCESS",
+        "score": "10/10",
+        "pass_rate": "100.00%",
+        "tokens": 30751,
+        "failed_cases": []
+    },
+    {
+        "task_id": "multi_node/task_002_sm_rosbag_recorder",
+        "status": "SUCCESS",
+        "score": "7/7",
+        "pass_rate": "100.00%",
+        "tokens": 19534,
+        "failed_cases": []
+    },
+    {
+        "task_id": "multi_node/task_004_talker_relay_listener",
+        "status": "SUCCESS",
+        "score": "8/8",
+        "pass_rate": "100.00%",
+        "tokens": 8185,
+        "failed_cases": []
+    },
+    {
+        "task_id": "multi_node/task_005_KIE_multiagent_model",
+        "status": "SUCCESS",
+        "score": "11/11",
+        "pass_rate": "100.00%",
+        "tokens": 46069,
+        "failed_cases": []
+    },
+    {
+        "task_id": "multi_node/task_006_swarm_ros_bridge",
+        "status": "FAILED",
+        "score": "5/8",
+        "pass_rate": "62.50%",
+        "tokens": 18691,
+        "failed_cases": [
+            {
+                "test_function": "test_hpp_ros2_interface_migration",
+                "error_message": "AssertionError: Header must declare ROS 2 SharedPtr interfaces.\nassert None\n +  where None = <function search at 0x7f64c4991f30>('std::vector<rclcpp::(?:Subscription|Publisher)(?:Base|Generic)?::SharedPtr>', '#ifndef __BRIDGE_NODE__\\n#define __BRIDGE_NODE__\\n\\n#include <rclcpp/rclcpp.hpp>\\n#include <rclcpp/serialization.hpp>...r<TopicInfo> recvTopics_;\\n  int len_send_;\\n  int len_recv_;\\n  \\n  static constexpr int SUB_MAX = 100;\\n};\\n\\n#endif')\n +    where <function search at 0x7f64c4991f30> = re.search"
+            },
+            {
+                "test_function": "test_cpp_node_inheritance_usage",
+                "error_message": "AssertionError: Source must use ROS 2 node creation patterns.\nassert None\n +  where None = <function search at 0x7f64c4991f30>('(?:this->|node->)create_(?:publisher|subscription)', '/**\\n * @file bridge_node.cpp\\n * @author Peixuan Shu (shupeixuan@qq.com)\\n * @brief Reliable TCP bridge for ros data...c, argv);\\n  auto node = std::make_shared<BridgeNode>();\\n  rclcpp::spin(node);\\n  rclcpp::shutdown();\\n  return 0;\\n}')\n +    where <function search at 0x7f64c4991f30> = re.search"
+            },
+            {
+                "test_function": "test_system_callback_consistency",
+                "error_message": "AssertionError: Callback signature should use SharedPtr for ROS 2 compatibility.\nassert None\n +  where None = <function search at 0x7f64c4991f30>('sub_cb\\\\s*\\\\(const\\\\s+[\\\\w:]+::SharedPtr\\\\s+\\\\w+\\\\)', '/**\\n * @file bridge_node.cpp\\n * @author Peixuan Shu (shupeixuan@qq.com)\\n * @brief Reliable TCP bridge for ros data...c, argv);\\n  auto node = std::make_shared<BridgeNode>();\\n  rclcpp::spin(node);\\n  rclcpp::shutdown();\\n  return 0;\\n}')\n +    where <function search at 0x7f64c4991f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "multi_node/task_007_aws_les",
+        "status": "FAILED",
+        "score": "2/8",
+        "pass_rate": "25.00%",
+        "tokens": 8258,
+        "failed_cases": [
+            {
+                "test_function": "test_member_variable_consistency",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_007_aws_les/lex_node.h'"
+            },
+            {
+                "test_function": "test_callback_signature_sync",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_007_aws_les/lex_node.h'"
+            },
+            {
+                "test_function": "test_service_binding_pattern",
+                "error_message": "AssertionError: Service initialization must use std::bind with two placeholders (_1, _2)\nassert None\n +  where None = <function search at 0x7f6342931f30>('std::bind\\\\s*\\\\(\\\\s*&LexNode::LexServerCallback\\\\s*,\\\\s*this\\\\s*,\\\\s*std::placeholders::_1\\\\s*,\\\\s*std::placeholders::_2\\\\s*\\\\)', '/*\\n * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.\\n *\\n * Licensed under the Apache Lice...is_success) {\\n    response << lex_response;\\n  }\\n  return is_success;\\n}\\n\\n}  // namespace Lex\\n}  // namespace Aws')\n +    where <function search at 0x7f6342931f30> = re.search"
+            },
+            {
+                "test_function": "test_inheritance_pattern",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_007_aws_les/lex_node.h'"
+            },
+            {
+                "test_function": "test_message_namespace_migration",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_007_aws_les/lex_node.h'"
+            },
+            {
+                "test_function": "test_ros1_leakage_cleanup",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_007_aws_les/lex_node.h'"
+            }
+        ]
+    },
+    {
+        "task_id": "multi_node/task_009_fleet_system",
+        "status": "FAILED",
+        "score": "1/5",
+        "pass_rate": "20.00%",
+        "tokens": 13781,
+        "failed_cases": [
+            {
+                "test_function": "test_time_struct_field_sync",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_009_fleet_system/schema.fbs'"
+            },
+            {
+                "test_function": "test_header_schema_no_seq",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_009_fleet_system/schema.fbs'"
+            },
+            {
+                "test_function": "test_namespace_conversion_logic",
+                "error_message": "AssertionError: The Type class must convert ROS paths to dot-separated namespaces.\nassert ('.replace(\"/\", \".\")' in '#! /usr/bin/env python3\\n\"\"\"\\nUtilities for generating Flatbuffers schemas for ROS message types. \\n\\nSchema formats ...ma(ns.message_type, args=ns)\\n    output_file.writelines(line + os.linesep for line in lines)\\n    output_file.close()' or \".replace('/', '.')\" in '#! /usr/bin/env python3\\n\"\"\"\\nUtilities for generating Flatbuffers schemas for ROS message types. \\n\\nSchema formats ...ma(ns.message_type, args=ns)\\n    output_file.writelines(line + os.linesep for line in lines)\\n    output_file.close()')"
+            },
+            {
+                "test_function": "test_no_ros1_naming_leakage",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_009_fleet_system/schema.fbs'"
+            }
+        ]
+    },
+    {
+        "task_id": "multi_node/task_011_amr_interop",
+        "status": "FAILED",
+        "score": "4/6",
+        "pass_rate": "66.67%",
+        "tokens": 16960,
+        "failed_cases": [
+            {
+                "test_function": "test_py_ros_to_mqtt_orchestration",
+                "error_message": "AssertionError: Subscription for VDAOrderState must be linked to callback self._publish_state.\nassert None\n +  where None = <function search at 0x7fa4f34d1f30>('msg_type\\\\s*=\\\\s*VDAOrderState.*callback\\\\s*=\\\\s*self\\\\._publish_state', '#!/usr/bin/env python3\\n\\n# BSD 3-Clause License\\n#\\n# Copyright (c) 2022 InOrbit, Inc.\\n# Copyright (c) 2022 Clearpa...version_alias,\\n            interface_name=self._interface_name\\n        )\\n        self._publish_to_topic(msg, topic)', re.DOTALL)\n +    where <function search at 0x7fa4f34d1f30> = re.search\n +    and   re.DOTALL = re.DOTALL"
+            },
+            {
+                "test_function": "test_no_ros1_terminology_leakage",
+                "error_message": "re.error: missing ), unterminated subpattern at position 11"
+            }
+        ]
+    },
+    {
+        "task_id": "multi_node/task_012_multimaster_flie",
+        "status": "FAILED",
+        "score": "6/8",
+        "pass_rate": "75.00%",
+        "tokens": 43522,
+        "failed_cases": [
+            {
+                "test_function": "test_sync_loop_prevention",
+                "error_message": "AssertionError: SyncThread must implement loop prevention by checking if the remote node name matches the local sync node's name before registration.\nassert None"
+            },
+            {
+                "test_function": "test_absence_of_hardcoded_names",
+                "error_message": "AssertionError: The migrated code should use dynamic node name retrieval (e.g., rospy.get_name()) rather than hardcoded strings.\nassert not <re.Match object; span=(31913, 31932), match=\"'/master_discovery'\">"
+            }
+        ]
+    }
+]

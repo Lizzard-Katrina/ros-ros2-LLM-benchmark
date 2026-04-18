@@ -1,0 +1,13 @@
+# Benchmark Report: PERCEPTION_CONTROL
+
+| Task ID | Status | Score | Failed Functions | Tokens |
+| :--- | :--- | :--- | :--- | :--- |
+| perception_control/task_001_color_blob_tracking | FAILED | 4/7 | test_02_node_spin_and_image_subscription_pipeline, test_06_three_region_left_center_right_decision_with_geometry_thresholds, test_07_stop_and_motion_semantics_without_literal_numbers | 4894 |
+| perception_control/task_002_camera_depth_reach_target | SUCCESS | 9/9 | None | 9137 |
+| perception_control/task_003_multi_node_perception_control | FAILED | 2/5 | test_ds4_enum_mapping_present_and_used, test_l1_toggle_semantics_fidelity, test_axis_scaling_and_publish_gating_fidelity | 12379 |
+| perception_control/task_004_mobile_lidar_obstacle_avoidance | FAILED | 4/9 | test_ros2_scaffold_and_no_ros1, test_ros2_lifecycle_and_node_creation, test_ros2_timer_rate_and_publish, test_decision_uses_signed_cost_table_and_abs_cost, test_control_laws_and_modes_match_reference_semantics | 6934 |
+| perception_control/task_005_ORBBEC | TRANSLATION_FAILED | 0/0 | None | 0 |
+| perception_control/task_006_3d_sensor_moveit_arm_control | FAILED | 3/4 | test_4_async_fallback_mastery | 20306 |
+| perception_control/task_007_autonomous_navigation | FAILED | 2/4 | test_proportional_control_law, test_emergency_safety_check | 14687 |
+| perception_control/task_008_limo_robot | FAILED | 2/6 | test_ackermann_inverse_kinematics, test_steering_limit_clamping, test_odom_integration_frames, test_time_differential_consistency | 24977 |
+| perception_control/task_009_stretch_pipeline | SUCCESS | 6/6 | None | 18090 |

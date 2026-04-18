@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Copyright (C) 2015 Fetch Robotics Inc
 #
@@ -17,39 +17,41 @@
 # Author: Michael Ferguson
 
 import sys
+import time
+from sys import exit
+
 import rclpy
 from rclpy.node import Node
-from rclpy.executors import ExternalShutdownException
-from rclpy.qos import qos_profile_sensor_data
-from rcl_interfaces.msg import ParameterDescriptor
-from rcl_interfaces.srv import GetParameters, SetParameters
 from rclpy.parameter import Parameter
+from rclpy.parameter_client import AsyncParametersClient
 
 
-class CameraReconfigure(Node):
+class CameraReconfigure(object):
     def __init__(self):
-        super().__init__('camera_reconfigure')
-        self.cli = self.create_client(GetParameters, 'set_camera_info')
-        while not self.cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('service not available, waiting again...')
-        self.req = GetParameters.Request()
-        self.req.names = ['auto_exposure', 'auto_white_balance']
+        self.node = Node("camera_reconfigure")
+        target_node = self.node.declare_parameter(
+            "target_node", "/head_camera/driver"
+        ).get_parameter_value().string_value
+        self.client = AsyncParametersClient(self.node, target_node)
+
+        while not self.client.wait_for_service(timeout_sec=1.0):
+            self.node.get_logger().info("Waiting for parameter service...")
 
     def disable_auto(self):
-        self.req = SetParameters.Request()
-        self.req.parameters = [
-            Parameter(name='auto_exposure', value=False),
-            Parameter(name='auto_white_balance', value=False)
+        params = [
+            Parameter("auto_exposure", value=False),
+            Parameter("auto_white_balance", value=False),
         ]
-        self.future = self.cli.call_async(self.req)
+        future = self.client.set_parameters(params)
+        rclpy.spin_until_future_complete(self.node, future)
 
     def enable_auto(self):
-        self.req = SetParameters.Request()
-        self.req.parameters = [
-            Parameter(name='auto_exposure', value=True),
-            Parameter(name='auto_white_balance', value=True)
+        params = [
+            Parameter("auto_exposure", value=True),
+            Parameter("auto_white_balance", value=True),
         ]
-        self.future = self.cli.call_async(self.req)
+        future = self.client.set_parameters(params)
+        rclpy.spin_until_future_complete(self.node, future)
 
 
 if __name__ == "__main__":
@@ -65,12 +67,7 @@ if __name__ == "__main__":
     else:
         reconfigure.disable_auto()
 
-    try:
-        rclpy.spin(reconfigure)
-    except KeyboardInterrupt:
-        reconfigure.get_logger().info('Keyboard Interrupt (SIGINT)')
-    except ExternalShutdownException:
-        reconfigure.get_logger().info('External Shutdown')
-    finally:
-        reconfigure.destroy_node()
-        rclpy.try_shutdown()
+    time.sleep(1.0)
+
+    reconfigure.node.destroy_node()
+    rclpy.shutdown()

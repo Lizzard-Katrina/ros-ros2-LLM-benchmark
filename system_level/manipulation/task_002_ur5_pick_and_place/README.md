@@ -1,78 +1,37 @@
-# Task 002: UR5 Pick-and-Place — Manipulation Integration
+# Task 002: Advanced ROS 2 Arm Manipulation and Trajectory Migration
 
-## Level
-Integration-Level Correctness — Manipulation
+## 1. Brief Description
+This task focuses on migrating a complex robotic manipulation sequence from ROS 1 to **ROS 2 Humble**. The scenario involves controlling a UR5-style arm in Gazebo to identify, "straighten" (re-orient), and pick-and-place Lego bricks. 
 
-## Task Goal
+The core challenge is transitioning from the synchronous `rospy` environment to the asynchronous, executor-based architecture of `rclpy`, while ensuring physical safety through end-effector trajectory interpolation.
 
-This task evaluates whether a robotic manipulation pipeline is **correctly integrated**
-from motion planning to execution orchestration.
+---
+source code file:
+1. ```https://github.com/pietrolechthaler/UR5-Pick-and-Place-Simulation/blob/main/catkin_ws/src/motion_planning/scripts/motion_planning.py```
+2. ```https://github.com/pietrolechthaler/UR5-Pick-and-Place-Simulation/blob/main/catkin_ws/src/motion_planning/scripts/controller.py```
 
-The benchmark focuses on **system-level correctness**, not low-level physics
-or perception accuracy.
+
+## 2. Design Logic for Implementation (Holes)
+
+### Hole 1: Trajectory Interpolation (`controller.py`)
+* **Logic:** In a high-fidelity Gazebo simulation, sending a single goal pose causes the physics engine to "teleport" the arm, leading to instability or solver crashes. 
+* **Requirement:** The developer must implement a motion loop in `move_to`. It must use **Slerp (Spherical Linear Interpolation)** for orientations and linear interpolation for positions to generate a smooth sequence of `JointTrajectoryPoint` messages.
+
+### Hole 2: Manipulation Orchestration (`motion_planning.py`)
+* **Logic:** This tests the ability to coordinate multiple ROS 2 interfaces (Actions and Services) within a logical loop.
+* **Requirement:** Implement a sequence that:
+    1. Detects the brick's current facing axis.
+    2. Executes a "straighten" maneuver if the brick is not upright.
+    3. Manages model state using `Attach` services for grasping and `SetStatic` for final placement.
 
 ---
 
----
+## 3. Test Case Design and Expected Outcomes
 
-## TODO Files and Source Mapping
-
-### 1. motion_planning_todo.py
-
-- Source directory:
-motion_planning/scripts/motion_planning.py
-
-
-- Responsibility:
-Generate a valid joint-space trajectory for the UR5 robot
-given a target end-effector pose.
-
-- Expected Outcome:
-- Returns a non-empty trajectory
-- Trajectory controls all UR5 joints
-- Trajectory is kinematically feasible
-
----
-
-### 2. controller_todo.py
-
-- Source directory:
-controller.py
-
-- Responsibility:
-Orchestrate a complete pick-and-place routine using the motion planner.
-
-- Expected Outcome:
-- Calls motion planner for each manipulation stage
-- Executes steps in correct semantic order
-- Stops execution if any planning step fails
-
----
-
-## Notes
-
-- Grasp attachment and Gazebo physics are **out of scope**
-- This benchmark does **not** evaluate trajectory optimality
-- Correct integration logic is the primary evaluation target
-
-# Motion Planning & Controller Oracle Tests (ROS2)
-
-This directory contains **oracle tests** for the translation of the original ROS1 motion planning and controller code to ROS2.  
-The purpose is to verify **system-level correctness** of the robotic manipulation pipeline without running the full simulation.
-
-## Tested Components
-
-| Todo File | Original Source Path | Oracle Test Focus |
-|-----------|--------------------|-----------------|
-| motion_planning.py | motion_planning/scripts/motion_planning.py | - Node inherits from rclpy.node.Node<br>- MODELS_INFO exists<br>- straighten method exists |
-| controller.py | motion_planning/scripts/controller.py | - ROS2 publisher exists<br>- move_to method callable and accepts position + quaternion<br>- gripper_state attribute exists |
-
-## How to Run
-
-1. Build the Docker container (see Dockerfile in this directory).
-2. Start the container.
-3. Inside the container, run:
-
-```bash
-pytest test_motion_planning_oracle.py
-pytest test_controller_oracle.py
+| Test Case | Design Intent | Expected Outcome (Pass Criteria) |
+| :--- | :--- | :--- |
+| **test_no_nested_deadlocks** | Prevents the most common ROS 2 migration failure: nested spinning. | **Fail** if `spin_until_future_complete` is used inside a class method. **Pass** if the node handles futures via callbacks or async patterns. |
+| **test_trajectory_integrity** | Ensures the robot doesn't "cheat" by removing the motion loop for speed. | **Fail** if the `move_to` logic lacks a `for` loop or the `slerp` method. **Pass** if smooth interpolation is detected. |
+| **test_strict_naming** | Enforces the specific naming convention required by the system-level benchmark. | **Fail** if service clients are renamed (e.g., `attach_client`). **Pass** if named exactly `self.attach_srv`, `self.detach_srv`, etc. |
+| **test_manipulation_flow** | Verifies the operational integrity of the pick-and-place logic. | **Pass** if the script calls all critical functions: `straighten`, `move_to`, `open_gripper`, and `set_model_fixed`. |
+| **test_ros2_interface** | Validates the use of correct ROS 2 messaging standards. | **Pass** if `trajectory_msgs.msg` and `ActionClient` are properly instantiated and used. |

@@ -1,9 +1,59 @@
-Here is the converted ROS2 code:
-```cpp
+/*********************************************************************
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2012, Willow Garage, Inc.
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of Willow Garage nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *********************************************************************/
+
+/* Author: Ioan Sucan, Ridhwan Luthra*/
+
+// ROS2
 #include <rclcpp/rclcpp.hpp>
-#include <moveit/planning_scene_interface/planning_scene_interface.hpp>
-#include <moveit/move_group_interface/move_group_interface.hpp>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+
+// MoveIt
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
+#include <moveit/move_group_interface/move_group_interface.h>
+
+// Messages
+#include <moveit_msgs/msg/collision_object.hpp>
+#include <moveit_msgs/msg/grasp.hpp>
+#include <moveit_msgs/msg/place_location.hpp>
+#include <shape_msgs/msg/solid_primitive.hpp>
+#include <trajectory_msgs/msg/joint_trajectory.hpp>
+
+// TF2
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include <tf2/LinearMath/Quaternion.h>
+
+#include <thread>
+#include <chrono>
 
 // The circle constant tau = 2*pi. One tau is one rotation in radians.
 const double tau = 2 * M_PI;
@@ -21,7 +71,7 @@ void openGripper(trajectory_msgs::msg::JointTrajectory& posture)
   posture.points[0].positions.resize(2);
   posture.points[0].positions[0] = 0.04;
   posture.points[0].positions[1] = 0.04;
-  posture.points[0].time_from_start = rclcpp::Duration(0.5);
+  posture.points[0].time_from_start = rclcpp::Duration::from_seconds(0.5).to_msg();
   // END_SUB_TUTORIAL
 }
 
@@ -38,68 +88,84 @@ void closedGripper(trajectory_msgs::msg::JointTrajectory& posture)
   posture.points[0].positions.resize(2);
   posture.points[0].positions[0] = 0.00;
   posture.points[0].positions[1] = 0.00;
-  posture.points[0].time_from_start = rclcpp::Duration(0.5);
+  posture.points[0].time_from_start = rclcpp::Duration::from_seconds(0.5).to_msg();
   // END_SUB_TUTORIAL
 }
 
+
+//TODO
+// - Initialize MoveGroupInterface in ROS2
+// - Add collision objects to the planning scene
+// - Implement the pick sequence:
+//      * Set pre-grasp approach
+//      *gripper
+//      * grasp
+//      * Apply post-grasp retreat
+// - Implement the place sequence:
+//      * Set pre-place approach
+//      * place location
+//      * Open gripper to release
+//      * Apply post-place retreat
 void pick(moveit::planning_interface::MoveGroupInterface& move_group)
 {
-  // Set pre-grasp approach
-  geometry_msgs::msg::PoseStamped pose;
-  pose.header.frame_id = "panda_link0";
-  pose.pose.position.x = 0.5;
-  pose.pose.position.y = 0;
-  pose.pose.position.z = 0.2;
-  pose.pose.orientation.w = 1.0;
-  move_group.set_pose_target(pose);
+  std::vector<moveit_msgs::msg::Grasp> grasps;
+  grasps.resize(1);
 
-  // Open gripper
-  trajectory_msgs::msg::JointTrajectory posture;
-  openGripper(posture);
-  move_group.execute(posture);
+  grasps[0].grasp_pose.header.frame_id = "panda_link0";
+  tf2::Quaternion orientation;
+  orientation.setRPY(-tau / 4, -tau / 8, -tau / 4);
+  grasps[0].grasp_pose.pose.orientation = tf2::toMsg(orientation);
+  grasps[0].grasp_pose.pose.position.x = 0.415;
+  grasps[0].grasp_pose.pose.position.y = 0.0;
+  grasps[0].grasp_pose.pose.position.z = 0.5;
 
-  // Grasp
-  pose.pose.position.z = 0.1;
-  move_group.set_pose_target(pose);
-  move_group.plan();
-  move_group.execute();
+  grasps[0].pre_grasp_approach.direction.header.frame_id = "panda_link0";
+  grasps[0].pre_grasp_approach.direction.vector.x = 1.0;
+  grasps[0].pre_grasp_approach.min_distance = 0.095;
+  grasps[0].pre_grasp_approach.desired_distance = 0.115;
 
-  // Apply post-grasp retreat
-  pose.pose.position.z = 0.2;
-  move_group.set_pose_target(pose);
-  move_group.plan();
-  move_group.execute();
+  grasps[0].post_grasp_retreat.direction.header.frame_id = "panda_link0";
+  grasps[0].post_grasp_retreat.direction.vector.z = 1.0;
+  grasps[0].post_grasp_retreat.min_distance = 0.1;
+  grasps[0].post_grasp_retreat.desired_distance = 0.25;
+
+  openGripper(grasps[0].pre_grasp_posture);
+  closedGripper(grasps[0].grasp_posture);
+
+  grasps[0].allowed_touch_objects.push_back("object");
+  move_group.setSupportSurfaceName("table1");
+  move_group.pick("object", grasps);
 }
 
 void place(moveit::planning_interface::MoveGroupInterface& group)
 {
-  // Set pre-place approach
-  geometry_msgs::msg::PoseStamped pose;
-  pose.header.frame_id = "panda_link0";
-  pose.pose.position.x = 0;
-  pose.pose.position.y = 0.5;
-  pose.pose.position.z = 0.2;
-  pose.pose.orientation.w = 1.0;
-  group.set_pose_target(pose);
+  std::vector<moveit_msgs::msg::PlaceLocation> place_location;
+  place_location.resize(1);
 
-  // Place location
-  pose.pose.position.z = 0.1;
-  group.set_pose_target(pose);
-  group.plan();
-  group.execute();
+  place_location[0].place_pose.header.frame_id = "panda_link0";
+  tf2::Quaternion orientation;
+  orientation.setRPY(0, 0, tau / 4);
+  place_location[0].place_pose.pose.orientation = tf2::toMsg(orientation);
+  place_location[0].place_pose.pose.position.x = 0.0;
+  place_location[0].place_pose.pose.position.y = 0.5;
+  place_location[0].place_pose.pose.position.z = 0.5;
 
-  // Open gripper to release
-  trajectory_msgs::msg::JointTrajectory posture;
-  openGripper(posture);
-  group.execute(posture);
+  place_location[0].pre_place_approach.direction.header.frame_id = "panda_link0";
+  place_location[0].pre_place_approach.direction.vector.z = -1.0;
+  place_location[0].pre_place_approach.min_distance = 0.095;
+  place_location[0].pre_place_approach.desired_distance = 0.115;
 
-  // Apply post-place retreat
-  pose.pose.position.z = 0.2;
-  group.set_pose_target(pose);
-  group.plan();
-  group.execute();
+  place_location[0].post_place_retreat.direction.header.frame_id = "panda_link0";
+  place_location[0].post_place_retreat.direction.vector.y = -1.0;
+  place_location[0].post_place_retreat.min_distance = 0.1;
+  place_location[0].post_place_retreat.desired_distance = 0.25;
+
+  openGripper(place_location[0].post_place_posture);
+
+  group.setSupportSurfaceName("table2");
+  group.place("object", place_location);
 }
-
+//END OF TODO
 void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& planning_scene_interface)
 {
   // BEGIN_SUB_TUTORIAL table1
@@ -116,7 +182,7 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
 
   /* Define the primitive and its dimensions. */
   collision_objects[0].primitives.resize(1);
-  collision_objects[0].primitives[0].type = collision_objects[0].primitives[0].BOX;
+  collision_objects[0].primitives[0].type = shape_msgs::msg::SolidPrimitive::BOX;
   collision_objects[0].primitives[0].dimensions.resize(3);
   collision_objects[0].primitives[0].dimensions[0] = 0.2;
   collision_objects[0].primitives[0].dimensions[1] = 0.4;
@@ -130,7 +196,7 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
   collision_objects[0].primitive_poses[0].orientation.w = 1.0;
   // END_SUB_TUTORIAL
 
-  collision_objects[0].operation = collision_objects[0].ADD;
+  collision_objects[0].operation = moveit_msgs::msg::CollisionObject::ADD;
 
   // BEGIN_SUB_TUTORIAL table2
   // Add the second table where we will be placing the cube.
@@ -139,7 +205,7 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
 
   /* Define the primitive and its dimensions. */
   collision_objects[1].primitives.resize(1);
-  collision_objects[1].primitives[0].type = collision_objects[1].primitives[0].BOX;
+  collision_objects[1].primitives[0].type = shape_msgs::msg::SolidPrimitive::BOX;
   collision_objects[1].primitives[0].dimensions.resize(3);
   collision_objects[1].primitives[0].dimensions[0] = 0.4;
   collision_objects[1].primitives[0].dimensions[1] = 0.2;
@@ -153,7 +219,7 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
   collision_objects[1].primitive_poses[0].orientation.w = 1.0;
   // END_SUB_TUTORIAL
 
-  collision_objects[1].operation = collision_objects[1].ADD;
+  collision_objects[1].operation = moveit_msgs::msg::CollisionObject::ADD;
 
   // BEGIN_SUB_TUTORIAL object
   // Define the object that we will be manipulating
@@ -162,7 +228,7 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
 
   /* Define the primitive and its dimensions. */
   collision_objects[2].primitives.resize(1);
-  collision_objects[2].primitives[0].type = collision_objects[1].primitives[0].BOX;
+  collision_objects[2].primitives[0].type = shape_msgs::msg::SolidPrimitive::BOX;
   collision_objects[2].primitives[0].dimensions.resize(3);
   collision_objects[2].primitives[0].dimensions[0] = 0.02;
   collision_objects[2].primitives[0].dimensions[1] = 0.02;
@@ -176,7 +242,7 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
   collision_objects[2].primitive_poses[0].orientation.w = 1.0;
   // END_SUB_TUTORIAL
 
-  collision_objects[2].operation = collision_objects[2].ADD;
+  collision_objects[2].operation = moveit_msgs::msg::CollisionObject::ADD;
 
   planning_scene_interface.applyCollisionObjects(collision_objects);
 }
@@ -184,25 +250,54 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
-  auto node = rclcpp::Node::make_shared("panda_arm_pick_place");
 
-  moveit::planning_interface::PlanningSceneInterface planning_scene_interface(node);
+  auto node = std::make_shared<rclcpp::Node>("panda_arm_pick_place");
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(node);
+  std::thread spinner([&executor]() { executor.spin(); });
+
+  using namespace std::chrono_literals;
+
+  rclcpp::sleep_for(1s);
+  moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
   moveit::planning_interface::MoveGroupInterface group(node, "panda_arm");
-  group.set_planning_time(45.0);
+  group.setPlanningTime(45.0);
 
   addCollisionObjects(planning_scene_interface);
 
   // Wait a bit for ROS things to initialize
-  rclcpp::sleep_for(rclcpp::Duration(1.0));
+  rclcpp::sleep_for(1s);
 
   pick(group);
 
-  rclcpp::sleep_for(rclcpp::Duration(1.0));
+  rclcpp::sleep_for(1s);
 
   place(group);
 
   rclcpp::shutdown();
+  if (spinner.joinable())
+    spinner.join();
   return 0;
 }
-```
-Note that I've replaced `ros::init` with `rclcpp::init`, `ros::NodeHandle` with `rclcpp::Node`, and `ros::AsyncSpinner` with `rclcpp::executors::SingleThreadedExecutor`. I've also replaced `ros::Duration` with `rclcpp::Duration` and `ros::WallDuration` with `rclcpp::sleep_for`. Additionally, I've updated the `moveit` and `tf2` includes to use the ROS2 versions.
+
+// BEGIN_TUTORIAL
+// CALL_SUB_TUTORIAL table1
+// CALL_SUB_TUTORIAL table2
+// CALL_SUB_TUTORIAL object
+//
+// Pick Pipeline
+// ^^^^^^^^^^^^^
+// CALL_SUB_TUTORIAL pick1
+// openGripper function
+// """"""""""""""""""""
+// CALL_SUB_TUTORIAL open_gripper
+// CALL_SUB_TUTORIAL pick2
+// closedGripper function
+// """"""""""""""""""""""
+// CALL_SUB_TUTORIAL closed_gripper
+// CALL_SUB_TUTORIAL pick3
+//
+// Place Pipeline
+// ^^^^^^^^^^^^^^
+// CALL_SUB_TUTORIAL place
+// END_TUTORIAL

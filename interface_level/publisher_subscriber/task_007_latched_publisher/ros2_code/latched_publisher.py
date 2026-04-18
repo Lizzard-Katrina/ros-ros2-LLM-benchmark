@@ -1,37 +1,52 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+import time
+
 import rclpy
-from rclpy.node import Node
+from rclpy.executors import SingleThreadedExecutor
+from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
 from std_msgs.msg import String
 
-class LatchedPubSubNode(Node):
 
-    def __init__(self):
-        super().__init__('latched_pub_sub_node')
-        self.publisher = self.create_publisher(String, 'latched_topic', 10)
-        self.subscription = self.create_subscription(String, 'latched_topic', self.callback, 10)
-        self.timer = self.create_timer(0.5, self.publish_loop)
+def main():
+    rclpy.init()
+    node = rclpy.create_node('latched_pub_sub_node')
 
-    def callback(self, msg):
-        self.get_logger().info('Received message: "%s"' % msg.data)
+    # TODO: Create a Publisher on 'latched_topic', define a Subscriber with a callback,
+    #       and implement the publish loop with rospy.is_shutdown().
+    #       The callback should log received messages.
+    qos_profile = QoSProfile(
+        history=QoSHistoryPolicy.KEEP_LAST,
+        depth=10,
+        reliability=QoSReliabilityPolicy.RELIABLE,
+        durability=QoSDurabilityPolicy.TRANSIENT_LOCAL,
+    )
 
-    def publish_loop(self):
-        if self.get_logger().get_effective_level() <= rclpy.logging.LoggingSeverity.INFO:
-            msg = String()
-            msg.data = 'Hello World!'
-            self.publisher.publish(msg)
-        if self.get_node_services_interface().get_node_count() > 1:
-            self.destroy_timer(self.timer)
+    def callback(msg: String):
+        node.get_logger().info(f"Received: {msg.data}")
 
-def main(args=None):
-    rclpy.init(args=args)
-    node = LatchedPubSubNode()
+    publisher = node.create_publisher(String, 'latched_topic', qos_profile)
+    subscriber = node.create_subscription(String, 'latched_topic', callback, qos_profile)
+
+    executor = SingleThreadedExecutor()
+    executor.add_node(node)
+
+    count = 0
     try:
-        rclpy.spin(node)
-    except KeyboardInterrupt:
-        node.get_logger().info('KeyboardInterrupt caught')
+        while rclpy.ok():
+            msg = String()
+            msg.data = f"Hello from ROS2 (latched) #{count}"
+            publisher.publish(msg)
+            node.get_logger().info(f"Published: {msg.data}")
+            executor.spin_once(timeout_sec=0.1)
+            time.sleep(1.0)
+            count += 1
     finally:
+        node.destroy_subscription(subscriber)
+        node.destroy_publisher(publisher)
         node.destroy_node()
         rclpy.shutdown()
+    # end: TODO block ends here
+
 
 if __name__ == "__main__":
     main()

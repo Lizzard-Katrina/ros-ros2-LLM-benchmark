@@ -1,3 +1,52 @@
+# Copyright (c) 2019 Open Source Robotics Foundation, Inc.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#
+#    * Redistributions in binary form must reproduce the above copyright
+#      notice, this list of conditions and the following disclaimer in the
+#      documentation and/or other materials provided with the distribution.
+#
+#    * Neither the name of the copyright holder nor the names of its
+#      contributors may be used to endorse or promote products derived from
+#      this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+from threading import Event
+from time import monotonic
+
+from rcl_interfaces.msg import Parameter as ParameterMsg
+from rcl_interfaces.msg import ParameterEvent
+from rcl_interfaces.srv import DescribeParameters
+from rcl_interfaces.srv import GetParameters
+from rcl_interfaces.srv import ListParameters
+from rcl_interfaces.srv import SetParameters
+
+from rclpy.parameter import Parameter
+from rclpy.qos import qos_profile_parameter_events
+
+
+class AsyncServiceCallFailed(Exception):
+
+    def __init__(self, message='asynchronous service call failed', hint=''):
+        self.message = message if not hint else message + ': ' + hint
+        super().__init__(self.message)
+
+
 class ParamClient(object):
 
     def __init__(self, node, remote_node_name, param_change_callback=None):
@@ -5,16 +54,16 @@ class ParamClient(object):
         self._node = node
         self._remote_node_name = remote_node_name
         self._get_params_client = self._node.create_client(
-            GetParameters, f'{remote_node_name}/get_parameters'
+            GetParameters, '{remote_node_name}/get_parameters'.format_map(locals())
         )
         self._set_params_client = self._node.create_client(
-            SetParameters, f'{remote_node_name}/set_parameters'
+            SetParameters, '{remote_node_name}/set_parameters'.format_map(locals())
         )
         self._list_params_client = self._node.create_client(
-            ListParameters, f'{remote_node_name}/list_parameters'
+            ListParameters, '{remote_node_name}/list_parameters'.format_map(locals())
         )
         self._describe_params_client = self._node.create_client(
-            DescribeParameters, f'{remote_node_name}/describe_parameters'
+            DescribeParameters, '{remote_node_name}/describe_parameters'.format_map(locals())
         )
         self._param_events_subscription = self._node.create_subscription(
             ParameterEvent, '/parameter_events', self._on_parameter_event,
@@ -66,24 +115,57 @@ class ParamClient(object):
         self._node.destroy_client(self._get_params_client)
 
     def _call_service(self, client, request, timeout=1.0):
+        start_time = monotonic()
+
         if not client.wait_for_service(timeout_sec=timeout):
             raise AsyncServiceCallFailed(hint='timed out waiting for service')
 
         future = client.call_async(request)
+        if future is None:
+            raise AsyncServiceCallFailed(hint='the target node may not be spinning')
+
         done_event = Event()
+        future.add_done_callback(lambda _: done_event.set())
 
-        def _done_callback(fut):
-            done_event.set()
+        elapsed = monotonic() - start_time
+        remaining_timeout = timeout - elapsed
+        if remaining_timeout < 0.0:
+            remaining_timeout = 0.0
 
-        future.add_done_callback(_done_callback)
+        if not done_event.wait(timeout=remaining_timeout):
+            raise AsyncServiceCallFailed(hint='timed out waiting for response')
 
-        if not done_event.wait(timeout):
+        try:
+            response = future.result()
+        except Exception as ex:
+            raise AsyncServiceCallFailed(hint=str(ex))
+
+        if response is None:
             raise AsyncServiceCallFailed(hint='the target node may not be spinning')
 
-        if future.done():
-            try:
-                return future.result()
-            except Exception as e:
-                raise AsyncServiceCallFailed(hint=str(e))
-        else:
-            raise AsyncServiceCallFailed(hint='the target node may not be spinning')
+        return response
+
+
+def create_param_client(node, remote_node_name, param_change_callback=None):
+    return ParamClient(node, remote_node_name, param_change_callback)
+
+
+def _has_parameters(node, node_name, node_namespace):
+    # Get all of the services provided by a node (node_name)
+    for service_name, service_types in node.get_service_names_and_types_by_node(
+            node_name, node_namespace):
+
+        # Make sure the node supports the ListParameters service
+        if 'rcl_interfaces/srv/ListParameters' in service_types:
+            return True
+    return False
+
+
+def find_nodes_with_params(node):
+    names_and_namespaces = node.get_node_names_and_namespaces()
+    node_list = []
+    for node_name, node_namespace in names_and_namespaces:
+        if _has_parameters(node, node_name, node_namespace):
+            full_name = node_namespace.rstrip('/') + '/' + node_name
+            node_list.append(full_name)
+    return node_list

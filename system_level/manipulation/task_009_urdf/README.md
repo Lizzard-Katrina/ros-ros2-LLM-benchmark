@@ -1,47 +1,38 @@
-# ROS1 Manipulator Benchmark Scaffold
+# Task: ROS 2 Manipulator URDF and MoveIt Integration
 
-This repository contains a benchmark scaffold for a generic 6-DOF manipulator with gripper, built using:
+## 1. Brief Description
+This task evaluates an AI's ability to maintain **system-level consistency** across three interconnected robotic configuration files: a URDF (Unified Robot Description Format), an SRDF (Semantic Robot Description Format), and a YAML joint limits file. 
 
-- ROS1
-- MoveIt
-- Gazebo simulation
-
-The scaffold is extracted and simplified from [ros_moveit_gazebo_ws](https://github.com/lFatality/ros_moveit_gazebo_ws).  
-The purpose of this benchmark is to test LLMs on reasoning about robotic control logic, MoveIt configurations, and URDF definitions.
-
+The objective is to complete the kinematic chain of a 6-DOF manipulator with a gripper. The model must not only provide syntactically correct XML/YAML but also calculate spatial offsets based on physical geometry, define proper motion planning groups, and explicitly enable dynamic safety overrides. Failure to align these three files results in a robot that either "breaks apart" visually, fails to solve Inverse Kinematics (IK), or ignores safety velocity constraints.
 
 ---
 
-## Scaffold Design
+source file:
+```https://github.com/lFatality/ros_moveit_gazebo_ws/blob/master/src/arm_moveit_config```
 
-1. **arm_urdf.urdf**  
-   - Contains the robot links and basic joint structure.  
-   - Core joint logic for `joint2~joint6` and fingers is removed (`TODO`) to test LLM completion of URDF limits, dynamics, and transmissions.
+## 2. Design Strategy for Holes
 
-2. **demo.launch**  
-   - Loads robot description and starts MoveIt demo nodes.  
-   - Core MoveIt launch logic (move_group, RViz, fake execution, database) is removed (`TODO`) for LLM reasoning tests.
+### Kinematic Chain Reasoning (URDF)
+The missing section requires the model to perform **spatial reasoning**. Instead of receiving raw coordinates, the model must analyze the preceding link's cylinder geometry and derive the subsequent joint's origin and the link's visual center. This tests if the model understands that URDF cylinder origins are relative to their geometric center, requiring a half-length offset to align perfectly with the parent joint.
 
-3. **ros_controllers.yaml**  
-   - Defines hardware interface, joint list, and controller list.  
-   - Controller gains and PID settings are removed (`TODO`) to challenge LLMs to fill in correct logic.
+### Semantic Planning Structures (SRDF)
+This part evaluates the understanding of **MoveIt's planning architecture**. The model is expected to distinguish between a "Chain" definition (essential for numerical IK solvers) and a "Joint/Link" collection. It also challenges the model to identify "Adjacent" link pairs in the kinematic tree to manually update the Allowed Collision Matrix (ACM), which is a prerequisite for successful motion planning without self-collision triggers.
 
----
-
-## How to Use
-
-1. Clone this repository.  
-2. Place it in your ROS workspace (`catkin_ws/src`).  
-3. Run `catkin_make` or `catkin build`.  
-4. Inspect the TODOs in each file.  
-5. Complete the missing logic to make the robot simulation functional.
+### Dynamic Constraint Overrides (YAML)
+The focus here is on **system-level logic activation**. In ROS 2 MoveIt, numerical constraints are ignored unless the corresponding boolean "has_limits" flags are explicitly toggled. The task tests whether the model can differentiate between continuous joints and fixed-range joints while ensuring all safety-critical limit flags are correctly activated.
 
 ---
 
-## Notes
+## 3. Testcase Design and Expected Outcomes
 
-- This scaffold is **not meant for running directly**; it is intended for benchmarking and testing LLM completion of robotic control logic.  
-- The TODOs highlight challenging parts of the code that require domain-specific reasoning.  
-- The original repository [ros_moveit_gazebo_ws](https://github.com/lFatality/ros_moveit_gazebo_ws) can be used as reference for validation.
+### Testcase 1: Geometric Alignment and Topology
+* **Design Logic**: Validates the mathematical correctness of the coordinate transforms. It specifically checks if the joint rotation axes match the arm's design (e.g., Pitch axis for lifting joints) and if the link offsets correctly account for the component's half-length.
+* **Expected Outcome**: The test fails if there is a "visual break" or overlap in the model. Success confirms the model's ability to translate geometric specs into a valid kinematic tree.
 
+### Testcase 2: MoveIt Group Semantics
+* **Design Logic**: Verifies that the arm is defined as a continuous chain from `base_link` to `link6`. It also checks for the presence of specific `disable_collisions` tags for adjacent components.
+* **Expected Outcome**: The test fails if the planning group is fragmented or if the robot is "trapped" by its own collision matrix. Success indicates the robot is ready for Inverse Kinematics solving.
 
+### Testcase 3: Safety Limit Enforcement
+* **Design Logic**: Targets the specific YAML structure for limit overrides. It checks for the explicit `true` value of velocity and acceleration limit flags for both the main arm and the gripper fingers.
+* **Expected Outcome**: The test fails if the model only provides values but fails to "arm" the limit switches. Success indicates the planner will respect the downscaled velocity and acceleration for safe operation.

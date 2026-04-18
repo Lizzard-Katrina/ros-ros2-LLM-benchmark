@@ -54,7 +54,7 @@ class ArmController:
     	Execute an end-effector motion to the target pose by generating
     	and publishing joint trajectories, and update the internal arm state
     	based on execution feedback.
-    	END OF todo
+    	END OF TODO
         """
 
 

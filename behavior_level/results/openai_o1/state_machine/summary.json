@@ -1,0 +1,151 @@
+[
+    {
+        "task_id": "state_machine/task_001_smach_basic",
+        "status": "FAILED",
+        "score": "7/8",
+        "pass_rate": "87.50%",
+        "tokens": 7127,
+        "failed_cases": [
+            {
+                "test_function": "test_userdata_request_mapping",
+                "error_message": "AssertionError: Request slot mapping from userdata is missing.\nassert None\n +  where None = <function search at 0x7f9cd9509f30>('setattr\\\\s*\\\\(\\\\s*self\\\\._request\\\\s*,\\\\s*key\\\\s*,\\\\s*ud\\\\[key\\\\]\\\\s*\\\\)', \"#!/usr/bin/env python3\\nimport rclpy\\n\\nimport threading\\n\\nimport smach\\nfrom .ros_state import RosState\\n\\n__all__ ...)\\n\\n        if response_cb_outcome is not None:\\n            return response_cb_outcome\\n\\n        return 'succeeded'\")\n +    where <function search at 0x7f9cd9509f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_002_mas_execution_manager",
+        "status": "FAILED",
+        "score": "4/7",
+        "pass_rate": "57.14%",
+        "tokens": 4285,
+        "failed_cases": [
+            {
+                "test_function": "test_parameter_logic",
+                "error_message": "AssertionError: Missing parameter declaration logic.\nassert None\n +  where None = <function search at 0x7f18a4d91f30>('self\\\\.node\\\\.declare_parameter', 'import rclpy\\nfrom rclpy.node import Node\\nimport smach\\nfrom std_msgs.msg import String\\nimport rosplan_dispatch_msg...y(self, sentence):\\n        say_msg = String()\\n        say_msg.data = sentence\\n        self.say_pub.publish(say_msg)')\n +    where <function search at 0x7f18a4d91f30> = re.search"
+            },
+            {
+                "test_function": "test_topic_and_msg_integrity",
+                "error_message": "AssertionError: Topic mismatch: Subscription must use ActionFeedback on the feedback topic.\nassert None\n +  where None = <function search at 0x7f18a4d91f30>('create_subscription\\\\s*\\\\(.*ActionFeedback.*[\\'\\\\\"]/kcl_rosplan/action_feedback[\\'\\\\\"]', 'import rclpy\\nfrom rclpy.node import Node\\nimport smach\\nfrom std_msgs.msg import String\\nimport rosplan_dispatch_msg...y(self, sentence):\\n        say_msg = String()\\n        say_msg.data = sentence\\n        self.say_pub.publish(say_msg)')\n +    where <function search at 0x7f18a4d91f30> = re.search"
+            },
+            {
+                "test_function": "test_interface_params_retention",
+                "error_message": "AssertionError: Data Flow Error: Ontology interface must receive the url and prefix parameters.\nassert None\n +  where None = <function search at 0x7f18a4d91f30>('DomesticOntologyInterface\\\\s*\\\\(\\\\s*[^,]+url[^,]*,\\\\s*[^,]+prefix', 'import rclpy\\nfrom rclpy.node import Node\\nimport smach\\nfrom std_msgs.msg import String\\nimport rosplan_dispatch_msg...y(self, sentence):\\n        say_msg = String()\\n        say_msg.data = sentence\\n        self.say_pub.publish(say_msg)')\n +    where <function search at 0x7f18a4d91f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_003_tutorial_baseline",
+        "status": "FAILED",
+        "score": "6/7",
+        "pass_rate": "85.71%",
+        "tokens": 5776,
+        "failed_cases": [
+            {
+                "test_function": "test_clock_and_manual_math",
+                "error_message": "AssertionError: Logic/Style Violation: Must manually convert nanoseconds to seconds for comparison as per TODO.\nassert None\n +  where None = <function search at 0x7fa430d51f30>('\\\\.nanoseconds\\\\s*/\\\\s*1(?:e9|000000000)', '#!/usr/bin/env python3\\nimport rclpy\\nimport smach\\nfrom gazebo_msgs.srv import SetModelState\\nfrom std_msgs.msg impo...   else:\\n            self.node.get_logger().info(\"SetModelState service call failed\")\\n            return \\'aborted\\'')\n +    where <function search at 0x7fa430d51f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_004_ros_task_manage",
+        "status": "FAILED",
+        "score": "5/7",
+        "pass_rate": "71.43%",
+        "tokens": 9557,
+        "failed_cases": [
+            {
+                "test_function": "test_introspection_node_handle",
+                "error_message": "AssertionError: API Error: IntrospectionServer must be passed the 'self.node' handle.\nassert None\n +  where None = <function search at 0x7f0ab8b39f30>('IntrospectionServer\\\\(.*self\\\\.node', '#!/usr/bin/env python3\\n\\nimport rclpy\\nfrom rclpy.executors import MultiThreadedExecutor\\nimport smach\\nimport smach...psilon(), transitions)\\n        else:\\n            smach.Sequence.add(label, self.TaskEpsilon())\\n        return label')\n +    where <function search at 0x7f0ab8b39f30> = re.search"
+            },
+            {
+                "test_function": "test_rclpy_init_protection",
+                "error_message": "AssertionError: Architecture Error: rclpy.init() called without safety check. This will crash in multi-node systems.\nassert None\n +  where None = <function search at 0x7f0ab8b39f30>('if\\\\s+not\\\\s+rclpy\\\\.ok\\\\(\\\\):\\\\s*(?:\\\\n\\\\s+)*rclpy\\\\.init', '#!/usr/bin/env python3\\n\\nimport rclpy\\nfrom rclpy.executors import MultiThreadedExecutor\\nimport smach\\nimport smach...psilon(), transitions)\\n        else:\\n            smach.Sequence.add(label, self.TaskEpsilon())\\n        return label')\n +    where <function search at 0x7f0ab8b39f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_005_flexbe_behavior_engine",
+        "status": "FAILED",
+        "score": "4/5",
+        "pass_rate": "80.00%",
+        "tokens": 5266,
+        "failed_cases": [
+            {
+                "test_function": "test_placeholder_removal",
+                "error_message": "AssertionError: Logic Error: NotImplementedError was not removed.\nassert 'NotImplementedError' not in '#!/usr/bin/...tive_goals()'\n  'NotImplementedError' is contained here:\n        raise NotImplementedError(\"MoveBase is not available in ROS 2 at this time!\")\n  ?           +++++++++++++++++++\n    \n        def cancel_active_goals(self):\n            if self._client.is_available(self._action_topic):\n                if self._client.is_active(self._action_topic):...\n  \n  ...Full output truncated (10 lines hidden), use '-vv' to show"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_006_flexbe_2",
+        "status": "FAILED",
+        "score": "3/5",
+        "pass_rate": "60.00%",
+        "tokens": 5035,
+        "failed_cases": [
+            {
+                "test_function": "test_true_buffer_drain_logic",
+                "error_message": "AssertionError: Logic Error: You must use a WHILE loop to drain ALL messages in the buffer per tick.\nassert None\n +  where None = <function search at 0x7fbc852bdf30>('while\\\\s+.*has_buffered', '#!/usr/bin/env python3\\n\\n# Copyright 2023 Philipp Schillinger,  Christopher Newport University\\n#\\n# Redistribution ...start_time = self.get_clock().now()\\n\\n    def on_exit(self, userdata):\\n        self._sub.disable_buffer(self._topic)')\n +    where <function search at 0x7fbc852bdf30> = re.search"
+            },
+            {
+                "test_function": "test_incremental_update_logic",
+                "error_message": "AssertionError: Logic Error: Must check if a joint value is None before assigning to avoid overwriting with stale data.\nassert ('is None' in '#!/usr/bin/env python3\\n\\n# Copyright 2023 Philipp Schillinger,  Christopher Newport University\\n#\\n# Redistribution ...start_time = self.get_clock().now()\\n\\n    def on_exit(self, userdata):\\n        self._sub.disable_buffer(self._topic)' or '== None' in '#!/usr/bin/env python3\\n\\n# Copyright 2023 Philipp Schillinger,  Christopher Newport University\\n#\\n# Redistribution ...start_time = self.get_clock().now()\\n\\n    def on_exit(self, userdata):\\n        self._sub.disable_buffer(self._topic)')"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_007_smacc",
+        "status": "FAILED",
+        "score": "4/5",
+        "pass_rate": "80.00%",
+        "tokens": 10677,
+        "failed_cases": [
+            {
+                "test_function": "test_memory_safety_and_types",
+                "error_message": "AssertionError: Safety Warning: Risky [=] capture of 'this' without lifetime protection.\nassert False\n +  where False = any(<generator object test_memory_safety_and_types.<locals>.<genexpr> at 0x7f358cd735a0>)"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_008A_robot_statemachine_scaffold",
+        "status": "FAILED",
+        "score": "2/6",
+        "pass_rate": "33.33%",
+        "tokens": 11649,
+        "failed_cases": [
+            {
+                "test_function": "test_no_ros1_remnants",
+                "error_message": "AssertionError: Migration Error: Legacy ROS 1 symbol 'ros::Timer' detected.\nassert not <re.Match object; span=(5007, 5017), match='ros::Timer'>\n +  where <re.Match object; span=(5007, 5017), match='ros::Timer'> = <function search at 0x7f1312d2df30>('ros::Timer', '#include <rclcpp/rclcpp.hpp>\\n#include <geometry_msgs/msg/twist.hpp>\\n#include <sensor_msgs/msg/joy.hpp>\\n#include <r...ue;\\n            }\\n        }\\n    }\\n    _joystick_cmd = *joy;\\n    return movingCommand;\\n}\\n\\n} /* namespace rsm */')\n +    where <function search at 0x7f1312d2df30> = re.search"
+            },
+            {
+                "test_function": "test_parameter_lifecycle_strict",
+                "error_message": "AssertionError: Logic Error: Found only 1 declarations. ROS 2 requires declaring every parameter.\nassert 1 >= 3\n +  where 1 = len(['this->declare_parameter'])"
+            },
+            {
+                "test_function": "test_ros2_service_signature_naming",
+                "error_message": "AssertionError: Type Error: Service callbacks must use std::shared_ptr.\nassert 'std::shared_ptr' in '#include <rclcpp/rclcpp.hpp>\\n#include <geometry_msgs/msg/twist.hpp>\\n#include <sensor_msgs/msg/joy.hpp>\\n#include <r...ue;\\n            }\\n        }\\n    }\\n    _joystick_cmd = *joy;\\n    return movingCommand;\\n}\\n\\n} /* namespace rsm */'"
+            },
+            {
+                "test_function": "test_timer_chrono_strict",
+                "error_message": "AssertionError: API Error: Missing create_wall_timer.\nassert 'create_wall_timer' in '#include <rclcpp/rclcpp.hpp>\\n#include <geometry_msgs/msg/twist.hpp>\\n#include <sensor_msgs/msg/joy.hpp>\\n#include <r...ue;\\n            }\\n        }\\n    }\\n    _joystick_cmd = *joy;\\n    return movingCommand;\\n}\\n\\n} /* namespace rsm */'"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_009_sm_dance_bot_strikes_back",
+        "status": "FAILED",
+        "score": "6/8",
+        "pass_rate": "75.00%",
+        "tokens": 12523,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_node_base_interface",
+                "error_message": "AssertionError: Architecture Error: RealtimePublisher must be initialized with 'get_node_base_interface()' in ROS 2.\nassert None\n +  where None = <function search at 0x7f132faf1f30>('RealtimePublisher<[\\\\w:]+>\\\\s*\\\\(\\\\s*\\\\w+->get_node_base_interface\\\\(\\\\)', '#include <angles/angles.h>\\n#include <move_base_z_client_plugin/components/odom_tracker/odom_tracker.h>\\n#include <bo...)\\n  {\\n    rtPublishPaths(odom.header.stamp);\\n  }\\n}\\n\\n}  // namespace odom_tracker\\n}  // namespace cl_move_base_z')\n +    where <function search at 0x7f132faf1f30> = re.search"
+            },
+            {
+                "test_function": "test_parameter_declaration_lifecycle",
+                "error_message": "AssertionError: API Error: Missing 'get_parameter' calls for runtime config.\nassert 'get_parameter' in '#include <angles/angles.h>\\n#include <move_base_z_client_plugin/components/odom_tracker/odom_tracker.h>\\n#include <bo...)\\n  {\\n    rtPublishPaths(odom.header.stamp);\\n  }\\n}\\n\\n}  // namespace odom_tracker\\n}  // namespace cl_move_base_z'"
+            }
+        ]
+    }
+]

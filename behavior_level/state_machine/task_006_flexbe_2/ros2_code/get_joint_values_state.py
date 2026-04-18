@@ -23,7 +23,7 @@
 # LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 # CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 # SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED ON ANY THEORY OF LIABILITY, WHETHER IN
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
@@ -76,26 +76,22 @@ class GetJointValuesState(EventState):
         self._start_time = None
 
     def execute(self, userdata):
-
         while self._sub.has_buffered(self._topic):
             msg = self._sub.get_from_buffer(self._topic)
-            name_to_pos = dict(zip(msg.name, msg.position))
-            found_all = True
-            joint_values = []
-            for joint in self._joints:
-                if joint in name_to_pos:
-                    joint_values.append(name_to_pos[joint])
-                else:
-                    found_all = False
-                    break
-            if found_all:
-                self._joint_values = joint_values
-                userdata.joint_values = self._joint_values
+            if msg is None:
+                continue
+
+            position_map = dict(zip(msg.name, msg.position))
+            for idx, joint_name in enumerate(self._joints):
+                if joint_name in position_map:
+                    self._joint_values[idx] = position_map[joint_name]
+
+            if all(value is not None for value in self._joint_values):
+                userdata.joint_values = list(self._joint_values)
                 return 'retrieved'
 
         if self._timeout is not None and self._start_time is not None:
-            elapsed = self.get_clock().now() - self._start_time
-            if elapsed > self._timeout:
+            if (self.get_clock().now() - self._start_time) > self._timeout:
                 return 'timeout'
 
     def on_enter(self, userdata):

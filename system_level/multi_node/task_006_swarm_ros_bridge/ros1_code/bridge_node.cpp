@@ -1,3 +1,25 @@
+/**
+ * @file bridge_node.cpp
+ * @author Peixuan Shu (shupeixuan@qq.com)
+ * @brief Reliable TCP bridge for ros data transfer in unstable network.
+ * It will send/receive the specified ROS topics in ../config/ros_topics.yaml
+ * It uses zmq socket(PUB/SUB mode), which reconnects others autonomously and
+ * supports 1-N pub-sub connection even with TCP protocol.
+ * 
+ * Note: This program relies on ZMQPP (c++ wrapper around ZeroMQ).
+ *  sudo apt install libzmqpp-dev
+ * 
+ * Core Idea: It would create the receving thread for each receiving ROS topic
+ *  and send ROS messages in each sub_cb() callback.
+ * 
+ * @version 1.0
+ * @date 2023-01-01
+ * 
+ * @license BSD 3-Clause License
+ * @copyright (c) 2023, Peixuan Shu
+ * All rights reserved.
+ * 
+ */
 
 #include "bridge_node.hpp"
 
@@ -40,28 +62,89 @@ bool send_freq_control(int i)
 
 /* uniform callback functions for ROS subscribers */
 template <typename T, int i>
-// TODO: complete the below 3 functions (voids) that
-// This logic must form a complete data path:
-// 1. Receive ROS messages from subscribed topics
-// 2. Apply frequency control if configured
-// 3. Serialize ROS messages into a byte buffer
-// 4. Send messages through ZeroMQ PUB sockets
-// 5. Receive messages from ZeroMQ SUB sockets
-// 6. Deserialize received data into ROS messages
-// 7. Publish them to the corresponding ROS topics
-// Ensure correctness for multiple topics, namespaces, and concurrent threads.
 void sub_cb(const T &msg)
 {
+  /* frequency control */
+  auto ignore_flag = send_freq_control(i);
+  if (ignore_flag){
+    return; // discard this message sending, abort
+  }
+
+// TODO: [SYSTEM_LEVEL_MIGRATION_TASK]
+// 1. Re-implement the message serialization logic for ROS 2.
+// 2. Use 'rclcpp::Serialization<T>' to serialize the incoming message 'msg' into a byte buffer.
+// 3. Populate a 'zmqpp::message' with the serialized data and send it.
+// STYLE: You must use 'this->get_serialized_message_factory()' or equivalent 'rclcpp' 
+// patterns to ensure the bridge maintains zero-copy potential where possible.
+//END OF TODO
 }
+
+
+/* uniform deserialize and publish the receiving messages */
 template<typename T>
 void deserialize_pub(uint8_t* buffer_ptr, size_t msg_size, int i)
 {
+  T msg;
+  // deserialize the receiving messages into ROS msg
+  namespace ser = ros::serialization;
+  ser::IStream stream(buffer_ptr, msg_size);
+  ser::deserialize(stream, msg);
+  // publish ROS msg
+  topic_pubs[i].publish(msg);
 }
+
+
+/* receive thread function to receive messages and publish them */
 void recv_func(int i)
 {
+  while(recv_thread_flags[i])
+  {
+    /* receive and process message */
+    zmqpp::message recv_array;
+    bool recv_flag; // receive success flag
+    // std::cout << "ready receive!" << std::endl;
+    // receive(&,true) for non-blocking, receive(&,false) for blocking
+    bool dont_block = false; // 'true' leads to high cpu load
+    if (recv_flag = receivers[i]->receive(recv_array, dont_block))
+    {
+      // std::cout << "receive!" << std::endl;
+      size_t data_len;
+      recv_array >> data_len; // unpack meta data
+      /*  equal to:
+        recv_array.get(&data_len, recv_array.read_cursor++); 
+        void get(T &value, size_t const cursor){
+          uint8_t const* byte = static_cast<uint8_t const*>(raw_data(cursor)); 
+          b = *byte;} 
+      */
+      // a dynamic length array by unique_ptr
+      std::unique_ptr<uint8_t> recv_buffer(new uint8_t[data_len]);  
+      // continue to copy the raw_data of recv_array into buffer
+      memcpy(recv_buffer.get(), static_cast<const uint8_t *>(recv_array.raw_data(recv_array.read_cursor())), data_len);
+      deserialize_publish(recv_buffer.get(), data_len, recvTopics[i].type, i);
+
+      // std::cout << data_len << std::endl;
+      // std::cout << recv_buffer.get() << std::endl;
+    }
+
+    /* if receive() does not block, sleep to decrease loop rate */
+    if (dont_block)
+      std::this_thread::sleep_for(std::chrono::microseconds(1000)); // sleep for us
+    else
+    {
+      /* check and report receive state */
+      if (recv_flag != recv_flags_last[i]){
+        std::string topicName = recvTopics[i].name;
+        if (topicName.at(0) != '/') {
+          if (ns == "/") {topicName = "/" + topicName;}
+          else {topicName = ns + "/" + topicName;}
+        }  // print namespace prefix if topic name is not global
+        ROS_INFO("[bridge node] \"%s\" received!", topicName.c_str());
+      } // false -> true(first message in)        
+      recv_flags_last[i] = recv_flag;
+    }
+  }
   return;
 }
-// END of TODO
 
 /* close recv socket, unsubscribe ROS topic */
 void stop_send(int i)
@@ -79,7 +162,6 @@ void stop_recv(int i)
   receivers[i]->close(); // close the receive socket
   topic_pubs[i].shutdown(); // unadvertise
 }
-
 
 int main(int argc, char **argv)
 {

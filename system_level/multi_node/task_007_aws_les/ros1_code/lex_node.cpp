@@ -1,3 +1,17 @@
+/*
+ * Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *  http://aws.amazon.com/apache2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
 #include <lex_common_msgs/KeyValue.h>
 #include <lex_node/lex_node.h>
 
@@ -34,30 +48,36 @@ lex_common_msgs::AudioTextConversationResponse& operator<<(lex_common_msgs::Audi
   return ros_response;
 }
 
-LexNode::LexNode() : node_handle_("~") {}
-
+/**
+ * TODO [Task_007_C]: Implement the complete LexNode Constructor for ROS 2.
+ * - Initialize the node (if inheriting from rclcpp::Node, call the base constructor).
+ * - Perform all necessary ROS 2 parameter declarations for configuration.
+ * - Style Constraint: Use 'this->declare_parameter<std::string>("lex_configuration_name", "default_val")' pattern.
+ * END OF TODO 
+*/
 ErrorCode LexNode::Init(std::shared_ptr<PostContentInterface> post_content)
 {
-  if (!post_content) {
-    return ErrorCode::INVALID_ARGUMENT;
-  }
-  post_content_ = post_content;
-  lex_server_ =
-    node_handle_.advertiseService<>("lex_conversation", &LexNode::LexServerCallback, this);
-  return ErrorCode::SUCCESS;
+/**
+ * TODO [Task_007_D]: Implement the complete Init function logic for ROS 2.
+ * - Ensure 'post_content' is valid before assignment.
+ * - Initialize the 'lex_server_' member using the ROS 2 service creation pattern.
+ * - Style Constraint: You MUST use 'this->create_service<...>' and bind it to 'LexServerCallback'.
+ * - IMPORTANT: The logic must strictly use the member variable names defined in your updated lex_node.h.
+ * END OF TODO 
+*/
 }
 
 bool LexNode::LexServerCallback(lex_common_msgs::AudioTextConversationRequest & request,
                                 lex_common_msgs::AudioTextConversationResponse & response)
 {
-// TODO(007-lex-service-loop):
-// This logic must:
-// 1. Translate the incoming ROS AudioTextConversationRequest into a LexRequest
-// 2. Send the request to the AWS Lex service via PostContentInterface
-// 3. Handle success and failure cases of the Lex request
-// 4. Translate the LexResponse back into a ROS AudioTextConversationResponse
-// 5. Return a boolean indicating whether the service call succeeded
-// END OF TODO
+  LexRequest lex_request;
+  lex_request << request;
+  LexResponse lex_response;
+  bool is_success = !post_content_->PostContent(lex_request, lex_response);
+  if (is_success) {
+    response << lex_response;
+  }
+  return is_success;
 }
 
 }  // namespace Lex

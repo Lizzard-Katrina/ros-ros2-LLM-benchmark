@@ -1,11 +1,15 @@
 #include <rclcpp/rclcpp.hpp>
 #include <memory>
-// MoveitCpp
-#include <moveit/moveit_cpp/moveit_cpp.h>
-#include <moveit/moveit_cpp/planning_component.h>
-#include <moveit/robot_state/conversions.h>
+#include <thread>
+
+// MoveItCpp
+#include <moveit/moveit_cpp/moveit_cpp.hpp>
+#include <moveit/moveit_cpp/planning_component.hpp>
+#include <moveit/robot_state/conversions.hpp>
 
 #include <geometry_msgs/msg/point_stamped.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 
 #include <moveit_visual_tools/moveit_visual_tools.h>
 
@@ -13,41 +17,38 @@ namespace rvt = rviz_visual_tools;
 
 int main(int argc, char** argv)
 {
-  rclcpp::init(argc, argv);
-
   // TODO: Task 011 - ROS 2 MoveItCpp Infrastructure Migration
   // Goal: Set up the full MoveIt 2 execution environment.
-  // The resulting environment must support loading complex planning parameters from YAML 
-  // and ensure that internal MoveIt 2 monitors (PlanningScene, RobotState) are 
+  // The resulting environment must support loading complex planning parameters from YAML
+  // and ensure that internal MoveIt 2 monitors (PlanningScene, RobotState) are
   // updated asynchronously to avoid initialization deadlocks.
-  auto node = rclcpp::Node::make_shared("moveitcpp_demo");
-  // Use AsyncSpinner equivalent in ROS2 by spinning in a separate thread
-  rclcpp::executors::MultiThreadedExecutor executor;
+  rclcpp::init(argc, argv);
+
+  rclcpp::NodeOptions node_options;
+  node_options.automatically_declare_parameters_from_overrides(true);
+  auto node = rclcpp::Node::make_shared("moveit_cpp_demo", node_options);
+
+  rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
-
-  // Create MoveItCpp instance with node and async spinner
-  auto moveit_cpp_ptr = std::make_shared<moveit::planning_interface::MoveItCpp>(node);
-
-  // Load planning pipeline parameters from YAML (assumed to be loaded via node parameters or external config)
-  // This is typically done via node parameters in ROS2, so no explicit YAML loading here
-
-  // Create PlanningComponent for the "panda_arm" group
-  auto planning_components = std::make_shared<moveit::planning_interface::PlanningComponent>("panda_arm", moveit_cpp_ptr);
-
-  // Get robot model and joint model group for visualization and IK
-  const moveit::core::RobotModelConstPtr& robot_model_ptr = moveit_cpp_ptr->getRobotModel();
-  const moveit::core::JointModelGroup* joint_model_group_ptr = robot_model_ptr->getJointModelGroup("panda_arm");
-
-  // Get current robot state for start state
-  moveit::core::RobotStatePtr robot_start_state = moveit_cpp_ptr->getCurrentState();
-
-  // Spin executor in background thread to update PlanningSceneMonitor asynchronously
   std::thread spinner([&executor]() { executor.spin(); });
 
+  auto moveit_cpp_ptr = std::make_shared<moveit_cpp::MoveItCpp>(node);
+  auto planning_scene_monitor = moveit_cpp_ptr->getPlanningSceneMonitorNonConst();
+  planning_scene_monitor->providePlanningSceneService();
+  planning_scene_monitor->startSceneMonitor();
+  planning_scene_monitor->startWorldGeometryMonitor();
+  planning_scene_monitor->startStateMonitor();
+
+  auto planning_components =
+      std::make_shared<moveit_cpp::PlanningComponent>("panda_arm", moveit_cpp_ptr);
+
+  auto robot_model_ptr = moveit_cpp_ptr->getRobotModel();
+  auto joint_model_group_ptr = robot_model_ptr->getJointModelGroup("panda_arm");
+  auto robot_start_state = moveit_cpp_ptr->getCurrentState(10.0);
   // END OF TODO
 
-  moveit_visual_tools::MoveItVisualTools visual_tools(node, "panda_link0", rvt::RVIZ_MARKER_TOPIC,
-                                                      moveit_cpp_ptr->getPlanningSceneMonitorNonConst());
+  moveit_visual_tools::MoveItVisualTools visual_tools(
+      node, "panda_link0", rvt::RVIZ_MARKER_TOPIC, moveit_cpp_ptr->getPlanningSceneMonitorNonConst());
   visual_tools.deleteAllMarkers();
   visual_tools.loadRemoteControl();
 
@@ -117,7 +118,7 @@ int main(int argc, char** argv)
   //
   // Here we will set the current state of the plan using
   // moveit::core::RobotState
-  auto start_state = *(moveit_cpp_ptr->getCurrentState());
+  auto start_state = *(moveit_cpp_ptr->getCurrentState(10.0));
   geometry_msgs::msg::Pose start_pose;
   start_pose.orientation.w = 1.0;
   start_pose.position.x = 0.55;
@@ -248,4 +249,5 @@ int main(int argc, char** argv)
   RCLCPP_INFO(node->get_logger(), "Shutting down.");
   rclcpp::shutdown();
   spinner.join();
+  return 0;
 }

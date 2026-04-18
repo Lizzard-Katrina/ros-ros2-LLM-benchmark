@@ -5,10 +5,6 @@
   "category": "navigation",
   "description": "Validate sequential waypoint following using ROS Actionlib for Husky in simulation.",
   "ros_version": "ROS1 Noetic",
-  "language": "Python",
+  "language": "C++",
   "difficulty": "Basic",
-  "source": [
-    "https://hotblackrobotics.github.io/en/blog/2018/01/29/action-client-py/",
-    "https://github.com/husky/husky"
-  ]
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import rclpy
-from rclpy.node import Node
 from std_msgs.msg import String
+
 
 class Person:
     def __init__(self):
@@ -9,31 +9,33 @@ class Person:
         self.age = 0
         self.height = 0
 
-class PersonSubscriber(Node):
-    def __init__(self):
-        super().__init__('person_subscriber')
-        self.subscription = self.create_subscription(
-            String,
-            'person_info',
-            self.callback,
-            10)
-        self.subscription  # prevent unused variable warning
 
-    def callback(self, msg):
-        # TODO
-        # Print received data
-        self.get_logger().info(f"Received: {msg.data}")
+node = None
+
+
+def callback(msg):
+    # Print received data
+    node.get_logger().info(f"Received: {msg}")
+
 
 def main(args=None):
+    global node
     rclpy.init(args=args)
-    person_subscriber = PersonSubscriber()
-    try:
-        rclpy.spin(person_subscriber)
-    except KeyboardInterrupt:
-        person_subscriber.get_logger().info('Keyboard Interrupt (SIGINT)')
-    finally:
-        person_subscriber.destroy_node()
-        rclpy.shutdown()
+    node = rclpy.create_node('person_subscriber')
+
+    # Create a subscriber listening to /person_info
+    subscription = node.create_subscription(
+        String,
+        '/person_info',
+        callback,
+        10
+    )
+    node.subscription = subscription
+
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()

@@ -1,21 +1,24 @@
 {
-  "task_id": "012",
-  "task_name": "ROS Multimaster Integration and Synchronization",
-  "source": "https://github.com/fkie/multimaster_fkie",
-  "difficulty_level": "hard",
-  "focus": [
-    "multinode integration",
-    "multi-master coordination",
-    "distributed ROS systems"
+  "task_id": "task_012_fkie_multimaster_migration",
+  "name": "FKIE Multimaster Core Logic Migration",
+  "category": "System-Level Correctness",
+  "sub_category": "Distributed Systems & Synchronization",
+  "difficulty": "Hard",
+  "description": "Migrate the core monitoring and synchronization logic of the FKIE Multimaster stack. Focuses on XML-RPC Master API handling, loop prevention, and batched topic registration.",
+  "required_artifacts": {
+    "master_monitor.py": "Handles local ROS Master state retrieval and mapping.",
+    "sync_thread.py": "Executes remote-to-local topic and service synchronization.",
+    "MasterState.msg": "Defines the communication contract between masters."
+  },
+  "evaluation_metrics": [
+    "Instruction Following (Style Constraints)",
+    "Logic Correctness (Loop Suppression)",
+    "Performance (Batched XML-RPC calls)",
+    "Architectural Integrity (Remote URI preservation)"
   ],
-  "key_components": [
-    "master discovery",
-    "state monitoring",
-    "synchronization lifecycle"
-  ],
-  "expected_outcome": [
-    "Implement master state extraction",
-    "Handle master discovery updates",
-    "Manage synchronization across multiple ROS masters"
-  ]
+  "env_requirements": {
+    "python_version": ">=3.8",
+    "framework": "ROS 1 (Noetic/Melodic) migration context",
+    "test_tool": "pytest"
+  }
 }

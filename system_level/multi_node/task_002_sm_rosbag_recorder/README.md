@@ -1,38 +1,46 @@
-# ROS Bag Recorder
+# ROS to ROS 2 Migration Benchmark: Recorder & Talker
 
-## Overview
-This package provides the `rosbag` recorder node that records ROS topics to bag files for later playback.  
-The recorder subscribes to specified topics, records messages with optional buffering and splitting, and supports snapshot triggers.  
+## 1. Brief Description
+This benchmark evaluates an LLM's capability to perform a **full-system migration** from ROS 1 (Noetic) to ROS 2 (Humble/Iron). Unlike simple code-completion tasks, this challenge requires the model to refactor legacy procedural code into modern object-oriented ROS 2 patterns. It focuses on two critical nodes:
 
-### Key Features
-- Record selected topics, all topics, or topics matching regex patterns.
-- Snapshot recording triggered via a ROS topic.
-- Automatic file splitting based on size, duration, or count.
-- Optional compression and latched message handling.
-- Disk space monitoring to prevent overflow.
-- Supports both synchronous and asynchronous writing.
+* **`talker.py`**: A Python publisher node testing the transition from global `rospy` calls to the `rclpy.node.Node` class, including parameter handling and non-blocking timers.
+* **`recorder.cpp`**: A complex C++ recorder engine testing high-level systems programming, specifically **Type-Agnostic (Generic)** subscriptions and **QoS (Quality of Service)** configuration.
 
-## Architecture
-The recorder orchestrates the following components:
+---
+source code file:
 
-1. **Publisher Nodes**  
-   ROS nodes publish messages to topics.
+```https://github.com/ros/ros_comm/blob/noetic-devel```
 
-2. **Recorder Node (`rosbag`)**  
-   - Subscribes to topics.
-   - Queues incoming messages (`OutgoingQueue`).
-   - Writes messages to bag files (`startWriting`, `doRecord`, `doRecordSnapshotter`).
-   - Monitors disk space and handles splitting (`checkSize`, `checkDuration`).
 
-3. **Playback / Analysis**  
-   Recorded bag files can be replayed or analyzed using ROS tools.
+## 2. Design Philosophy of Gaps (TODOs)
 
-## Installation
-```bash
-# Clone the repository
-git clone https://github.com/ros/ros_comm.git
-cd ros_comm
+The gaps are designed as "hollowed-out" function bodies. This forces the model to reason about the local implementation while ensuring the code remains consistent with the surrounding ROS 2 architecture.
 
-# Build using catkin
-catkin_make
-source devel/setup.bash
+### A. The "Timer & Parameter" Gap (`talker.py`)
+* **The Task**: Replace the legacy `while not rospy.is_shutdown()` sleep loop.
+* **The Logic**: In ROS 2, nodes must avoid blocking the main thread. The model is expected to implement a `create_timer` callback. It must also utilize the **Parameter API** to fetch the `topic_name`, reflecting the ROS 2 "Configuration over Coding" philosophy.
+
+### B. The "Generic Subscription" Gap (`recorder.cpp`)
+* **The Task**: Implement a subscriber that can record any topic without knowing its data type at compile time.
+* **The Logic**: This tests if the model knows about `rclcpp::GenericSubscription`. It also validates **QoS Awareness**: the model must choose `SensorDataQoS` or `BestEffort` for high-bandwidth topics (like LIDAR/Images) to prevent network congestion.
+
+### C. The "Temporal Integrity" Gap (`recorder.cpp`)
+* **The Task**: Timestamp the recorded messages.
+* **The Logic**: LLMs often hallucinate by using `std::chrono` or system time. The model must use `node_->now()` to ensure the data is timestamped according to the **ROS Domain Clock**, which is vital for accurate bag playback.
+
+---
+
+## 3. Oracle Test Design & Expected Outcomes
+
+The Oracle utilizes regex-based "Intent Detection" to verify that the model implemented the correct architectural patterns rather than just generating compilable syntax.
+
+### Evaluation Criteria
+
+| Test Case | Intent | Expected Code Outcome (Example) |
+| :--- | :--- | :--- |
+| **Generic Intent** | Type-agnostic recording | `node->create_generic_subscription(topic, "rmw_serialized_message", ...)` |
+| **QoS Awareness** | Handle sensor streams | `rclcpp::QoS(10).best_effort()` or `rclcpp::SensorDataQoS()` |
+| **Clock Source** | System-wide sync | `node_->now()` or `this->now()` |
+| **Parameter Intent**| Dynamic configuration | `self.declare_parameter` & `self.get_parameter` |
+| **Timer Intent** | Event-driven execution | `self.create_timer(0.1, self.timer_callback)` |
+| **Cleanliness** | Zero legacy leakage | **Fail** if `import rospy` or `ros::NodeHandle` is found. |

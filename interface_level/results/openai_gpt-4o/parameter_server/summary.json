@@ -1,0 +1,257 @@
+[
+    {
+        "task_id": "parameter_server/task_001_basic_param",
+        "status": "FAILED",
+        "score": "3/7",
+        "pass_rate": "42.86%",
+        "tokens": 10074,
+        "failed_cases": [
+            {
+                "test_function": "test_parameter_event_subscription_is_real",
+                "error_message": "AssertionError: Must use ROS2 parameter event mechanism\nassert None\n +  where None = <function search at 0x7fa1fc7bdf30>('rcl_interfaces::msg::ParameterEvent|ParameterEventHandler', '/*\\n * Copyright (C) 2009, Willow Garage, Inc.\\n *\\n * Redistribution and use in source and binary forms, with or wit...\\n  // TODO: Bind parameter update callback in ROS 2\\n  //END OF TODO\\n}\\n\\n} // namespace param\\n\\n} // namespace ros')\n +    where <function search at 0x7fa1fc7bdf30> = re.search"
+            },
+            {
+                "test_function": "test_update_is_gated_by_subscribed_set_and_mutates_cache",
+                "error_message": "AssertionError: update must lock around shared state\nassert None\n +  where None = <function search at 0x7fa1fc7bdf30>('lock_guard|scoped_lock|unique_lock', 'update(const std::string& key, const rclcpp::Parameter& v)\\n{\\n// TODO: Apply a remote parameter update to the local ...invalidate\\n//       affected parent namespace entries so that hierarchical lookups stay consistent.\\n//END of TODO\\n}')\n +    where <function search at 0x7fa1fc7bdf30> = re.search"
+            },
+            {
+                "test_function": "test_invalidate_parent_walks_up_namespaces_and_erases_parents",
+                "error_message": "AssertionError: invalidateParentParams must lock around cache\nassert None\n +  where None = <function search at 0x7fa1fc7bdf30>('lock_guard|scoped_lock|unique_lock', 'invalidateParentParams(const std::string& key)\\n{\\n// TODO: Invalidate cached parent namespace entries for a given key.\\n//END OF TODO\\n}')\n +    where <function search at 0x7fa1fc7bdf30> = re.search"
+            },
+            {
+                "test_function": "test_getImpl_has_cache_hit_shortcut_and_subscribe_on_miss",
+                "error_message": "AssertionError: getImpl must attempt cache lookup\nassert None\n +  where None = <function search at 0x7fa1fc7bdf30>('(cache|params)\\\\w*\\\\.\\\\s*(find|count)\\\\s*\\\\(', 'getImpl(const std::string& key, rclcpp::Parameter& v, bool use_cache)\\n{\\n//TODO: Implement cached parameter retrieva...g values,\\n//       and refreshing cache entries when remote updates are observed.\\n// END of TODO\\n  return false;\\n}')\n +    where <function search at 0x7fa1fc7bdf30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_002_dynamic_robot_configuration",
+        "status": "FAILED",
+        "score": "3/6",
+        "pass_rate": "50.00%",
+        "tokens": 1120,
+        "failed_cases": [
+            {
+                "test_function": "test_uses_ros2_declare_parameter",
+                "error_message": "AssertionError: Critical Error: Missing 'declare_parameter'. ROS2 requires declaration before use.\nassert None\n +  where None = <function search at 0x7fa6ead75f30>('nh_->declare_parameter\\\\s*(?:<.*?>)?\\\\s*\\\\(', '// Copyright (c) 2009, Willow Garage, Inc.\\n//\\n// Redistribution and use in source and binary forms, with or without... // END OF TODO\\n  }\\n};\\n\\nint main(int argc, char ** argv)\\n{\\n  TurtleApp app(argc, argv);\\n  return app.exec();\\n}')\n +    where <function search at 0x7fa6ead75f30> = re.search"
+            },
+            {
+                "test_function": "test_default_value_integrity",
+                "error_message": "AssertionError: Logic Error: Default fallback values {69, 86, 255} (Deep Sky Blue) not found.\nassert None\n +  where None = <function search at 0x7fa6ead75f30>('\\\\{\\\\s*69\\\\s*,\\\\s*86\\\\s*,\\\\s*255\\\\s*\\\\}', '// Copyright (c) 2009, Willow Garage, Inc.\\n//\\n// Redistribution and use in source and binary forms, with or without... // END OF TODO\\n  }\\n};\\n\\nint main(int argc, char ** argv)\\n{\\n  TurtleApp app(argc, argv);\\n  return app.exec();\\n}')\n +    where <function search at 0x7fa6ead75f30> = re.search"
+            },
+            {
+                "test_function": "test_type_strictness_casting",
+                "error_message": "AssertionError: Interface Error: Should assign the result of declare_parameter to a variable for immediate use.\nassert None\n +  where None = <function search at 0x7fa6ead75f30>('(?:auto|vector).*?=\\\\s*nh_->declare_parameter', '// Copyright (c) 2009, Willow Garage, Inc.\\n//\\n// Redistribution and use in source and binary forms, with or without... // END OF TODO\\n  }\\n};\\n\\nint main(int argc, char ** argv)\\n{\\n  TurtleApp app(argc, argv);\\n  return app.exec();\\n}')\n +    where <function search at 0x7fa6ead75f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_003_Mobile_robot_control",
+        "status": "SUCCESS",
+        "score": "7/7",
+        "pass_rate": "100.00%",
+        "tokens": 16819,
+        "failed_cases": []
+    },
+    {
+        "task_id": "parameter_server/task_004_turtlrbot3_params",
+        "status": "FAILED",
+        "score": "6/9",
+        "pass_rate": "66.67%",
+        "tokens": 6202,
+        "failed_cases": [
+            {
+                "test_function": "test_api_constraint_compliance",
+                "error_message": "AssertionError: Constraint Violation: Used prohibited 'add_on_set_parameters_callback'.\nassert 'add_on_set_...ers_callback' not in '// Copyrigh...  )\\n  );\\n}'\n  'add_on_set_parameters_callback' is contained here:\n     not use 'add_on_set_parameters_callback').\n      // - Must use standard ROS 2 parameter message parsing.\n      // END OF TODO\n    \n      auto parameters_client = std::make_shared<rclcpp::AsyncParametersClient>(this);\n    ...\n  \n  ...Full output truncated (339 lines hidden), use '-vv' to show"
+            },
+            {
+                "test_function": "test_physics_logic_preservation",
+                "error_message": "AssertionError: Physics Error: Acceleration should be DIVIDED by the constant for unit conversion.\nassert None\n +  where None = <function search at 0x7fb8f4fc1f30>('profile_acceleration\\\\s*=\\\\s*.*?\\\\s*/\\\\s*motors_\\\\.profile_acceleration_constant', '// Copyright 2019 ROBOTIS CO., LTD.\\n//\\n// Licensed under the Apache License, Version 2.0 (the \"License\");\\n// you m...n          msg->twist.linear.x,\\n          msg->twist.angular.z,\\n          sdk_msg.c_str());\\n      }\\n    )\\n  );\\n}')\n +    where <function search at 0x7fb8f4fc1f30> = re.search"
+            },
+            {
+                "test_function": "test_value_extraction_style",
+                "error_message": "AssertionError: Must use standard ROS2 methods to extract parameter values.\nassert None\n +  where None = <function search at 0x7fb8f4fc1f30>('\\\\.as_double\\\\(|from_parameter_msg', '// Copyright 2019 ROBOTIS CO., LTD.\\n//\\n// Licensed under the Apache License, Version 2.0 (the \"License\");\\n// you m...n          msg->twist.linear.x,\\n          msg->twist.angular.z,\\n          sdk_msg.c_str());\\n      }\\n    )\\n  );\\n}')\n +    where <function search at 0x7fb8f4fc1f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_005_laser_scan_filter_params",
+        "status": "FAILED",
+        "score": "4/6",
+        "pass_rate": "66.67%",
+        "tokens": 2141,
+        "failed_cases": [
+            {
+                "test_function": "test_filter_chain_interface_usage",
+                "error_message": "AssertionError: API Signature Error: logging_interface must be passed before parameters_interface in FilterChain::configure.\nassert None\n +  where None = <function search at 0x7f75aa75df30>('filter_chain_\\\\.configure\\\\s*\\\\(.*?get_node_logging_interface.*?get_node_parameters_interface', '/*\\n * Copyright (c) 2008, Willow Garage, Inc.\\n * All rights reserved.\\n *\\n * Redistribution and use in source and ...or.add_node(nh);\\n  while (rclcpp::ok()) {\\n\\n    executor.spin_some();\\n    loop_rate.sleep();\\n  }\\n\\n  return 0;\\n}', re.DOTALL)\n +    where <function search at 0x7f75aa75df30> = re.search\n +    and   re.DOTALL = re.DOTALL"
+            },
+            {
+                "test_function": "test_qos_and_topics",
+                "error_message": "AssertionError: Publisher topic 'output' not found.\nassert '\"output\"' in '/*\\n * Copyright (c) 2008, Willow Garage, Inc.\\n * All rights reserved.\\n *\\n * Redistribution and use in source and ...or.add_node(nh);\\n  while (rclcpp::ok()) {\\n\\n    executor.spin_some();\\n    loop_rate.sleep();\\n  }\\n\\n  return 0;\\n}'"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_006_dynamic_param_rqt_reconfigure",
+        "status": "SUCCESS",
+        "score": "6/6",
+        "pass_rate": "100.00%",
+        "tokens": 2908,
+        "failed_cases": []
+    },
+    {
+        "task_id": "parameter_server/task_007_navigation_stack_config",
+        "status": "FAILED",
+        "score": "5/7",
+        "pass_rate": "71.43%",
+        "tokens": 24809,
+        "failed_cases": [
+            {
+                "test_function": "test_min_max_constraint_logic",
+                "error_message": "AssertionError: \u903b\u8f91\u7f3a\u5931\uff1a\u56de\u8c03\u51fd\u6570\u4e2d\u672a\u5bf9\u6bd4 min/max particles \u7684\u5408\u6cd5\u6027\nassert None\n +  where None = <function search at 0x7fdad7349f30>('min_particles\\\\s*[><=]+\\\\s*max_particles', '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...o large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, \"OK\");\\n  }\\n}')\n +    where <function search at 0x7fdad7349f30> = re.search"
+            },
+            {
+                "test_function": "test_no_legacy_artifacts",
+                "error_message": "AssertionError: \u8fc1\u79fb\u4e0d\u5f7b\u5e95\uff1a\u4ee3\u7801\u4e2d\u68c0\u6d4b\u5230 ROS 1 \u9057\u7559\u7b26\u53f7 'private_nh_'\nassert not <re.Match object; span=(10936, 10947), match='private_nh_'>\n +  where <re.Match object; span=(10936, 10947), match='private_nh_'> = <function search at 0x7fdad7349f30>('private_nh_', '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...o large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, \"OK\");\\n  }\\n}')\n +    where <function search at 0x7fdad7349f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_008_gazebo_sim_param",
+        "status": "FAILED",
+        "score": "5/8",
+        "pass_rate": "62.50%",
+        "tokens": 10196,
+        "failed_cases": [
+            {
+                "test_function": "test_multicamera_suffix_preservation",
+                "error_message": "AssertionError: The model likely lost the '_camera_name_suffix' logic which is critical for Multicamera plugins.\nassert (None or None)\n +  where None = <function search at 0x7f1b7eb45f30>('camera_name_.*?\\\\+=.*?_camera_name_suffix', '\\n\\n#include <string>\\n#include <algorithm>\\n#include <assert.h>\\n#include <thread>\\n#include <memory>\\n#include <fun...= 0.001;\\n\\n  while (rclcpp::ok())\\n  {\\n    this->camera_queue_.callAvailable(ros::WallDuration(timeout));\\n  }\\n}\\n}')\n +    where <function search at 0x7f1b7eb45f30> = re.search\n +  and   None = <function search at 0x7f1b7eb45f30>('camera_name_.*?_camera_name_suffix', '\\n\\n#include <string>\\n#include <algorithm>\\n#include <assert.h>\\n#include <thread>\\n#include <memory>\\n#include <fun...= 0.001;\\n\\n  while (rclcpp::ok())\\n  {\\n    this->camera_queue_.callAvailable(ros::WallDuration(timeout));\\n  }\\n}\\n}')\n +    where <function search at 0x7f1b7eb45f30> = re.search"
+            },
+            {
+                "test_function": "test_standard_library_pointer_migration",
+                "error_message": "AssertionError: assert ('std::shared_ptr' in '\\n\\n#include <string>\\n#include <algorithm>\\n#include <assert.h>\\n#include <thread>\\n#include <memory>\\n#include <fun...= 0.001;\\n\\n  while (rclcpp::ok())\\n  {\\n    this->camera_queue_.callAvailable(ros::WallDuration(timeout));\\n  }\\n}\\n}' or 'std::unique_ptr' in '\\n\\n#include <string>\\n#include <algorithm>\\n#include <assert.h>\\n#include <thread>\\n#include <memory>\\n#include <fun...= 0.001;\\n\\n  while (rclcpp::ok())\\n  {\\n    this->camera_queue_.callAvailable(ros::WallDuration(timeout));\\n  }\\n}\\n}')"
+            },
+            {
+                "test_function": "test_time_source_logic",
+                "error_message": "AssertionError: assert 'now()' in '\\n\\n#include <string>\\n#include <algorithm>\\n#include <assert.h>\\n#include <thread>\\n#include <memory>\\n#include <fun...= 0.001;\\n\\n  while (rclcpp::ok())\\n  {\\n    this->camera_queue_.callAvailable(ros::WallDuration(timeout));\\n  }\\n}\\n}'"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_009_fetch_arm_params",
+        "status": "FAILED",
+        "score": "2/6",
+        "pass_rate": "33.33%",
+        "tokens": 26783,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_param_declaration",
+                "error_message": "AssertionError: Missing mandatory ROS 2 parameter declarations via node_->declare_parameter.\nassert None\n +  where None = <function search at 0x7f7e815e5f30>('node_->declare_parameter\\\\s*<\\\\s*(?:std::string|double|int)\\\\s*>\\\\s*\\\\(\\\\s*\\\\\"[\\\\w_]+\\\\\"', '/*********************************************************************\\n *\\n * Software License Agreement (BSD Licens...uginlib/class_list_macros.hpp>\\nPLUGINLIB_EXPORT_CLASS(fetch_arm::IKFastKinematicsPlugin, kinematics::KinematicsBase);')\n +    where <function search at 0x7f7e815e5f30> = re.search"
+            },
+            {
+                "test_function": "test_logging_migration",
+                "error_message": "AssertionError: RCLCPP macros must use node_->get_logger().\nassert 'get_logger()' in '/*********************************************************************\\n *\\n * Software License Agreement (BSD Licens...uginlib/class_list_macros.hpp>\\nPLUGINLIB_EXPORT_CLASS(fetch_arm::IKFastKinematicsPlugin, kinematics::KinematicsBase);'"
+            },
+            {
+                "test_function": "test_moveit2_api_usage",
+                "error_message": "AssertionError: Missing call to getJointModelGroup for validation.\nassert 'getJointModelGroup' in '/*********************************************************************\\n *\\n * Software License Agreement (BSD Licens...uginlib/class_list_macros.hpp>\\nPLUGINLIB_EXPORT_CLASS(fetch_arm::IKFastKinematicsPlugin, kinematics::KinematicsBase);'"
+            },
+            {
+                "test_function": "test_tip_frame_validation",
+                "error_message": "AssertionError: Should validate that exactly one tip frame is provided.\nassert None\n +  where None = <function search at 0x7f7e815e5f30>('tip_frames\\\\.size\\\\(\\\\)\\\\s*(!=|==|>)\\\\s*1', '/*********************************************************************\\n *\\n * Software License Agreement (BSD Licens...uginlib/class_list_macros.hpp>\\nPLUGINLIB_EXPORT_CLASS(fetch_arm::IKFastKinematicsPlugin, kinematics::KinematicsBase);')\n +    where <function search at 0x7f7e815e5f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_010_sensor_fusion_params",
+        "status": "FAILED",
+        "score": "5/6",
+        "pass_rate": "83.33%",
+        "tokens": 20357,
+        "failed_cases": [
+            {
+                "test_function": "test_sensor_config_logic",
+                "error_message": "AssertionError: Failure: Could not find logic to construct parameter names like '<type><index>_config'.\nassert None\n +  where None = <function search at 0x7f07616f5f30>('(?:\\\\\"[\\\\w_]+\\\\\"|[\\\\w_]+)\\\\s*\\\\+\\\\s*(?:std::to_string\\\\(.*\\\\)|[\\\\w_]+)\\\\s*\\\\+\\\\s*\\\\\"_config\\\\\"', '/*\\n * Copyright (c) 2014, 2015, 2016 Charles River Analytics, Inc.\\n * All rights reserved.\\n *\\n * Redistribution a...  callback_data.update_vector_ = config_vector;\\n        topic_subs_.push_back(callback_data);\\n      }\\n    }\\n  }\\n}')\n +    where <function search at 0x7f07616f5f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_011_moveit_motion_params",
+        "status": "FAILED",
+        "score": "3/6",
+        "pass_rate": "50.00%",
+        "tokens": 4505,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_node_lifecycle_setup",
+                "error_message": "AssertionError: Failure: NodeOptions must enable parameter overrides for MoveIt 2 YAML loading.\nassert 'automatically_declare_parameters_from_overrides' in '#include <rclcpp/rclcpp.hpp>\\n#include <memory>\\n\\n#include <moveit/moveit_cpp/moveit_cpp.h>\\n#include <moveit/moveit...t(\"Press \\'next\\' to end the demo\");\\n\\n  RCLCPP_INFO(node->get_logger(), \"Shutting down.\");\\n  rclcpp::shutdown();\\n}'"
+            },
+            {
+                "test_function": "test_moveit_cpp_namespace_accuracy",
+                "error_message": "AssertionError: Failure: Detected ROS 1 style namespace 'moveit::planning_interface::MoveItCpp'. In ROS 2, use 'moveit_cpp::MoveItCpp'.\nassert 'moveit::pla...e::MoveItCpp' not in '#include <r...utdown();\\n}'\n  'moveit::planning_interface::MoveItCpp' is contained here:\n    ke_shared<moveit::planning_interface::MoveItCpp>(node);\n      moveit_cpp_ptr->getPlanningSceneMonitorNonConst()->providePlanningSceneService();\n      moveit_cpp_ptr->getPlanningSceneMonitorNonConst()->startSceneMonitor();\n      moveit_cpp_ptr->getPlanningSceneMonitorNonConst()->startWorldGeometryMonitor();\n      moveit_cpp_ptr->getPlanningSceneMonitorNonConst()->startStateMonitor();\n      auto planning_components = std::make_shared<moveit::planning_interface::PlanningComponent>(\"panda_arm\", moveit_cpp_ptr);...\n  \n  ...Full output truncated (75 lines hidden), use '-vv' to show"
+            },
+            {
+                "test_function": "test_async_execution_paradigm",
+                "error_message": "AssertionError: Failure: MoveItCpp requires a background thread or MultiThreadedExecutor.\nassert False"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_012_px4_flight_params",
+        "status": "FAILED",
+        "score": "4/8",
+        "pass_rate": "50.00%",
+        "tokens": 2502,
+        "failed_cases": [
+            {
+                "test_function": "test_parameter_declaration_logic",
+                "error_message": "AssertionError: Failure: 'target_yaw' parameter was not declared using self.declare_parameter().\nassert None\n +  where None = <function search at 0x7fc27fcc9f30>('self\\\\.declare_parameter\\\\s*\\\\(\\\\s*[\\'\\\\\"]target_yaw[\\'\\\\\"]', \"\\n\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, Du...lpy.shutdown()\\n\\n\\nif __name__ == '__main__':\\n    try:\\n        main()\\n    except Exception as e:\\n        print(e)\")\n +    where <function search at 0x7fc27fcc9f30> = re.search"
+            },
+            {
+                "test_function": "test_dynamic_message_population_yaw",
+                "error_message": "AssertionError: Failure: TrajectorySetpoint.yaw is still using a hardcoded value or not assigned from a class attribute.\nassert None\n +  where None = <function search at 0x7fc27fcc9f30>('msg\\\\.yaw\\\\s*=\\\\s*self\\\\.', \"\\n\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, Du...lpy.shutdown()\\n\\n\\nif __name__ == '__main__':\\n    try:\\n        main()\\n    except Exception as e:\\n        print(e)\")\n +    where <function search at 0x7fc27fcc9f30> = re.search"
+            },
+            {
+                "test_function": "test_px4_msg_field_integrity",
+                "error_message": "AssertionError: Failure: TrajectorySetpoint uses 'position' array. Do not use 'msg.x', 'msg.y', or 'msg.z'.\nassert not <re.Match object; span=(3392, 3399), match='msg.x ='>\n +  where <re.Match object; span=(3392, 3399), match='msg.x ='> = <function search at 0x7fc27fcc9f30>('msg\\\\.[xyz]\\\\s*=', \"\\n\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, Du...lpy.shutdown()\\n\\n\\nif __name__ == '__main__':\\n    try:\\n        main()\\n    except Exception as e:\\n        print(e)\")\n +    where <function search at 0x7fc27fcc9f30> = re.search"
+            },
+            {
+                "test_function": "test_dynamic_message_population_position",
+                "error_message": "AssertionError: Failure: TrajectorySetpoint.position[2] (Z-axis) must use the dynamic height attribute.\nassert None\n +  where None = <function search at 0x7fc27fcc9f30>('msg\\\\.position\\\\s*=\\\\s*\\\\[.*,.*,.*self\\\\..*\\\\]', \"\\n\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, Du...lpy.shutdown()\\n\\n\\nif __name__ == '__main__':\\n    try:\\n        main()\\n    except Exception as e:\\n        print(e)\")\n +    where <function search at 0x7fc27fcc9f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_013_slam_mapping_params",
+        "status": "FAILED",
+        "score": "1/7",
+        "pass_rate": "14.29%",
+        "tokens": 14644,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_lifecycle_sequence",
+                "error_message": "AssertionError: Failure: ROS 2 parameters must be explicitly declared.\nassert ('this->declare_parameter' in '\\n\\n\\n\\n\\n\\n\\n\\n#include \"slam_gmapping.h\"\\n\\n#include <iostream>\\n\\n#include <time.h>\\n\\n#include \"rclcpp/rclcpp.hpp...rm = tf2::toMsg(map_to_odom_);\\n  tf_broadcaster_->sendTransform(transformStamped);\\n  map_to_odom_mutex_.unlock();\\n}' or 'declare_parameter' in '\\n\\n\\n\\n\\n\\n\\n\\n#include \"slam_gmapping.h\"\\n\\n#include <iostream>\\n\\n#include <time.h>\\n\\n#include \"rclcpp/rclcpp.hpp...rm = tf2::toMsg(map_to_odom_);\\n  tf_broadcaster_->sendTransform(transformStamped);\\n  map_to_odom_mutex_.unlock();\\n}')"
+            },
+            {
+                "test_function": "test_scanner_physical_validation_logic",
+                "error_message": "AssertionError: Failure: Missing physical consistency check. maxUrange must be capped by maxRange.\nassert None\n +  where None = <function search at 0x7f622d0b1f30>('if\\\\s*\\\\(\\\\s*\\\\w*maxUrange\\\\w*\\\\s*>\\\\s*\\\\w*maxRange\\\\w*\\\\s*\\\\)', '\\n\\n\\n\\n\\n\\n\\n\\n#include \"slam_gmapping.h\"\\n\\n#include <iostream>\\n\\n#include <time.h>\\n\\n#include \"rclcpp/rclcpp.hpp...rm = tf2::toMsg(map_to_odom_);\\n  tf_broadcaster_->sendTransform(transformStamped);\\n  map_to_odom_mutex_.unlock();\\n}')\n +    where <function search at 0x7f622d0b1f30> = re.search"
+            },
+            {
+                "test_function": "test_explicit_type_casting",
+                "error_message": "AssertionError: Failure: Use explicit type casting (e.g., .as_double()) for ROS 2 parameters.\nassert None\n +  where None = <function search at 0x7f622d0b1f30>('\\\\.as_(?:double|int|string|bool)\\\\(\\\\)', '\\n\\n\\n\\n\\n\\n\\n\\n#include \"slam_gmapping.h\"\\n\\n#include <iostream>\\n\\n#include <time.h>\\n\\n#include \"rclcpp/rclcpp.hpp...rm = tf2::toMsg(map_to_odom_);\\n  tf_broadcaster_->sendTransform(transformStamped);\\n  map_to_odom_mutex_.unlock();\\n}')\n +    where <function search at 0x7f622d0b1f30> = re.search"
+            },
+            {
+                "test_function": "test_no_fake_nodehandle",
+                "error_message": "AssertionError: Failure: 'private_nh_' detected. In ROS 2, use 'this->declare_parameter' directly.\nassert 'private_nh_' not in '\\n\\n\\n\\n\\n\\...unlock();\\n}'\n  'private_nh_' is contained here:\n    ount_(0), private_nh_(\"~\"), scan_filter_sub_(nullptr), scan_filter_(nullptr), transform_thread_(nullptr)\n  ?           +++++++++++\n    {\n      seed_ = time(NULL);\n      init();\n    }...\n  \n  ...Full output truncated (575 lines hidden), use '-vv' to show"
+            },
+            {
+                "test_function": "test_slam_default_values",
+                "error_message": "AssertionError: Failure: Map resolution (delta) default of 0.05 not found.\nassert ('0.05' in '\\n\\n\\n\\n\\n\\n\\n\\n#include \"slam_gmapping.h\"\\n\\n#include <iostream>\\n\\n#include <time.h>\\n\\n#include \"rclcpp/rclcpp.hpp...rm = tf2::toMsg(map_to_odom_);\\n  tf_broadcaster_->sendTransform(transformStamped);\\n  map_to_odom_mutex_.unlock();\\n}')"
+            },
+            {
+                "test_function": "test_member_variable_assignment",
+                "error_message": "AssertionError: Failure: Parameters must be explicitly assigned to class members using .as_type() syntax.\nassert None\n +  where None = <function search at 0x7f622d0b1f30>('\\\\w+_\\\\s*=\\\\s*(?:this->)?get_parameter\\\\(.*?\\\\)\\\\.as_', '\\n\\n\\n\\n\\n\\n\\n\\n#include \"slam_gmapping.h\"\\n\\n#include <iostream>\\n\\n#include <time.h>\\n\\n#include \"rclcpp/rclcpp.hpp...rm = tf2::toMsg(map_to_odom_);\\n  tf_broadcaster_->sendTransform(transformStamped);\\n  map_to_odom_mutex_.unlock();\\n}')\n +    where <function search at 0x7f622d0b1f30> = re.search"
+            }
+        ]
+    }
+]

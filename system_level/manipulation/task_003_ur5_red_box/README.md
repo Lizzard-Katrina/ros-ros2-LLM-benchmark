@@ -1,53 +1,42 @@
-# Task 003: Arm IK Integration
+# Task 003: UR5 Red Box - Communication & Build Migration
 
-## Overview
-This task tests the integration correctness of the robotic arm IK solver and trajectory execution.
+## 1. Brief Description
+This task focuses on the complete migration of a robotic manipulation control interface from **ROS 1 (Noetic/Kinetic)** to **ROS 2 Humble**. 
 
-## Files and TODOs
+The scenario involves a UR5 robot tasked with picking a red box. The core objective is to migrate the custom service-client communication layer and the underlying build system. This requires transitioning from the synchronous `rospy` and `catkin` environment to the asynchronous, executor-based architecture of `rclpy` and the `ament_cmake` build system, while ensuring custom service interfaces (`SetJointStates.srv`) are correctly generated and accessible.
 
-## Original ROS1 Source
+---
+source code direcory:
+```https://github.com/kkumpa/ros-robotic-arm/blob/master/robotic_arm_algorithms```
 
-The IK solver function we benchmark originates from the `robotic_arm_ikfast_arm_plugin` package in ROS1. Specifically, the relevant code is located in:
-robotic_arm_ikfast_arm_plugin/include/robotic_arm_ikfast_arm_plugin/ik_solver.cpp
 
+## 2. Design Logic for Implementation (Holes)
 
-The function `searchPositionIK` implements the main Inverse Kinematics (IK) search loop for redundant robotic arm joints. It handles:
+### Hole 1: Service Server Migration (`set_joint_states_service.py`)
+* **Logic:** ROS 2 service callbacks use a pre-instantiated `response` object. The execution must be non-blocking to the executor.
+* **Requirement:** Refactor the ROS 1 callback to accept `(request, response)` arguments. The implementation must populate the `response` fields and return the object explicitly. The node must be initialized as a standard ROS 2 `Node` class.
 
-- Free parameter initialization and discretization.
-- Enumeration of all IK solutions within joint limits.
-- Optional collision checking via callback.
-- Selection of the best solution according to the largest joint motion (`OPTIMIZE_MAX_JOINT`).
-- Proper error handling when no solution exists or input is invalid.
+### Hole 2: Asynchronous Client Logic (`set_joint_states_client.py`)
+* **Logic:** Calling services synchronously in a single-threaded ROS 2 executor often leads to deadlocks.
+* **Requirement:** Implement a client that uses `call_async()`. The control flow must use `rclpy.spin_until_future_complete()` or a manual `spin_once()` loop to wait for the `Future` result without freezing the process.
 
-## Extracted IK Search Loop
+### Hole 3: Modern Build System (`CMakeLists.txt`)
+* **Logic:** ROS 2 replaces `message_generation` with the `rosidl` pipeline.
+* **Requirement:** Implement `rosidl_generate_interfaces` to compile the `.srv` file. All install targets must be updated to the ROS 2 standard `lib/${PROJECT_NAME}` directory to ensure scripts are discoverable by `ros2 run`.
 
-For benchmarking purposes, we extracted the core IK search loop that contains the critical enumeration and decision-making logic. This segment represents the main computational logic of the solver.
+### Hole 4: Package Manifest (`package.xml`)
+* **Logic:** ROS 2 requires Format 3 for advanced dependency grouping.
+* **Requirement:** Update the package format to `3`. Crucially, add the package to the `rosidl_interface_packages` member group to allow Python-based service discovery.
 
-## ROS2 Translation Expected Outcome
+---
 
-When the function is translated to ROS2 via LLM-assisted conversion, the expected outcomes are:
+## 3. Oracle Test Design and Expected Outcomes
 
-1. The solver returns a solution within joint limits when one exists.
-2. If a collision-checking callback is provided, the returned solution passes it.
-3. If multiple solutions exist, the solver selects the one minimizing total joint motion (`OPTIMIZE_MAX_JOINT` mode).
-4. If no solution exists or input is invalid, `error_code` is set to `NO_IK_SOLUTION`.
+| Test Case | Design Intent | Expected Outcome (Pass Criteria) |
+| :--- | :--- | :--- |
+| **test_service_server_migration** | Validates the structural integrity of the Service provider. | **Pass** if the callback uses `(request, response)` and returns `response`. |
+| **test_service_client_async** | Ensures the client won't deadlock in a ROS 2 environment. | **Pass** if `call_async` is used and the `Future` object is properly handled. |
+| **test_cmakelists_rosidl** | Verifies the custom interface generation pipeline. | **Pass** if `rosidl_generate_interfaces` is present and `catkin` macros are removed. |
+| **test_package_xml_format** | Enforces ROS 2 engineering standards and interface visibility. | **Pass** if `format="3"` is used and `rosidl_interface_packages` is declared. |
+| **test_no_rospy_anywhere** | Ensures a clean migration without "zombie" ROS 1 code. | **Pass** if no strings of `rospy` or `catkin` exist in the migrated files. |
 
-## Testcase Design
-
-The test is implemented in `tests/test_ik_decision_loop.cpp` and focuses on the extracted core IK search loop. Key points of the test:
-
-| Test Case | What it Checks | Expected Outcome |
-|-----------|----------------|-----------------|
-| `OptimizeMaxJointSelectsMinimalDisplacement` | Multiple candidate solutions available | The solution chosen has the **minimal maximum joint motion** among valid candidates. Returns `true` and `error_code = SUCCESS`. |
-| `NoSolutionReturnsFalse` | All candidate solutions exceed joint limits | No solution is returned. Function returns `false` and `error_code = NO_IK_SOLUTION`. |
-
-This testcase ensures that the ROS2 translation faithfully reproduces the original ROS1 logic and handles all critical decision points.
-
-## Build and Run
-```bash
-cd docker
-docker build -t task_003_arm .
-docker run -it task_003_arm
-```
-## Notes
-To avoid introducing external system dependencies (e.g., MoveIt 2), we provide minimal mock implementations of required message types (e.g., moveit_msgs::MoveItErrorCodes) at the header level. This allows us to isolate and evaluate the semantic correctness of LLM-translated control logic without modifying the translated source code.

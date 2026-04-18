@@ -14,34 +14,53 @@ class OffboardControl(Node):
 
         # TODO: Task 012 - PX4 Flight Parameter Integration
         # Goal: Replace all hardcoded flight constants (height and yaw) with ROS 2 parameters.
-        # Ensure the node is configurable via external YAML or launch arguments. 
+        # Ensure the node is configurable via external YAML or launch arguments.
         # The parameters must be safely stored as class attributes and logged during startup.
         self.declare_parameter('takeoff_height', -5.0)
-        self.declare_parameter('yaw', 0.0)
-        self.takeoff_height = self.get_parameter('takeoff_height').get_parameter_value().double_value
-        self.yaw = self.get_parameter('yaw').get_parameter_value().double_value
-        self.get_logger().info(f"Takeoff height parameter: {self.takeoff_height}")
-        self.get_logger().info(f"Yaw parameter: {self.yaw}")
+        self.declare_parameter('takeoff_yaw', 0.0)
+
+        self.takeoff_height = float(self.get_parameter('takeoff_height').value)
+        self.takeoff_yaw = float(self.get_parameter('takeoff_yaw').value)
+
+        self.get_logger().info(
+            f"Flight parameters loaded: takeoff_height={self.takeoff_height}, takeoff_yaw={self.takeoff_yaw}"
+        )
         # END OF TODO
+
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1
+        )
+
+        self.offboard_control_mode_publisher = self.create_publisher(
+            OffboardControlMode, '/fmu/in/offboard_control_mode', qos_profile
+        )
+        self.trajectory_setpoint_publisher = self.create_publisher(
+            TrajectorySetpoint, '/fmu/in/trajectory_setpoint', qos_profile
+        )
+        self.vehicle_command_publisher = self.create_publisher(
+            VehicleCommand, '/fmu/in/vehicle_command', qos_profile
+        )
+
+        self.vehicle_local_position_subscriber = self.create_subscription(
+            VehicleLocalPosition,
+            '/fmu/out/vehicle_local_position',
+            self.vehicle_local_position_callback,
+            qos_profile
+        )
+        self.vehicle_status_subscriber = self.create_subscription(
+            VehicleStatus,
+            '/fmu/out/vehicle_status',
+            self.vehicle_status_callback,
+            qos_profile
+        )
 
         # Initialize variables
         self.offboard_setpoint_counter = 0
         self.vehicle_local_position = VehicleLocalPosition()
         self.vehicle_status = VehicleStatus()
-
-        # Publishers
-        qos = QoSProfile(
-            reliability=ReliabilityPolicy.RELIABLE,
-            history=HistoryPolicy.KEEP_LAST,
-            depth=10,
-            durability=DurabilityPolicy.VOLATILE)
-        self.offboard_control_mode_publisher = self.create_publisher(OffboardControlMode, 'OffboardControlMode', qos)
-        self.trajectory_setpoint_publisher = self.create_publisher(TrajectorySetpoint, 'TrajectorySetpoint', qos)
-        self.vehicle_command_publisher = self.create_publisher(VehicleCommand, 'VehicleCommand', qos)
-
-        # Subscribers
-        self.create_subscription(VehicleLocalPosition, 'VehicleLocalPosition', self.vehicle_local_position_callback, qos)
-        self.create_subscription(VehicleStatus, 'VehicleStatus', self.vehicle_status_callback, qos)
 
         # Create a timer to publish control commands
         self.timer = self.create_timer(0.1, self.timer_callback)
@@ -91,12 +110,10 @@ class OffboardControl(Node):
     def publish_position_setpoint(self, x: float, y: float, z: float):
         """Publish the trajectory setpoint."""
         msg = TrajectorySetpoint()
-        # TODO: Implement the setpoint message population using the dynamic parameters 
+        # TODO: Implement the setpoint message population using the dynamic parameters
         # loaded in the constructor. Ensure the timestamp is set in microseconds.
-        msg.x = x
-        msg.y = y
-        msg.z = z
-        msg.yaw = self.yaw
+        msg.position = [float(x), float(y), float(z)]
+        msg.yaw = float(self.takeoff_yaw)
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         # END OF TODO
         self.trajectory_setpoint_publisher.publish(msg)

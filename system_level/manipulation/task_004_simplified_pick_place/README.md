@@ -1,227 +1,72 @@
-# Task 004 – Simplified Pick & Place  
-**Integration-Level Manipulation Benchmark**
+# Task: EZ Pick-and-Place ROS 1 to ROS 2 Migration Benchmark
+
+## 1. Brief Description
+This task focuses on the migration of the **EZ Pick-and-Place** system from ROS 1 to ROS 2 (Foxy/Humble). The system is a hybrid manipulation pipeline that integrates **GraspIt!** (for grasp planning and contact physics) and **MoveIt 2** (for motion planning and collision checking). 
+
+The goal is to ensure that the logic originally written in `rospy` and `tf` is correctly translated into `rclpy` and `tf2_ros`, maintaining strict synchronization between the two simulation engines.
 
 ---
 
-## 1. Task Scope and Purpose
+## 2. Design Thinking for "Fill-in-the-Blanks" (Holes)
 
-This task evaluates an AI system’s ability to complete an **end-to-end robotic manipulation pipeline** in ROS1 by filling in missing logic inside an existing codebase.
+### A. Coordinate Scaling & Unit Conversion
+* **Context:** MoveIt 2 (and ROS 2 in general) operates in **meters**, while the GraspIt! simulator backend is hardcoded to work in **millimeters**.
+* **Design Logic:** A `pose_factor` (typically `1000`) must be applied to all translation values (x, y, z) before sending object/robot poses to GraspIt.
+* **Critical implementation:** `p.position.x = trans.x * self.pose_factor`.
 
-The benchmark focuses on **integration correctness**, rather than algorithmic novelty or low-level control performance.
+### B. Asynchronous Execution & Deadlock Prevention
+* **Context:** In ROS 1, service calls were simple blocking proxies. In ROS 2, calling a service from a callback using a blocking `call()` will deadlock the SingleThreadedExecutor.
+* **Design Logic:** The migration must use `call_async()` and `rclpy.spin_until_future_complete()`. This allows the node to continue processing executor events while waiting for the IK solver or database response.
 
-Specifically, the task requires coordinating:
-
-- TF transformations  
-- Inverse kinematics (IK) feasibility  
-- Motion planning via MoveIt  
-- Gripper control  
-- Pick-and-place sequencing  
-
-The reference implementation is adapted from:
-
-> https://github.com/gstavrinos/ez_pick_and_place
+### C. Kinematic Scene Consistency
+* **Context:** When the robot successfully grasps an object, the object must be "attached" to the robot's end-effector in the MoveIt Planning Scene.
+* **Design Logic:** The logic must call `self.moveit_scene.attach_object()` after a successful pick and `detach_object()` after a successful place. Failing to do so causes the motion planner to trigger a collision between the "held" object and the environment.
 
 ---
 
-## 2. Task Boundary
-
-- **ROS version**: ROS1 Noetic  
-- **Language**: Python  
-- **Evaluation level**: Integration  
-- **Simulation / visualization**: Not required for correctness  
-
-Only one file contains missing logic:
-
-ros1_code/src/ez_tools.py
-
-The file `ez_pnp2.py` is provided **unchanged** and should be treated as a black-box orchestration layer.
-
----
-
-## 3. Subtask Decomposition
-
-The task is decomposed into **four subtasks**, each corresponding to a semantically meaningful stage in a manipulation pipeline.
-
-Each subtask must satisfy **explicit functional conditions** described below.
-
----
-
-## Subtask 004-1: Grasp Feasibility Filtering (`discard`)
-
-### Objective
-
-Filter out grasp poses that are **kinematically infeasible** for the robot arm.
-
-### Required Operation
-
-For each candidate grasp pose \( g_i \):
-
-1. Transform the grasp pose into the robot base frame  
-2. Call the inverse kinematics solver  
-3. Discard the grasp if no valid joint configuration exists  
-
-### Expected Outcome (Formal Condition)
-
-Let:
-
-- \( G = \{ g_1, g_2, \dots, g_n \} \) be the set of candidate grasps  
-- \( IK(g_i) \) return a valid joint vector or fail  
-
-Then the output set \( G' \) must satisfy:
-
-\[
-G' = \{ g_i \in G \mid IK(g_i) \text{ exists} \}
-\]
-
-### Evaluation Criterion
-
-- All remaining grasps must admit at least one valid IK solution  
-- No infeasible grasp is passed to downstream planning  
-
----
-
-## Subtask 004-2: Pick Execution (`pick`)
-
-
-#### Objective
-
-Ensure the gripper is in a valid open state before approaching the object.
-
-#### Expected Outcome
-
-The gripper joint values satisfy:
-
-\[
-q_{\text{gripper}} = q_{\text{open}}
-\]
-
-prior to any grasp motion.
-
-
-#### Objective
-
-Refine grasp candidates by removing those that fail during planning or execution checks.
-
-#### Expected Outcome
-
-Let \( G' \) be the output of Subtask 004-1.  
-The selected grasp \( g^* \) must satisfy:
-
-\[
-g^* \in G' \quad \text{and} \quad \text{planning}(g^*) = \text{success}
-\]
-
-
-#### Objective
-
-Move the robot end-effector to the grasp pose and attach the object.
-
-#### Expected Outcome
-
-After execution:
-
-- The robot end-effector pose equals the grasp pose within tolerance  
-- The object is attached to the gripper link  
-
-Formally:
-
-\[
-T_{\text{ee}} \approx T_{g^*}, \quad \text{object} \in \text{attached\_collision\_objects}
-\]
-
----
-
-## Subtask 004-3: Place Execution (`place`)
-
-This subtask evaluates the **placement phase**, including pose computation, motion execution, and object release.
-
-
-#### Objective
-
-Compute a valid end-effector pose for placing the object.
-
-#### Expected Outcome
-
-There exists a placement pose \( p \) such that:
-
-\[
-IK(p) \text{ exists}
-\]
-
-and the pose is collision-free.
-
-#### Objective
-
-Move the robot arm to the placement pose.
-
-#### Expected Outcome
-
-The motion planner successfully computes and executes a trajectory:
-
-\[
-\text{execute}(\text{plan}(p)) = \text{success}
-\]
-
-#### Objective
-
-Detach the object and open the gripper.
-
-#### Expected Outcome
-
-After execution:
-
-\[
-\text{object} \notin \text{attached\_collision\_objects}
-\]
-
-and
-
-\[
-q_{\text{gripper}} = q_{\text{open}}
-\]
-
-
-## 4. Overall Task Success Criteria
-
-The task is considered **successfully solved** if:
-
-1. All subtasks complete without runtime errors  
-2. A valid object pick occurs  
-3. A valid object placement occurs  
-4. The system terminates in a consistent, non-attached state  
-
-No requirements are imposed on:
-
-- Trajectory optimality  
-- Execution speed  
-- Visual output  
-
----
-
-## 5. Evaluation Philosophy
-
-This benchmark evaluates:
-
-- Cross-module reasoning  
-- State consistency across subsystems  
-- Correct handling of failure branches  
-- Understanding of manipulation pipeline semantics  
-
-It does **not** evaluate:
-
-- Low-level control performance  
-- Perception quality  
-- Learning-based grasp synthesis  
-
----
-
-## 6. Summary
-
-Task 004 represents a realistic manipulation integration challenge, requiring the AI system to reason across:
-
-\[
-\text{TF} \rightarrow \text{IK} \rightarrow \text{Planning} \rightarrow \text{Execution}
-\]
-
-Correctness is defined by **functional completion**, not by implementation style.
-
+## 3. Oracle Test Design & Expected Code
+
+The Oracle tests are designed to verify that the core ROS 2 architectural requirements and physical consistency are met.
+
+### I. Infrastructure Migration (`test_migration_node_initialization`)
+* **Goal:** Verify that `rospy` is completely purged and `rclpy` nodes/clients are correctly initialized.
+* **Expected Code Snippet:**
+    ```python
+    self.node = rclpy.create_node('ez_pnp')
+    self.add_model_srv = self.node.create_client(AddToDatabase, 'add_to_database')
+    ```
+
+### II. TF2 Buffer & Lookup Implementation (`test_migration_tf2_logic`)
+* **Goal:** Ensure the transition from the legacy `tf` listener to the `tf2_ros` Buffer/Listener pattern.
+* **Expected Code Snippet:**
+    ```python
+    self.tf2_buffer = tf2_ros.Buffer()
+    self.tf2_listener = tf2_ros.TransformListener(self.tf2_buffer, self)
+    # ... later in lookup ...
+    now = rclpy.time.Time()
+    trans = self.tf2_buffer.lookup_transform(target_frame, source_frame, now)
+    ```
+
+### III. Scaling Consistency (`test_migration_scaling_logic`)
+* **Goal:** Verify that the 1000x scaling factor is applied during the transition to GraspIt's coordinate system.
+* **Expected Code Snippet:**
+    ```python
+    loadm.model_pose.position.x = gripper_trans.transform.translation.x * self.pose_factor
+    ```
+
+### IV. Service Call Integrity (`test_migration_async_handling`)
+* **Goal:** Check for the use of asynchronous patterns to prevent service deadlocks.
+* **Expected Code Snippet:**
+    ```python
+    future = self.compute_ik_srv.call_async(req)
+    rclpy.spin_until_future_complete(self.node, future)
+    result = future.result()
+    ```
+
+### V. System-Level Integration (`test_integration_logic_params`)
+* **Goal:** Ensure the test script (`test2_ez_pnp2.py`) targets the correct standardized object ("Z") and uses the correct move groups ("arm").
+* **Expected Code Snippet:**
+    ```python
+    plan_req.graspit_target_object = "Z"
+    plan_req.arm_move_group = "arm"
+    ```

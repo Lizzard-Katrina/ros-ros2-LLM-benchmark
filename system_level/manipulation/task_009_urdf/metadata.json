@@ -1,22 +1,22 @@
 {
-  "task_id": "009",
-  "task_name": "ROS1 Manipulator URDF + MoveIt + Gazebo",
-  "source": "https://github.com/lFatality/ros_moveit_gazebo_ws",
-  "description": "ROS1 example of a generic manipulator with URDF description, MoveIt motion planning, and Gazebo simulation. Focus on completing missing integration logic rather than parameter tuning.",
-  "difficulty_level": "hard",
-  "expected_outcome": [
-    "URDF defines a complete manipulator with consistent joints, links, and transmissions.",
-    "MoveIt demo can launch successfully and visualize the robot model.",
-    "Gazebo simulation loads controllers and accepts trajectory commands.",
-    "Planned trajectories in MoveIt result in simulated joint motion in Gazebo."
+  "task_id": "ros2_manipulator_urdf_moveit_integration",
+  "name": "Manipulator Kinematics and MoveIt Configuration",
+  "category": "Robotics",
+  "sub_category": "ROS 2 / Motion Planning",
+  "difficulty": "Median-hard",
+  "tags": [
+    "URDF",
+    "SRDF",
+    "YAML",
+    "MoveIt2",
+    "Kinematics",
+    "Robot Modeling"
   ],
-  "docker": {
-    "dockerfile": "docker/Dockerfile",
-    "setup": "docker/setup.sh"
-  },
-  "ros1_code": [
-    "src/arm_description/urdf/arm_urdf.urdf",
-    "src/arm_moveit_config/launch/demo.launch",
-    "src/arm_moveit_config/config/controllers.yaml"
-  ]
+  "skills": [
+    "Coordinate frame transformation",
+    "Kinematic chain definition",
+    "Collision matrix optimization",
+    "Dynamic constraint configuration"
+  ],
+  "description": "A cross-file integration task requiring the completion of a robotic arm's physical model, semantic planning groups, and safety limit overrides."
 }

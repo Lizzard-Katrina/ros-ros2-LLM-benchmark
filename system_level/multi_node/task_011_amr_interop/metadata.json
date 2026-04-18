@@ -1,20 +1,14 @@
 {
-  "task_id": "011",
-  "task_name": "AMR Interoperability via VDA5050 Adapter",
-  "source": "https://github.com/inorbit-ai/ros_amr_interop",
-  "integration_type": [
-    "plugin-based state aggregation",
-    "standard-to-local action translation",
-    "fleet-level interoperability"
-  ],
-  "primary_language": "C++",
-  "middleware": "ROS2",
-  "concepts_tested": [
-    "multinode integration",
-    "adapter pattern",
-    "pluginlib architecture",
-    "robot-fleet interoperability",
-    "standardized robot interfaces"
-  ],
-  "difficulty_level": "hard"
+  "project_id": "VDA5050_ROS2_BRIDGE_011",
+  "version": "1.0.0",
+  "author": "Gemini-Dev",
+  "description": "Bridge node for VDA5050 interoperability between MQTT and ROS 2.",
+  "language":"python",
+  "difficulty":"median",
+   "dependencies": {
+    "python": ["rclpy", "paho-mqtt", "vda5050_msgs"],
+    "cpp": ["rclcpp", "vda5050_msgs"]
+  },
+  "supported_vda_version": "2.0.0",
+  "interface_name": "uagv"
 }

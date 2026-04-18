@@ -6,8 +6,8 @@
   "description": "Run SLAM in unknown environment, save map, start localization and navigation, then send goals and verify robot navigation behavior.",
   "ros_version": "ROS1 Noetic",
   "language": "Python",
-  "difficulty": "Median",
+  "difficulty": "basic",
   "source": [
-    "https://docs.hello-robot.com/0.2/stretch-tutorials/ros1/navigation_stack/"
+  "https://github.com/hello-robot/stretch_ros/blob/noetic/stretch_rtabmap"
   ]
 }

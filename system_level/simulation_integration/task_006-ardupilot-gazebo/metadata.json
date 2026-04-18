@@ -1,16 +1,45 @@
 {
-  "task_id": "006",
-  "task_name": "ArduPilot SITL + Gazebo + ROS1",
-  "source": "https://github.com/ArduPilot/ardupilot_gazebo",
-  "description": "Integrate ArduPilot SITL with Gazebo and ROS1 (MAVROS). The plugin simulates drone actuation and sensor feedback.",
-  "difficulty_level": "high",
-  "expected_outcome": [
-    "Receive servo packets → update motor commands → send state to SITL",
-    "Preserve full parameter loading and configuration",
-    "Plugin skeleton ready to extend with sensors and PID controllers"
+  "task_id": "gz_ardupilot_sync_01",
+  "category": "Robotics / Embedded Systems",
+  "difficulty": "Hard",
+  "language": "cpp",
+  "environment": {
+    "simulator": "Gazebo Sim (Garden/Harmonic)",
+    "dependencies": [
+      "rapidjson",
+      "gz-sim",
+      "gz-msgs"
+    ]
+  },
+  "knowledge_points": [
+    "UDP Socket Communication",
+    "Lock-step Synchronization",
+    "Linear Normalization Logic",
+    "Coordinate Transformations (Quaternion & Pose)",
+    "SDF Element Parsing"
   ],
-  "files": [
-    "include/ArduPilotPlugin.hh",
-    "src/ArduPilotPlugin.cc"
+  "oracles": [
+    {
+      "name": "test_lockstep_logic",
+      "type": "symbolic_check",
+      "target": "receivedFirstCmd"
+    },
+    {
+      "name": "test_pwm_normalization_logic",
+      "type": "regex_match",
+      "pattern": "\\(raw_cmd\\s*\\+\\s*offset\\)\\s*\\*\\s*multiplier"
+    },
+    {
+      "name": "test_no_hardcoded_addresses",
+      "type": "static_analysis",
+      "forbidden": [
+        "\"127.0.0.1\""
+      ]
+    },
+    {
+      "name": "test_pose_transform_consistency",
+      "type": "logic_check",
+      "target": "wldAToBdyA"
+    }
   ]
 }

@@ -1,0 +1,8 @@
+<launch>
+
+'TODO'
+'add a rosparam label'
+'the param must be controller_join_names'
+'contain 6 length lists'
+'END OF TODO'
+</launch>

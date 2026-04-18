@@ -1,13 +1,12 @@
 {
   "task_id": "integration_008",
-  "task_name": "Unknown Environment Exploration + Mapping",
+  "task_name": "Autonomous Robot Navigation",
   "level": "integration_level",
   "category": "navigation",
   "ros_version": "ROS1 Noetic",
-  "language": "Python",
-  "difficulty": "Hard",
+  "language": "C++",
+  "difficulty": "median-Hard",
   "source": {
     "repository": "https://github.com/bandasaikrishna/Autonomous_Mobile_Robot",
-    "file": "navigation/scripts/explore.py"
   }
 }

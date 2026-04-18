@@ -1,24 +1,18 @@
 {
-  "task_id": "manipulation_pick_and_place_panda",
-  "category": "manipulation",
-  "level": "system_integration",
-  "robot": "Franka Panda",
-  "source_repository": "https://github.com/elena-ecn/pick-and-place",
-  "language": "python",
-  "ros_version": "ROS1",
-  "evaluation_focus": [
-    "perception_to_system_integration",
-    "state_machine_correctness",
-    "manipulation_execution_interface"
-  ],
-  "files_with_todo": [
+  "task_id": "manipulation_001",
+  "task_name": "Pick and Place System Migration",
+  "category": "Robotics",
+  "sub_category": "ROS 2 Humble Migration",
+  "difficulty": "Hard",
+  "tags": ["Asynchronous", "Executor", "State Machine", "Manipulation"],
+  "environment": {
+    "ros_distro": "humble",
+    "language": "python",
+    "simulator": "Gazebo"
+  },
+  "files": [
     "scripts/object_detector.py",
-    "scripts/pick_and_place_state_machine.py",
-    "scripts/controller.py"
+    "scripts/pick_and_place_state_machine.py"
   ],
-  "expected_capabilities": [
-    "publish_detected_objects",
-    "system_state_transition",
-    "pick_and_place_execution"
-  ]
+  "oracle_script": "src/test/test_oracle_ros2.py"
 }

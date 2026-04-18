@@ -6,13 +6,23 @@ import shutil
 from openai import OpenAI
 
 # ================= CONFIGURATION =================
-CATEGORIES = ["action_server", "publisher_subscriber", "service_client"]
+CATEGORIES = ["action_server", "publisher_subscriber", "service_client","parameter_server"]
 BASE_IMAGE = "ros2-benchmark-base"
 # Add your desired models from OpenRouter here
 MODELS_TO_TEST = [
-    "openai/gpt-4o-mini",
-    "anthropic/claude-3-5-sonnet",
-    "meta-llama/llama-3.1-70b-instruct"
+#    "openai/gpt-5.4",
+#    "openai/gpt-4o",
+#    "anthropic/claude-opus-4.6",
+#    "anthropic/claude-3.7-sonnet",
+#    "google/gemini-3.1-pro-preview",
+#    "google/gemini-2.5-flash",
+#    "meta-llama/llama-3.3-70b-instruct",
+#    "deepseek/deepseek-v3.2"
+"z-ai/glm-5-turbo",
+"moonshotai/kimi-k2.5",
+"qwen/qwen3.5-plus-02-15",
+"minimax/minimax-m2.7",
+"openai/gpt-5.3-codex",
 ]
 # =================================================
 
@@ -57,8 +67,29 @@ def translate_task(task_path, cat_name, task_name, model_name, results_root):
 
         prompt = f"""
 You are an expert ROS2 migration engineer.
-Task: Convert this ROS1 file to ROS2. Fill TODO locations. Keep function names and structure.
-Do NOT explain. Only output source code.
+
+IMPORTANT:
+- This is NOT a documentation task.
+- This is NOT a code explanation task.
+- This is a CODE COMPLETION task.
+
+Context:
+The following file is originally from a real ROS1 MoveIt Task Constructor example.
+Some code blocks were intentionally REMOVED and replaced with TODO markers.
+
+Your task:
+- Convert this file to ROS2 using appropriate language.
+- Fill in the missing code at TODO locations.
+- Keep all existing function names, signatures, and file structure.
+- Do NOT create new files.
+- Do NOT split the code.
+- Do NOT output anything except the completed C++ source code of THIS FILE.
+
+Rules:
+- Replace ROS1 APIs with ROS2 equivalents.
+- Implement meaningful logic at TODO sections (do not leave TODO empty).
+- Do not explain.
+- Do not add comments unrelated to the original code.
 ROS1 code:
 ----------------------------
 {ros1_code}

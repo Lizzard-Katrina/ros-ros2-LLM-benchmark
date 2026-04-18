@@ -23,7 +23,7 @@
 # LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
 # CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
 # SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED ON ANY THEORY OF LIABILITY, WHETHER IN
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
@@ -41,7 +41,6 @@ from flexbe_core.proxy import ProxyActionClient
 
 from action_msgs.msg import GoalStatus
 from nav2_msgs.action import NavigateToPose
-from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion
 import tf_transformations
 
 
@@ -57,59 +56,54 @@ class MoveBaseState(EventState):
 
     def __init__(self):
         """Constructor"""
-
-        self._action_topic = 'navigate_to_pose'
+        super(MoveBaseState, self).__init__(outcomes=['arrived', 'failed'], input_keys=['waypoint'])
+        self._action_topic = '/navigate_to_pose'
         self._client = ProxyActionClient({self._action_topic: NavigateToPose})
-        self._goal_handle = None
-        self._result_future = None
         self._arrived = False
         self._failed = False
 
     def execute(self, userdata):
-        if self._result_future is None:
-            return None
+        if self._failed:
+            return 'failed'
 
-        if self._result_future.done():
-            result = self._result_future.result()
-            status = self._goal_handle.status
+        if self._arrived:
+            return 'arrived'
 
+        if self._client.has_result(self._action_topic):
+            status = self._client.get_state(self._action_topic)
             if status == GoalStatus.STATUS_SUCCEEDED:
                 self._arrived = True
                 return 'arrived'
             else:
+                Logger.logwarn('Navigation failed with status code: %s' % str(status))
                 self._failed = True
                 return 'failed'
-        return None
 
     def on_enter(self, userdata):
         """Create and send action goal"""
 
-        self._failed = False
         self._arrived = False
+        self._failed = False
 
-        goal_msg = NavigateToPose.Goal()
-        pose_stamped = PoseStamped()
-        pose_stamped.header.frame_id = 'map'
-        pose_stamped.header.stamp = self._node.get_clock().now().to_msg()
+        goal = NavigateToPose.Goal()
+        goal.pose.header.frame_id = 'odom'
+        if hasattr(self, '_node') and self._node is not None:
+            goal.pose.header.stamp = self._node.get_clock().now().to_msg()
 
-        x = userdata.waypoint.x
-        y = userdata.waypoint.y
-        theta = userdata.waypoint.theta
+        goal.pose.pose.position.x = userdata.waypoint.x
+        goal.pose.pose.position.y = userdata.waypoint.y
+        goal.pose.pose.position.z = 0.0
 
-        quat = tf_transformations.quaternion_from_euler(0, 0, theta)
-
-        pose_stamped.pose = Pose(
-            position=Point(x=x, y=y, z=0.0),
-            orientation=Quaternion(x=quat[0], y=quat[1], z=quat[2], w=quat[3])
-        )
-
-        goal_msg.pose = pose_stamped
+        qt = tf_transformations.quaternion_from_euler(0.0, 0.0, userdata.waypoint.theta)
+        goal.pose.pose.orientation.x = qt[0]
+        goal.pose.pose.orientation.y = qt[1]
+        goal.pose.pose.orientation.z = qt[2]
+        goal.pose.pose.orientation.w = qt[3]
 
         try:
-            self._goal_handle = self._client.send_goal(self._action_topic, goal_msg)
-            self._result_future = self._goal_handle.get_result_async()
+            self._client.send_goal(self._action_topic, goal)
         except Exception as e:
-            Logger.logwarn(f"Unable to send navigation action goal:\n{str(e)}")
+            Logger.logwarn("Unable to send navigation action goal:\n%s" % str(e))
             self._failed = True
 
     def cancel_active_goals(self):

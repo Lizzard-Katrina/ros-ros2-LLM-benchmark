@@ -1,0 +1,187 @@
+[
+    {
+        "task_id": "manipulation/task_001_pick_and_place",
+        "status": "FAILED",
+        "score": "3/6",
+        "pass_rate": "50.00%",
+        "tokens": 10112,
+        "failed_cases": [
+            {
+                "test_function": "test_detector_async_non_blocking_pattern",
+                "error_message": "AssertionError: Anti-Leakage Failure: ROS 1 ServiceProxy or blocking wait detected in detector.\nassert not <re.Match object; span=(2672, 2688), match='wait_for_service'>\n +  where <re.Match object; span=(2672, 2688), match='wait_for_service'> = <function search at 0x7f15bb45df30>('ServiceProxy|wait_for_service', '#!/usr/bin/env python3\\n\\n\"\"\"\\nDetects objects based on their color and provides information \\nabout their position, ...ctor()\\n    rclpy.spin(node)\\n    node.destroy_node()\\n    rclpy.shutdown()\\n\\nif __name__ == \"__main__\": \\n    main()')\n +    where <function search at 0x7f15bb45df30> = re.search"
+            },
+            {
+                "test_function": "test_state_machine_future_synchronization",
+                "error_message": "AssertionError: Logic Consistency Failure: State machine transitions occur without waiting for the Controller's async response.\nassert None\n +  where None = <function search at 0x7f15bb45df30>('(\\\\.add_done_callback|spin_until_future_complete|\\\\.done\\\\(\\\\))', '#!/usr/bin/env python3\\n\\n\"\"\"\\nA state machine for pick-and-place tasks.\\n\\nThe robot starts in the home position. If...shutdown()\\n        controller.destroy_node()\\n        rclpy.shutdown()\\n\\nif __name__ == \"__main__\":     \\n    main()')\n +    where <function search at 0x7f15bb45df30> = re.search"
+            },
+            {
+                "test_function": "test_static_interface_linkage_consistency",
+                "error_message": "AssertionError: Linkage Failure: Topic name mismatch between Detector (Publisher) and State Machine system (Subscriber).\nassert ('/object_detection' in '#!/usr/bin/env python3\\n\\n\"\"\"\\nDetects objects based on their color and provides information \\nabout their position, ...ctor()\\n    rclpy.spin(node)\\n    node.destroy_node()\\n    rclpy.shutdown()\\n\\nif __name__ == \"__main__\": \\n    main()')"
+            }
+        ]
+    },
+    {
+        "task_id": "manipulation/task_002_ur5_pick_and_place",
+        "status": "FAILED",
+        "score": "6/9",
+        "pass_rate": "66.67%",
+        "tokens": 11455,
+        "failed_cases": [
+            {
+                "test_function": "test_controller_move_to_logic",
+                "error_message": "AssertionError: Logic Failure: Missing orientation interpolation (Slerp).\nassert 'slerp' in 'import math\\nimport copy\\nimport rclpy\\nfrom rclpy.node import node\\nimport numpy as np\\nimport kinematics\\nimport co...                     break\\n                    return\\n        self.get_logger().warn(\"timeout waiting for position\")'\n +  where 'import math\\nimport copy\\nimport rclpy\\nfrom rclpy.node import node\\nimport numpy as np\\nimport kinematics\\nimport co...                     break\\n                    return\\n        self.get_logger().warn(\"timeout waiting for position\")' = <built-in method lower of str object at 0x5572c58a6e50>()\n +    where <built-in method lower of str object at 0x5572c58a6e50> = 'import math\\nimport copy\\nimport rclpy\\nfrom rclpy.node import Node\\nimport numpy as np\\nimport kinematics\\nimport co...                     break\\n                    return\\n        self.get_logger().warn(\"Timeout waiting for position\")'.lower"
+            },
+            {
+                "test_function": "test_no_nested_deadlocks",
+                "error_message": "AssertionError: Architecture Failure: Detected 'rclpy.spin_until_future_complete' inside a class method. This will cause a deadlock in a real ROS 2 system. Use async/await or Future callbacks.\nassert <re.Match object; span=(1225, 7580), match='def __init__(self, gripper_state=0, controller_to> is None"
+            },
+            {
+                "test_function": "test_trajectory_interpolation_integrity",
+                "error_message": "AssertionError: Kinematics Failure: The move_to implementation is missing smooth interpolation. You must iterate through steps and use Slerp to ensure safe arm movement.\nassert (<re.Match object; span=(3544, 3558), match='for _ in range'> and False)"
+            }
+        ]
+    },
+    {
+        "task_id": "manipulation/task_003_ur5_red_box",
+        "status": "FAILED",
+        "score": "3/5",
+        "pass_rate": "60.00%",
+        "tokens": 2362,
+        "failed_cases": [
+            {
+                "test_function": "test_cmakelists_rosidl_integrity",
+                "error_message": "AssertionError: Build Failure: Missing 'rosidl_generate_interfaces' to compile SetJointStates.srv.\nassert 'rosidl_generate_interfaces' in ''"
+            },
+            {
+                "test_function": "test_package_xml_modern_format",
+                "error_message": "AssertionError: Format Failure: package.xml must use format='3'.\nassert 'format=\"3\"' in ''"
+            }
+        ]
+    },
+    {
+        "task_id": "manipulation/task_004_simplified_pick_place",
+        "status": "FAILED",
+        "score": "3/7",
+        "pass_rate": "42.86%",
+        "tokens": 16190,
+        "failed_cases": [
+            {
+                "test_function": "test_migration_node_initialization",
+                "error_message": "assert 'rclpy.create_node' in \"#!/usr/bin/env python3\\nimport sys\\nimport rclpy\\nfrom rclpy.node import Node\\nimport tf2_ros\\nimport moveit_commande...  rclpy.init()\\n    node = EzPnpNode()\\n    node.run()\\n    rclpy.shutdown()\\n\\nif __name__ == '__main__':\\n    main()\""
+            },
+            {
+                "test_function": "test_migration_tf2_logic",
+                "error_message": "AssertionError: assert 'tf2_ros.Buffer()' in '#!/usr/bin/env python3\\nimport tf2_ros\\nimport time\\nimport numpy as np\\nimport rclpy\\nfrom rclpy.node import Node\\ni...                 rclpy.spin_until_future_complete(self.node, future)\\n                    response_add = future.result'"
+            },
+            {
+                "test_function": "test_migration_scaling_logic",
+                "error_message": "AssertionError: assert None\n +  where None = <function search at 0x7fc99aa0df30>('\\\\*\\\\s*self\\\\.pose_factor', '#!/usr/bin/env python3\\nimport tf2_ros\\nimport time\\nimport numpy as np\\nimport rclpy\\nfrom rclpy.node import Node\\ni...                 rclpy.spin_until_future_complete(self.node, future)\\n                    response_add = future.result')\n +    where <function search at 0x7fc99aa0df30> = re.search"
+            },
+            {
+                "test_function": "test_integration_logic_params",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_004_simplified_pick_place/test2_ez_pnp2.py'"
+            }
+        ]
+    },
+    {
+        "task_id": "manipulation/task_005_interbotix_demo",
+        "status": "FAILED",
+        "score": "4/7",
+        "pass_rate": "57.14%",
+        "tokens": 1410,
+        "failed_cases": [
+            {
+                "test_function": "test_shared_node_instance",
+                "error_message": "AssertionError: System Error: No rclpy.create_node() found. ROS 2 requires an explicit Node handle.\nassert None"
+            },
+            {
+                "test_function": "test_constructor_params_migration",
+                "error_message": "AssertionError: API Failure: robot_model parameter is missing or incorrectly mapped in the constructor.\nassert None\n +  where None = <function search at 0x7f3c217c5f30>('InterbotixManipulatorXS\\\\(.*robot_model\\\\s*=\\\\s*[\"\\\\\\']wx200[\"\\\\\\']', \"import rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.executors import SingleThreadedExecutor\\nimport time\\nfrom inte...eep_pose(moving_time=2.0)\\n    \\n    executor.shutdown()\\n    rclpy.shutdown()\\n\\nif __name__=='__main__':\\n    main()\")\n +    where <function search at 0x7f3c217c5f30> = re.search"
+            },
+            {
+                "test_function": "test_cluster_position_destructuring",
+                "error_message": "AssertionError: Logic Failure: Cluster position destructuring (x, y, z = cluster['position']) is missing or malformed.\nassert None\n +  where None = <function search at 0x7f3c217c5f30>('(\\\\w+),\\\\s*(\\\\w+),\\\\s*(\\\\w+)\\\\s*=\\\\s*cluster\\\\[[\"\\\\\\']position[\"\\\\\\']\\\\]', \"import rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.executors import SingleThreadedExecutor\\nimport time\\nfrom inte...eep_pose(moving_time=2.0)\\n    \\n    executor.shutdown()\\n    rclpy.shutdown()\\n\\nif __name__=='__main__':\\n    main()\")\n +    where <function search at 0x7f3c217c5f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "manipulation/task_006_pick_up_objects",
+        "status": "FAILED",
+        "score": "6/9",
+        "pass_rate": "66.67%",
+        "tokens": 9216,
+        "failed_cases": [
+            {
+                "test_function": "test_service_interface_alignment",
+                "error_message": "AssertionError: System Desync: Service name mismatch between Manager (Server) and Behavior (Client).\nassert (None)"
+            },
+            {
+                "test_function": "test_no_leading_slashes_in_topics",
+                "error_message": "AssertionError: Static Consistency: Leading slash found in Manager topics.\nassert not <re.Match object; span=(1290, 1298), match=\"'/gazebo\">\n +  where <re.Match object; span=(1290, 1298), match=\"'/gazebo\"> = <function search at 0x7f3be1449f30>('[\\\\\\'\"]/(?:odom|cmd_vel|gazebo|spawn_entity|manage_objects)', '#!/usr/bin/env python3\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom gazebo_msgs.srv import SpawnEntity\\nfrom gaze...h)\\n    rclpy.init()\\n    check_object = ManageObject(models_path)\\n    rclpy.spin(check_object)\\n    rclpy.shutdown()')\n +    where <function search at 0x7f3be1449f30> = re.search"
+            },
+            {
+                "test_function": "test_no_nested_spin",
+                "error_message": "AssertionError: assert not <re.Match object; span=(314, 6692), match='def __init__(self, models_path):\\n        super()>\n +  where <re.Match object; span=(314, 6692), match='def __init__(self, models_path):\\n        super()> = <function search at 0x7f3be1449f30>('def\\\\s+\\\\w+\\\\(self.*:\\\\s*.*?rclpy\\\\.spin', '#!/usr/bin/env python3\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom gazebo_msgs.srv import SpawnEntity\\nfrom gaze...h)\\n    rclpy.init()\\n    check_object = ManageObject(models_path)\\n    rclpy.spin(check_object)\\n    rclpy.shutdown()', re.DOTALL)\n +    where <function search at 0x7f3be1449f30> = re.search\n +    and   re.DOTALL = re.DOTALL"
+            }
+        ]
+    },
+    {
+        "task_id": "manipulation/task_007_tm_robot_arms",
+        "status": "FAILED",
+        "score": "8/10",
+        "pass_rate": "80.00%",
+        "tokens": 13753,
+        "failed_cases": [
+            {
+                "test_function": "test_sync_wait_logic",
+                "error_message": "AssertionError: Missing synchronous wait logic. The service must wait for the SVR response thread.\nassert None\n +  where None = <function search at 0x7f7a5b75df30>('svr_cond_\\\\.wait_for\\\\s*\\\\(\\\\s*\\\\w+,\\\\s*(?:std|boost)::chrono::duration', '#include \"tm_driver/tm_ros_node.h\"\\n\\n////////////////////////////////\\n// Service\\n////////////////////////////////\\...nection->ask_sta_struct(req->subcmd, req->subdata, req->wait_time, res->subcmd, res->subdata);\\n    return res->ok;\\n}')\n +    where <function search at 0x7f7a5b75df30> = re.search"
+            },
+            {
+                "test_function": "test_demo_blocking_call",
+                "error_message": "AssertionError: Demo failed to implement a blocking service call (wait_time must be > 0).\nassert None\n +  where None = <function search at 0x7f7a5b75df30>('ask_item\\\\(.*?,.*?,[^0]\\\\d*\\\\)', '#!/usr/bin/env python3\\n\\n\"\"\"\\nDemo: Ask item (HandCamera_Value, Delta)\\n\\'ask_item\\' service send \\'Read\\' request c...r(e))\\n    finally:\\n        node.destroy_node()\\n        rclpy.shutdown()\\n\\nif __name__ == \\'__main__\\':\\n    main()')\n +    where <function search at 0x7f7a5b75df30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "manipulation/task_008_allegro_hand",
+        "status": "FAILED",
+        "score": "5/7",
+        "pass_rate": "71.43%",
+        "tokens": 9485,
+        "failed_cases": [
+            {
+                "test_function": "test_emergency_stop_logic",
+                "error_message": "AssertionError: The node must shutdown immediately if the driver reports an emergency status.\nassert None\n +  where None = <function search at 0x7f031b975f30>('if\\\\s*\\\\(\\\\s*lEmergencyStop\\\\s*<\\\\s*0\\\\s*\\\\).*?ros::shutdown\\\\(\\\\)', '// Common allegro node code used by any node. Each node that implements an\\n// AllegroNode must define the computeDes..._timer(\\n      std::chrono::milliseconds(1),\\n      std::bind(&AllegroNode::timerCallback, this));\\n  return timer;\\n}', re.DOTALL)\n +    where <function search at 0x7f031b975f30> = re.search\n +    and   re.DOTALL = re.DOTALL"
+            },
+            {
+                "test_function": "test_variable_naming_consistency",
+                "error_message": "AssertionError: LLM used an undefined variable (e.g., _hand_type). Use 'HAND_TYPE_A' from the driver header.\nassert False"
+            }
+        ]
+    },
+    {
+        "task_id": "manipulation/task_009_urdf",
+        "status": "TRANSLATION_FAILED",
+        "score": "0/0",
+        "pass_rate": "0.00%",
+        "tokens": 0,
+        "failed_cases": []
+    },
+    {
+        "task_id": "manipulation/task_010_reach_study",
+        "status": "FAILED",
+        "score": "2/4",
+        "pass_rate": "50.00%",
+        "tokens": 10338,
+        "failed_cases": [
+            {
+                "test_function": "test_ros1_remnants_check",
+                "error_message": "AssertionError: FAILED in transformed_point_cloud_target_pose_generator.cpp: Detected ROS 1 'ros::' namespace.\nassert 'ros::' not in '#include <r...ce reach_ros'\n  'ros::' is contained here:\n    hared<tf2_ros::Buffer>(std::make_shared<rclcpp::Clock>());\n  ?           +++++\n      tf2_ros::TransformListener tf_listener(*tf_buffer);\n    \n      geometry_msgs::msg::TransformStamped transform;\n      try...\n  \n  ...Full output truncated (20 lines hidden), use '-vv' to show"
+            },
+            {
+                "test_function": "test_tf2_ros2_migration",
+                "error_message": "AssertionError: The transform must be applied to the target poses.\nassert None\n +  where None = <function search at 0x7f5055f8df30>('(pose\\\\s*=\\\\s*transform\\\\s*\\\\*\\\\s*pose|push_back\\\\(transform\\\\s*\\\\*\\\\s*pose\\\\))', '#include <reach_ros/target_pose_generator/transformed_point_cloud_target_pose_generator.h>\\n#include <reach_ros/utils... (auto& pose : poses)\\n  {\\n    pose = transform_eigen * pose;\\n  }\\n\\n  return poses;\\n}\\n\\n}  // namespace reach_ros')\n +    where <function search at 0x7f5055f8df30> = re.search"
+            }
+        ]
+    }
+]

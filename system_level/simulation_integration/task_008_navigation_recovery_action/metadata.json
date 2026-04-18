@@ -4,7 +4,7 @@
     "description": "Benchmark ROS1 → ROS2 translation for navigation recovery action server",
     "ros_versions": ["ROS1 Noetic"],
     "language": "Python",
-    "difficulty": "Medium",
+    "difficulty": "Basic",
     "directories": {
         "ros1_code": "ros1_code",
         "expected_ros2_code": "expected_ros2_code",

@@ -1,0 +1,176 @@
+[
+    {
+        "task_id": "simulation_integration/task_001_urdf",
+        "status": "TRANSLATION_FAILED",
+        "score": "0/0",
+        "pass_rate": "0.00%",
+        "tokens": 0,
+        "failed_cases": []
+    },
+    {
+        "task_id": "simulation_integration/task_002_gazebo_plugin",
+        "status": "FAILED",
+        "score": "2/7",
+        "pass_rate": "28.57%",
+        "tokens": 615,
+        "failed_cases": [
+            {
+                "test_function": "test_cpp_load_function_signature",
+                "error_message": "AssertionError: The Load() function signature is missing or does not include required WorldPtr/ElementPtr.\nassert None\n +  where None = <function search at 0x7f997875df30>('void\\\\s+Load\\\\s*\\\\(\\\\s*physics::WorldPtr\\\\s+\\\\w+,\\\\s*sdf::ElementPtr\\\\s+\\\\w+\\\\s*\\\\)', '#include <gazebo/common/Plugin.hh>\\n#include <rclcpp/rclcpp.hpp>\\n#include <gazebo_ros/node.hpp>\\n\\nnamespace gazebo\\...r ROS node communication and world interaction\\n    //END\\n  }\\n};\\n\\nGZ_REGISTER_WORLD_PLUGIN(WorldPluginTutorial)\\n}')\n +    where <function search at 0x7f997875df30> = re.search"
+            },
+            {
+                "test_function": "test_launch_empty_world_inclusion",
+                "error_message": "Failed: File not found: /ros2_ws/src/task_002_gazebo_plugin/hello.launch"
+            },
+            {
+                "test_function": "test_launch_world_parameter_passing",
+                "error_message": "Failed: File not found: /ros2_ws/src/task_002_gazebo_plugin/hello.launch"
+            },
+            {
+                "test_function": "test_launch_xml_structure",
+                "error_message": "Failed: File not found: /ros2_ws/src/task_002_gazebo_plugin/hello.launch"
+            },
+            {
+                "test_function": "test_anti_leakage_ros2_substitution",
+                "error_message": "Failed: File not found: /ros2_ws/src/task_002_gazebo_plugin/hello.launch"
+            }
+        ]
+    },
+    {
+        "task_id": "simulation_integration/task_003_turtlebot3_gazebo",
+        "status": "FAILED",
+        "score": "2/9",
+        "pass_rate": "22.22%",
+        "tokens": 1531,
+        "failed_cases": [
+            {
+                "test_function": "test_burger_base_link_mesh",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_003_turtlebot3_gazebo/turtlebot3_burger_cam.urdf'"
+            },
+            {
+                "test_function": "test_burger_collision_geometry",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_003_turtlebot3_gazebo/turtlebot3_burger_cam.urdf'"
+            },
+            {
+                "test_function": "test_burger_inertial_properties",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_003_turtlebot3_gazebo/turtlebot3_burger_cam.urdf'"
+            },
+            {
+                "test_function": "test_waffle_dual_caster_structure",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_003_turtlebot3_gazebo/turtlebot3_waffle.urdf'"
+            },
+            {
+                "test_function": "test_waffle_base_link_mesh",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_003_turtlebot3_gazebo/turtlebot3_waffle.urdf'"
+            },
+            {
+                "test_function": "test_launch_uses_modern_gz_sim",
+                "error_message": "AssertionError: Launch file missing modern gz_sim.launch.py reference.\nassert 'gz_sim.launch.py' in '#!/usr/bin/env python3\\n#\\n# Copyright 2019 ROBOTIS CO., LTD.\\n#\\n# Licensed under the Apache License, Version 2.0 (t...rtlebot_cmd)\\n    ld.add_action(robot_state_publisher_cmd)\\n    ld.add_action(set_env_vars_resources)\\n\\n    return ld'"
+            },
+            {
+                "test_function": "test_launch_server_client_separation",
+                "error_message": "AssertionError: GzServer command missing -r -s arguments.\nassert None\n +  where None = <function search at 0x7f6606455f30>(\"'-r\\\\s+-s\\\\s+-v2\\\\s*',\\\\s*world\", '#!/usr/bin/env python3\\n#\\n# Copyright 2019 ROBOTIS CO., LTD.\\n#\\n# Licensed under the Apache License, Version 2.0 (t...rtlebot_cmd)\\n    ld.add_action(robot_state_publisher_cmd)\\n    ld.add_action(set_env_vars_resources)\\n\\n    return ld')\n +    where <function search at 0x7f6606455f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "simulation_integration/task_004_industrial_robot_simulator",
+        "status": "FAILED",
+        "score": "2/4",
+        "pass_rate": "50.00%",
+        "tokens": 7579,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_trajectory_param_logic",
+                "error_message": "AssertionError: ROS 2 requires parameters to be declared.\nassert 'declare_parameter' in '/*\\n * Software License Agreement (BSD License)\\n *\\n * Copyright (c) 2011, Southwest Research Institute\\n * All righ...e::SharedPtr msg)\\n{\\n  this->cur_joint_pos_ = *msg;\\n}\\n\\n} //joint_trajectory_interface\\n} //industrial_robot_client'"
+            },
+            {
+                "test_function": "test_launch_system_migration_check",
+                "error_message": "FileNotFoundError: [Errno 2] No such file or directory: '/ros2_ws/src/task_004_industrial_robot_simulator/robot_interface_simulator.launch'"
+            }
+        ]
+    },
+    {
+        "task_id": "simulation_integration/task_005_Allegro_Hand_V5_ROS1_Task",
+        "status": "FAILED",
+        "score": "1/8",
+        "pass_rate": "12.50%",
+        "tokens": 5893,
+        "failed_cases": [
+            {
+                "test_function": "test_cmake_ros2_ament_integrity",
+                "error_message": "AssertionError: assert 'find_package(ament_cmake REQUIRED)' in ''"
+            },
+            {
+                "test_function": "test_imu_physics_frequency_scaling_semantics",
+                "error_message": "AssertionError: Missing 1/sqrt(dt) scaling for white noise density.\nassert None\n +  where None = <function search at 0x7fc38c605f30>('1\\\\s*/\\\\s*sqrt\\\\s*\\\\(\\\\s*dt\\\\s*\\\\)', '/*\\n * Copyright 2015 Fadri Furrer, ASL, ETH Zurich, Switzerland\\n * Copyright 2015 Michael Burri, ASL, ETH Zurich, S...elocity(angular_velocity);\\n\\n  imu_pub_->Publish(imu_message_);\\n}\\n\\n\\nGZ_REGISTER_MODEL_PLUGIN(GazeboImuPlugin);\\n}')\n +    where <function search at 0x7fc38c605f30> = re.search"
+            },
+            {
+                "test_function": "test_ros2_api_usage",
+                "error_message": "AssertionError: assert 'rclcpp::init' in '/*\\n * Copyright 2015 Fadri Furrer, ASL, ETH Zurich, Switzerland\\n * Copyright 2015 Michael Burri, ASL, ETH Zurich, S...elocity(angular_velocity);\\n\\n  imu_pub_->Publish(imu_message_);\\n}\\n\\n\\nGZ_REGISTER_MODEL_PLUGIN(GazeboImuPlugin);\\n}'"
+            },
+            {
+                "test_function": "test_no_legacy_remnants",
+                "error_message": "AssertionError: assert 'set_allocated_' not in '/*\\n * Copy...uPlugin);\\n}'\n  'set_allocated_' is contained here:\n    _message_.set_allocated_orientation(orientation);\n  ?           ++++++++++++++\n      imu_message_.set_allocated_linear_acceleration(linear_acceleration);\n      imu_message_.set_allocated_angular_velocity(angular_velocity);\n    \n      imu_pub_->Publish(imu_message_);...\n  \n  ...Full output truncated (6 lines hidden), use '-vv' to show"
+            },
+            {
+                "test_function": "test_msgbuffer_memory_logic",
+                "error_message": "AssertionError: assert 'MAVLINK_MAX_PACKET_LEN' in ''"
+            },
+            {
+                "test_function": "test_msgbuffer_safety_assertions",
+                "error_message": "AssertionError: assert 'assert' in ''"
+            },
+            {
+                "test_function": "test_header_inclusion_semantics",
+                "error_message": "AssertionError: assert 'namespace gazebo' in ''"
+            }
+        ]
+    },
+    {
+        "task_id": "simulation_integration/task_006-ardupilot-gazebo",
+        "status": "TRANSLATION_FAILED",
+        "score": "0/0",
+        "pass_rate": "0.00%",
+        "tokens": 0,
+        "failed_cases": []
+    },
+    {
+        "task_id": "simulation_integration/task_007_carla_ros_bridge",
+        "status": "FAILED",
+        "score": "5/8",
+        "pass_rate": "62.50%",
+        "tokens": 12449,
+        "failed_cases": [
+            {
+                "test_function": "test_twist_linear_rotation_logic",
+                "error_message": "AssertionError: Failed to find rotation-aware linear velocity transformation.\nassert None\n +  where None = <function search at 0x7f23ecd55f30>('if\\\\s+carla_rotation:.*carla_vector_to_ros_vector_rotated', '#!/usr/bin/env python\\n\\n#\\n# Copyright (c) 2018-2019 Intel Corporation\\n#\\n# This work is licensed under the terms o...tation.y, msg.orientation.z])\\n    mat44[0:3, -1] = [msg.position.x, msg.position.y, msg.position.z]\\n    return mat44', re.DOTALL)\n +    where <function search at 0x7f23ecd55f30> = re.search\n +    and   re.DOTALL = re.DOTALL"
+            },
+            {
+                "test_function": "test_bridge_update_trigger_with_timestamp",
+                "error_message": "AssertionError: Global _update() must be called with frame ID and elapsed simulation time.\nassert None\n +  where None = <function search at 0x7f23ecd55f30>('self\\\\._update\\\\(\\\\s*frame\\\\s*,\\\\s*\\\\w+\\\\.timestamp\\\\.elapsed_seconds\\\\s*\\\\)', '#!/usr/bin/env python\\n#\\n# Copyright (c) 2018-2020 Intel Corporation\\n#\\n# This work is licensed under the terms of ...     roscomp.shutdown()\\n        del carla_world\\n        del carla_client\\n\\n\\nif __name__ == \"__main__\":\\n    main()')\n +    where <function search at 0x7f23ecd55f30> = re.search"
+            },
+            {
+                "test_function": "test_actor_factory_pre_tick_update",
+                "error_message": "AssertionError: Actor factory must update available objects before ticking the world.\nassert (-1 != -1)"
+            }
+        ]
+    },
+    {
+        "task_id": "simulation_integration/task_008_navigation_recovery_action",
+        "status": "FAILED",
+        "score": "2/4",
+        "pass_rate": "50.00%",
+        "tokens": 1396,
+        "failed_cases": [
+            {
+                "test_function": "test_service_client_and_call",
+                "error_message": "AssertionError: The set_model_state helper function is not called in the main loop.\nassert None\n +  where None = <function search at 0x7fcbfa8d5f30>('set_model_state\\\\s*\\\\(.*?\\\\)', '#include <rclcpp/rclcpp.hpp>\\n#include <gazebo_msgs/msg/link_states.hpp>\\n#include <gazebo_msgs/msg/model_states.hpp>...:srv::SetModelState>(\"/gazebo/set_model_state\");\\n\\n    rclcpp::spin(node);\\n    rclcpp::shutdown();\\n    return 0;\\n}')\n +    where <function search at 0x7fcbfa8d5f30> = re.search"
+            },
+            {
+                "test_function": "test_pose_and_twist_initialization",
+                "error_message": "AssertionError: Service call does not pass required Pose and Twist arguments.\nassert None\n +  where None = <function search at 0x7fcbfa8d5f30>('set_model_state\\\\s*\\\\(\\\\s*\\\\\"ball\\\\\"\\\\s*,\\\\s*\\\\\"world\\\\\"\\\\s*,\\\\s*.*?\\\\s*,\\\\s*.*?\\\\)', '#include <rclcpp/rclcpp.hpp>\\n#include <gazebo_msgs/msg/link_states.hpp>\\n#include <gazebo_msgs/msg/model_states.hpp>...:srv::SetModelState>(\"/gazebo/set_model_state\");\\n\\n    rclcpp::spin(node);\\n    rclcpp::shutdown();\\n    return 0;\\n}')\n +    where <function search at 0x7fcbfa8d5f30> = re.search"
+            }
+        ]
+    }
+]

@@ -21,20 +21,24 @@
 #   * Job van Dieten
 #   * Jordi Pages
 
-import rclpy
-from rclpy.action import ActionClient, ActionServer
-from rclpy.node import Node
-from spherical_grasps_server import SphericalGrasps
-from moveit_commander import PlanningSceneInterface
-from moveit_msgs.action import Pickup, Place
-from moveit_msgs.msg import Grasp, PlaceLocation, MoveItErrorCodes
-from geometry_msgs.msg import Pose, PoseStamped
-from tiago_pick_demo.action import PickUpPose
-from moveit_msgs.srv import GetPlanningScene
-from std_srvs.srv import Empty
+import time
+import copy
 from copy import deepcopy
 from random import shuffle
-import time
+
+import rclpy
+from rclpy.node import Node
+from rclpy.action import ActionClient, ActionServer
+from rclpy.executors import MultiThreadedExecutor
+
+from spherical_grasps_server import SphericalGrasps
+from moveit_commander import PlanningSceneInterface
+from moveit_msgs.msg import Grasp, MoveItErrorCodes, PlaceLocation
+from moveit_msgs.action import Pickup, Place
+from moveit_msgs.srv import GetPlanningScene
+from geometry_msgs.msg import Pose, PoseStamped, PoseArray, Vector3Stamped, Vector3, Quaternion
+from tiago_pick_demo.action import PickUpPose
+from std_srvs.srv import Empty
 
 moveit_error_dict = {}
 for name in MoveItErrorCodes.__dict__.keys():
@@ -48,6 +52,9 @@ def createPickupGoal(group="arm_torso", target="part",
                      possible_grasps=[],
                      links_to_allow_contact=None):
     """ Create a PickupGoal with the provided data"""
+    if links_to_allow_contact is None:
+        links_to_allow_contact = []
+
     pug = Pickup.Goal()
     pug.target_name = target
     pug.group_name = group
@@ -71,6 +78,9 @@ def createPlaceGoal(place_pose,
                     target="part",
                     links_to_allow_contact=None):
     """Create PlaceGoal with the provided data"""
+    if links_to_allow_contact is None:
+        links_to_allow_contact = []
+
     placeg = Place.Goal()
     placeg.group_name = group
     placeg.attached_object_name = target
@@ -92,37 +102,46 @@ class PickAndPlaceServer(Node):
         super().__init__('pick_and_place_server')
         self.get_logger().info("Initalizing PickAndPlaceServer...")
         self.sg = SphericalGrasps()
+
         self.get_logger().info("Connecting to pickup AS")
         self.pickup_ac = ActionClient(self, Pickup, '/pickup')
         self.pickup_ac.wait_for_server()
         self.get_logger().info("Succesfully connected.")
+
         self.get_logger().info("Connecting to place AS")
         self.place_ac = ActionClient(self, Place, '/place')
         self.place_ac.wait_for_server()
         self.get_logger().info("Succesfully connected.")
+
         self.scene = PlanningSceneInterface()
+
         self.get_logger().info("Connecting to /get_planning_scene service")
-        self.scene_cli = self.create_client(GetPlanningScene, '/get_planning_scene')
-        while not self.scene_cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('/get_planning_scene service not available, waiting...')
+        self.scene_srv = self.create_client(GetPlanningScene, '/get_planning_scene')
+        while not self.scene_srv.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info("Waiting for /get_planning_scene service...")
         self.get_logger().info("Connected.")
 
         self.get_logger().info("Connecting to clear octomap service...")
-        self.clear_octomap_cli = self.create_client(Empty, '/clear_octomap')
-        while not self.clear_octomap_cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('/clear_octomap service not available, waiting...')
+        self.clear_octomap_srv = self.create_client(Empty, '/clear_octomap')
+        while not self.clear_octomap_srv.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info("Waiting for /clear_octomap service...")
         self.get_logger().info("Connected!")
 
         # Get the object size
-        self.object_height = self.get_parameter_or('object_height', 0.0)
-        self.object_width = self.get_parameter_or('object_width', 0.0)
-        self.object_depth = self.get_parameter_or('object_depth', 0.0)
+        self.declare_parameter('object_height', 0.1)
+        self.declare_parameter('object_width', 0.03)
+        self.declare_parameter('object_depth', 0.03)
+        self.declare_parameter('links_to_allow_contact', [])
+
+        self.object_height = float(self.get_parameter('object_height').value)
+        self.object_width = float(self.get_parameter('object_width').value)
+        self.object_depth = float(self.get_parameter('object_depth').value)
 
         # Get the links of the end effector exclude from collisions
-        self.links_to_allow_contact = self.get_parameter_or('links_to_allow_contact', None)
-        if self.links_to_allow_contact is None:
-            self.get_logger().warn("Didn't find any links to allow contacts... at param ~links_to_allow_contact")
+        self.links_to_allow_contact = self.get_parameter('links_to_allow_contact').value
+        if self.links_to_allow_contact is None or len(self.links_to_allow_contact) == 0:
             self.links_to_allow_contact = []
+            self.get_logger().warn("Didn't find any links to allow contacts... at param ~links_to_allow_contact")
         else:
             self.get_logger().info("Found links to allow contacts: " + str(self.links_to_allow_contact))
 
@@ -130,185 +149,187 @@ class PickAndPlaceServer(Node):
             self,
             PickUpPose,
             '/pickup_pose',
-            execute_callback=self.pick_cb)
+            execute_callback=self.pick_cb
+        )
 
         self.place_as = ActionServer(
             self,
             PickUpPose,
             '/place_pose',
-            execute_callback=self.place_cb)
+            execute_callback=self.place_cb
+        )
 
-    def get_parameter_or(self, name, default):
-        try:
-            return self.get_parameter(name).value
-        except Exception:
-            return default
-
-    async def pick_cb(self, goal_handle):
+    def pick_cb(self, goal_handle):
         """
-        :type goal_handle: rclpy.action.server.GoalHandle
+        :type goal: PickUpPose.Goal
         """
         goal = goal_handle.request
-        error_code = await self.grasp_object(goal.object_pose)
-        result = PickUpPose.Result()
-        result.error_code = error_code
+        error_code = self.grasp_object(goal.object_pose)
+        p_res = PickUpPose.Result()
+        p_res.error_code = int(error_code)
         if error_code != MoveItErrorCodes.SUCCESS:
             goal_handle.abort()
         else:
             goal_handle.succeed()
-        return result
+        return p_res
 
-    async def place_cb(self, goal_handle):
+    def place_cb(self, goal_handle):
         """
-        :type goal_handle: rclpy.action.server.GoalHandle
+        :type goal: PickUpPose.Goal
         """
         goal = goal_handle.request
-        error_code = await self.place_object(goal.object_pose)
-        result = PickUpPose.Result()
-        result.error_code = error_code
+        error_code = self.place_object(goal.object_pose)
+        p_res = PickUpPose.Result()
+        p_res.error_code = int(error_code)
         if error_code != MoveItErrorCodes.SUCCESS:
             goal_handle.abort()
         else:
             goal_handle.succeed()
-        return result
+        return p_res
 
     def wait_for_planning_scene_object(self, object_name='part'):
         self.get_logger().info(
-            "Waiting for object '" + object_name + "' to appear in planning scene...")
-        req = GetPlanningScene.Request()
-        req.components.components = req.components.WORLD_OBJECT_NAMES
+            "Waiting for object '" + object_name + "'' to appear in planning scene...")
+        gps_req = GetPlanningScene.Request()
+        gps_req.components.components = gps_req.components.WORLD_OBJECT_NAMES
 
-        while rclpy.ok():
-            future = self.scene_cli.call_async(req)
-            rclpy.spin_until_future_complete(self, future)
-            if future.result() is not None:
-                planning_scene = future.result().scene
-                world = planning_scene.world
-                collision_objects = world.collision_objects
-                for co in collision_objects:
+        found = False
+        while rclpy.ok() and not found:
+            future = self.scene_srv.call_async(gps_req)
+            rclpy.spin_until_future_complete(self, future, timeout_sec=2.0)
+            if future.done() and future.result() is not None:
+                scene = future.result().scene
+                for co in scene.world.collision_objects:
                     if co.id == object_name:
-                        self.get_logger().info("'" + object_name + "' is in scene!")
-                        return
-            time.sleep(0.5)
+                        found = True
+                        break
+            if not found:
+                time.sleep(0.1)
 
-    async def grasp_object(self, object_pose):
+        self.get_logger().info("'" + object_name + "'' is in scene!")
+
+    def grasp_object(self, object_pose):
         self.get_logger().info("Removing any previous 'part' object")
-        # Remove previous object and add new object and support surface
         self.scene.remove_world_object('part')
-        self.scene.remove_world_object('support')
-        # Add support surface
-        support_pose = PoseStamped()
-        support_pose.header.frame_id = 'base_footprint'
-        support_pose.pose.position.x = 0.7
-        support_pose.pose.position.y = 0.0
-        support_pose.pose.position.z = 0.0
-        support_pose.pose.orientation.w = 1.0
-        self.scene.add_box('support', support_pose, size=(0.8, 1.2, 0.01))
-        # Add object
-        obj_pose = deepcopy(object_pose)
-        obj_pose.header.frame_id = 'base_footprint'
-        self.scene.add_box('part', obj_pose, size=(self.object_width, self.object_depth, self.object_height))
+        self.scene.remove_world_object('table')
+        time.sleep(0.5)
 
-        # Wait for scene update
+        self.get_logger().info("Adding new 'part' object")
+        self.scene.add_box(
+            'part',
+            object_pose,
+            size=(self.object_depth, self.object_width, self.object_height)
+        )
+
+        self.get_logger().info("Adding supporting surface 'table'")
+        table_pose = deepcopy(object_pose)
+        table_height = max(object_pose.pose.position.z - (self.object_height / 2.0), 0.01)
+        table_pose.pose.position.z = table_height / 2.0
+        table_pose.pose.orientation.x = 0.0
+        table_pose.pose.orientation.y = 0.0
+        table_pose.pose.orientation.z = 0.0
+        table_pose.pose.orientation.w = 1.0
+        self.scene.add_box(
+            'table',
+            table_pose,
+            size=(1.5, 1.5, table_height)
+        )
+
         self.wait_for_planning_scene_object('part')
+        self.wait_for_planning_scene_object('table')
 
-        # Generate grasps
-        possible_grasps = self.sg.generate_grasps(obj_pose)
+        self.get_logger().info("Clearing octomap")
+        clear_future = self.clear_octomap_srv.call_async(Empty.Request())
+        rclpy.spin_until_future_complete(self, clear_future, timeout_sec=5.0)
 
-        # Shuffle grasps to add randomness
-        shuffle(possible_grasps)
+        grasps = self.sg.create_grasps_from_object_pose(object_pose)
+        shuffle(grasps)
 
-        # Create pickup goal
-        pickup_goal = createPickupGoal(
+        pug = createPickupGoal(
             group="arm_torso",
             target="part",
-            grasp_pose=obj_pose,
-            possible_grasps=possible_grasps,
-            links_to_allow_contact=self.links_to_allow_contact)
+            grasp_pose=object_pose,
+            possible_grasps=grasps,
+            links_to_allow_contact=self.links_to_allow_contact
+        )
+        pug.support_surface_name = 'table'
 
-        # Send goal and wait for result
-        send_goal_future = self.pickup_ac.send_goal_async(pickup_goal)
+        send_goal_future = self.pickup_ac.send_goal_async(pug)
         rclpy.spin_until_future_complete(self, send_goal_future)
         goal_handle = send_goal_future.result()
-        if not goal_handle.accepted:
-            self.get_logger().error('Pickup goal rejected')
-            return MoveItErrorCodes.FAILURE
-        get_result_future = goal_handle.get_result_async()
-        rclpy.spin_until_future_complete(self, get_result_future)
-        result = get_result_future.result().result
 
+        if goal_handle is None or not goal_handle.accepted:
+            self.get_logger().error("Pickup goal was rejected")
+            return MoveItErrorCodes.FAILURE
+
+        result_future = goal_handle.get_result_async()
+        rclpy.spin_until_future_complete(self, result_future)
+        wrapped_result = result_future.result()
+        if wrapped_result is None:
+            return MoveItErrorCodes.FAILURE
+
+        result = wrapped_result.result
         return result.error_code.val
 
-    async def place_object(self, object_pose):
+    def place_object(self, object_pose):
         self.get_logger().info("Clearing octomap")
-        clear_req = Empty.Request()
-        clear_future = self.clear_octomap_cli.call_async(clear_req)
-        rclpy.spin_until_future_complete(self, clear_future)
+        clear_future = self.clear_octomap_srv.call_async(Empty.Request())
+        rclpy.spin_until_future_complete(self, clear_future, timeout_sec=5.0)
 
-        place_pose = deepcopy(object_pose)
-        place_pose.header.frame_id = 'base_footprint'
+        place_locations = self.sg.create_placings_from_object_pose(object_pose)
+        shuffle(place_locations)
 
-        place_location = PlaceLocation()
-        place_location.place_pose = place_pose
-        place_location.post_place_posture.joint_names = []
-        place_location.post_place_posture.points = []
-        place_location.pre_place_approach.direction.header.frame_id = 'base_footprint'
-        place_location.pre_place_approach.direction.vector.z = -1.0
-        place_location.pre_place_approach.min_distance = 0.095
-        place_location.pre_place_approach.desired_distance = 0.115
-        place_location.post_place_retreat.direction.header.frame_id = 'base_footprint'
-        place_location.post_place_retreat.direction.vector.z = 1.0
-        place_location.post_place_retreat.min_distance = 0.1
-        place_location.post_place_retreat.desired_distance = 0.25
-
-        place_locations = [place_location]
-
-        # Try with primary group
-        place_goal = createPlaceGoal(
-            place_pose=place_pose,
-            place_locations=place_locations,
-            group="arm_torso",
-            target="part",
-            links_to_allow_contact=self.links_to_allow_contact)
-
-        send_goal_future = self.place_ac.send_goal_async(place_goal)
-        rclpy.spin_until_future_complete(self, send_goal_future)
-        goal_handle = send_goal_future.result()
-        if not goal_handle.accepted:
-            self.get_logger().error('Place goal rejected')
-            return MoveItErrorCodes.FAILURE
-        get_result_future = goal_handle.get_result_async()
-        rclpy.spin_until_future_complete(self, get_result_future)
-        result = get_result_future.result().result
-
-        if result.error_code.val != MoveItErrorCodes.SUCCESS:
-            self.get_logger().warn("Place with 'arm_torso' group failed, retrying with 'arm' group")
-            place_goal = createPlaceGoal(
-                place_pose=place_pose,
-                place_locations=place_locations,
-                group="arm",
+        last_error = MoveItErrorCodes.FAILURE
+        for group_name in ["arm_torso", "arm"]:
+            self.get_logger().info(f"Trying place with group '{group_name}'")
+            placeg = createPlaceGoal(
+                object_pose,
+                copy.deepcopy(place_locations),
+                group=group_name,
                 target="part",
-                links_to_allow_contact=self.links_to_allow_contact)
+                links_to_allow_contact=self.links_to_allow_contact
+            )
 
-            send_goal_future = self.place_ac.send_goal_async(place_goal)
+            send_goal_future = self.place_ac.send_goal_async(placeg)
             rclpy.spin_until_future_complete(self, send_goal_future)
             goal_handle = send_goal_future.result()
-            if not goal_handle.accepted:
-                self.get_logger().error('Place goal rejected')
-                return MoveItErrorCodes.FAILURE
-            get_result_future = goal_handle.get_result_async()
-            rclpy.spin_until_future_complete(self, get_result_future)
-            result = get_result_future.result().result
 
-        return result.error_code.val
+            if goal_handle is None or not goal_handle.accepted:
+                self.get_logger().warn(f"Place goal rejected for group '{group_name}'")
+                last_error = MoveItErrorCodes.FAILURE
+                continue
+
+            result_future = goal_handle.get_result_async()
+            rclpy.spin_until_future_complete(self, result_future)
+            wrapped_result = result_future.result()
+            if wrapped_result is None:
+                last_error = MoveItErrorCodes.FAILURE
+                continue
+
+            result = wrapped_result.result
+            last_error = result.error_code.val
+            if last_error == MoveItErrorCodes.SUCCESS:
+                return last_error
+
+            self.get_logger().warn(
+                f"Place failed with group '{group_name}' and error "
+                f"{moveit_error_dict.get(last_error, str(last_error))}, retrying if possible..."
+            )
+
+        return last_error
 
 
 def main(args=None):
     rclpy.init(args=args)
     paps = PickAndPlaceServer()
-    rclpy.spin(paps)
-    paps.destroy_node()
-    rclpy.shutdown()
+    executor = MultiThreadedExecutor()
+    executor.add_node(paps)
+    try:
+        executor.spin()
+    finally:
+        executor.shutdown()
+        paps.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':

@@ -1,16 +1,20 @@
 {
   "task_id": "009",
-  "task_name": "Fleet-Level Multinode Integration (Robofleet)",
-  "source": "https://github.com/ut-amrl/robofleet",
+  "task_name": "robofleet_msg2fbs_migration",
+  "level": "System Level",
+  "category": "Cross-Language Schema Consistency",
+  "language":"python",
   "difficulty":"hard",
-  "integration_level": "multinode",
-  "removed_files": [
-    "robofleet_server/src/subscriptions.ts",
-    "robofleet_client/robofleet_client/RosClientNode.hpp"
+  "target_package": "robofleet/msg2fbs",
+  "files": [
+    "msg2fbs/msg2fbs.py",
+    "msg2fbs/schema.fbs"
   ],
-  "focus": [
-    "fleet-level subscription state management",
-    "robot-local ROS multinode integration",
-    "topic-based message routing across multiple robots"
-  ]
+  "constraints": [
+    "Standardize on ROS 2 sec/nanosec naming",
+    "Remove 'seq' from Header definitions",
+    "Use FlatBuffers 'struct' for time primitives",
+    "Implement dynamic namespace resolution"
+  ],
+  "oracle_type": "Static Cross-File Regex Verification"
 }

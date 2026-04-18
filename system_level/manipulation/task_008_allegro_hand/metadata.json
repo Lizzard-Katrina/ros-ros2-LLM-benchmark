@@ -1,20 +1,25 @@
 {
-  "task_id": "008",
-  "task_name": "Allegro Hand V5 ROS1",
-  "source": "https://github.com/Wonikrobotics-git/allegro_hand_ros_v5",
-  "description": "ROS1 support for Allegro Hand V5 (4-finger robotic hand). Fine manipulation only. Connect driver, read joint states, send torque commands, execute finger motions.",
-  "difficulty_level": "median",
-  "expected_outcome": [
-    "AllegroHandNode publishes joint positions to 'allegro_hand/joint_states'.",
-    "Demo node subscribes to joint positions and prints them for verification.",
-    "Torque commands from AllegroHandNode should update finger positions."
-  ],
-  "docker": {
-    "dockerfile": "docker/Dockerfile",
-    "setup": "docker/setup.sh"
+  "task_id": "task_008_allegro_hand_ros2",
+  "name": "Allegro Hand CAN-ROS2 Driver Integration",
+  "description": "Implement the low-level CAN protocol parsing and high-level ROS2 control loop synchronization for the 16-DOF Allegro Hand.",
+  "language": "cpp",
+  "category": "Robotics / Embedded Systems",
+  "difficulty": "Hard",
+  "files": {
+    "driver": "allegro_hand_driver/src/AllegroHandDrv.cpp",
+    "controller": "allegro_hand_controllers/src/allegro_node.cpp",
+    "header": "allegro_hand_driver/include/allegro_hand_driver/AllegroHandDrv.h"
   },
-  "ros1_code": [
-    "src/allegro_hand_node.py",
-    "src/demo_get_joint_state.cpp"
-  ]
+  "knowledge_points": [
+    "Reconstructing 16-bit integers from 8-bit CAN segments",
+    "Applying physical scaling factors (Ticks to Radians)",
+    "Bitmask-based state synchronization",
+    "Finite difference method for velocity derivation",
+    "ROS2 lifecycle and safety shutdown (rclcpp::shutdown)"
+  ],
+  "requirements": {
+    "compiler": "GCC/G++",
+    "ros_distro": "Humble / Foxy",
+    "dependencies": ["rclcpp", "sensor_msgs", "can_msgs"]
+  }
 }

@@ -81,63 +81,46 @@ class Turtlebot3PatrolServer(Node):
         return math.atan2(siny, cosy)
 
     def go_front(self, position, length):
-        """TODO:
-Implement a spatial-feedback control loop that drives the robot forward for a 
-specified distance. Instead of using timing, the logic must monitor real-time 
-odometry updates to calculate the actual displacement from the starting pose 
-and terminate the motion once the target distance is reached.
-        END OF TODO"""
         start_x = self.odom.pose.pose.position.x
         start_y = self.odom.pose.pose.position.y
 
-        self.twist.linear.x = self.linear_x
-        self.twist.angular.z = 0.0
-        self.cmd_vel_pub.publish(self.twist)
+        distance = 0.0
+        while rclpy.ok() and distance < length:
+            self.twist.linear.x = self.linear_x
+            self.twist.angular.z = 0.0
+            self.cmd_vel_pub.publish(self.twist)
 
-        rate = self.create_rate(10)
-        while rclpy.ok():
             current_x = self.odom.pose.pose.position.x
             current_y = self.odom.pose.pose.position.y
-
             distance = math.sqrt((current_x - start_x) ** 2 + (current_y - start_y) ** 2)
-            if distance >= length:
-                break
 
-            rclpy.spin_once(self, timeout_sec=0.1)
-            rate.sleep()
+            time.sleep(0.01)
 
         self.init_twist()
 
     def turn(self, target_angle):
-        """TODO:
-Implement a heading-feedback control loop to rotate the robot to a target 
-relative angle. The implementation must handle orientation state estimation 
-from odometry data and manage the angular difference calculations, ensuring 
-the robot converges to the target heading while properly addressing the 
-discontinuity in angular representations.
-        END OF TODO"""
+        def normalize_angle(angle):
+            while angle > math.pi:
+                angle -= 2.0 * math.pi
+            while angle < -math.pi:
+                angle += 2.0 * math.pi
+            return angle
+
         start_yaw = self.get_yaw()
-        target_rad = math.radians(target_angle)
-        turned_angle = 0.0
+        target_yaw = normalize_angle(start_yaw + math.radians(target_angle))
 
-        self.twist.linear.x = 0.0
-
-        rate = self.create_rate(10)
         while rclpy.ok():
             current_yaw = self.get_yaw()
-            # Calculate shortest angular difference
-            error = target_rad - (current_yaw - start_yaw)
-            error = (error + math.pi) % (2 * math.pi) - math.pi  # Normalize to [-pi, pi]
+            angle_error = normalize_angle(target_yaw - current_yaw)
 
-            if abs(error) < 0.01:
+            if abs(angle_error) < math.radians(2.0):
                 break
 
-            angular_speed = self.angular_z if error > 0 else -self.angular_z
-            self.twist.angular.z = angular_speed
+            self.twist.linear.x = 0.0
+            self.twist.angular.z = self.angular_z if angle_error > 0.0 else -self.angular_z
             self.cmd_vel_pub.publish(self.twist)
 
-            rclpy.spin_once(self, timeout_sec=0.1)
-            rate.sleep()
+            time.sleep(0.01)
 
         self.init_twist()
 

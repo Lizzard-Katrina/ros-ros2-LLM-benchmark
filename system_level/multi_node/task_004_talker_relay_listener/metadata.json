@@ -1,16 +1,18 @@
 {
-  "task_id": "004",
-  "task_name": "Multinode Talker-Relay-Listener",
-  "source": "https://github.com/ros/ros_tutorials/tree/noetic-devel/roscpp_tutorials",
-  "ros_version": "ROS1",
-  "difficulty_level": "easy",
-  "integration_level": "multinode",
-  "missing_files": [
-    "ros1_code/relay.cpp"
+  "task_id": "task_004_system_ipc",
+  "name": "Multi-Node Service and Timer Migration",
+  "difficulty": "Hard",
+  "domain": "ROS 2 Distributed Systems",
+  "target_files": [
+    "add_two_ints_server.cpp",
+    "add_two_ints_client.cpp",
+    "babbler.cpp"
   ],
-  "expected_outcome": [
-    "Relay node subscribes to a talker topic",
-    "Relay node republishes messages unchanged",
-    "Listener receives relayed messages successfully"
+  "scoring_points": [
+    { "concept": "Service Discovery (wait_for_service)", "weight": 25 },
+    { "concept": "Asynchronous Request (async_send_request)", "weight": 25 },
+    { "concept": "Timer-based Paradigm (create_wall_timer)", "weight": 20 },
+    { "concept": "Executor Integration (rclcpp::spin)", "weight": 15 },
+    { "concept": "Zero Legacy Leakage (No ROS 1 artifacts)", "weight": 15 }
   ]
 }

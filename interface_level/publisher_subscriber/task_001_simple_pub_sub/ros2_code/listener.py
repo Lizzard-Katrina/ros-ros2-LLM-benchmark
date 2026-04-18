@@ -1,30 +1,29 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 
-class Listener(Node):
-    def __init__(self):
-        super().__init__('listener')
-        self.subscription = self.create_subscription(
-            String,
-            'chatter',
-            self.callback,
-            10)
+node = None
 
-    def callback(self, data):
-        self.get_logger().info("I heard '%s'" % data.data)
 
-def main(args=None):
-    rclpy.init(args=args)
-    listener = Listener()
-    try:
-        rclpy.spin(listener)
-    except KeyboardInterrupt:
-        listener.get_logger().info('Keyboard Interrupt (SIGINT)')
-    finally:
-        listener.destroy_node()
-        rclpy.shutdown()
+def callback(data):
+    # Keep logging logic
+    node.get_logger().info("I heard %s" % data.data)
+
+
+def listener():
+    global node
+    # TODO: initialize node 'listener'
+    # and subscribe to topic 'chatter'
+    # and keep spin
+    # END OF TODO
+    rclpy.init()
+    node = Node('listener')
+    node.create_subscription(String, 'chatter', callback, 10)
+    rclpy.spin(node)
+    node.destroy_node()
+    rclpy.shutdown()
+
 
 if __name__ == '__main__':
-    main()
+    listener()

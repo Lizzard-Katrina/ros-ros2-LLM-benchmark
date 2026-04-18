@@ -1,23 +1,26 @@
-# CARLA ↔ ROS Bridge (ROS1)
+# Task: CARLA ROS Bridge Migration - Synchronous Mode & Transforms
 
-Integrates the high-fidelity CARLA simulator with ROS1 topics for vehicle control and sensor data.
+## 1. Brief Description
+This task involves migrating the core synchronization logic and coordinate transformation utilities from a CARLA-ROS 1 environment to a ROS 2 compatible structure using the `ros_compatibility` framework. The goal is to ensure that the bridge maintains a strict lockstep with the simulator and correctly maps physics data between different coordinate conventions.
 
-## Description
+---
+source code file:
+```https://github.com/carla-simulator/ros-bridge/blob/master/carla_ros_bridge```
 
-- Connects CARLA simulator and ROS nodes.
-- Supports synchronous and asynchronous modes.
-- Publishes sensor topics and subscribes to control commands.
-- Manages ego vehicles, other actors, and world information.
+## 2. Abstraction Strategy (Hole-Punching Logic)
+The holes are strategically placed to test architectural understanding rather than syntax:
 
-## Expected Outcome
+* **Logic Coupling (`transforms.py`)**: The entire body of `carla_velocity_to_ros_twist` is removed. The developer must correctly combine linear and angular transformations, ensuring they re-use existing helper functions like `carla_vector_to_ros_vector_rotated` to maintain system-wide consistency.
+* **Sequential Barrier (`bridge.py`)**: The `_synchronous_mode_update` loop is hollowed out. This requires the developer to implement the "Update-Tick-Broadcast" sequence in the specific order required for temporal alignment in synchronous simulation.
 
-- Control commands from ROS (`CarlaControl`) are received and applied in CARLA.
-- Actor states are updated every tick and synchronized with ROS topics.
-- Clock and status messages are published to ROS.
-- Ego vehicle control commands are correctly handled in synchronous mode.
-- Bridge supports spawning/destroying objects and retrieving blueprints.
+## 3. Testcase Design & Expected Outcomes
 
-## Usage
-
-```bash
-rosrun carla_ros_bridge bridge.py
+| Test Case | Design Logic / Concept | Expected Outcome |
+| :--- | :--- | :--- |
+| `test_twist_linear_rotation_logic` | **Functional Re-use**: Checks if the rotation helper is called. | Presence of `carla_vector_to_ros_vector_rotated`. |
+| `test_twist_angular_unit_conversion` | **Physics Conversion**: Validates degrees to radians. | Usage of `math.radians()` for all axes. |
+| `test_twist_angular_handedness_inversion` | **Coordinate Handedness**: Checks LH (Carla) to RH (ROS) mapping. | Negative signs (`-`) on Angular Y and Z components. |
+| `test_bridge_sync_tick_order` | **Temporal Sequence**: tick() must precede snapshot processing. | `carla_world.tick()` index < `get_snapshot()` index. |
+| `test_bridge_clock_synchronization_call` | **Clock Coupling**: Ensures the ROS clock is driven by Carla. | Call to `self.update_clock()` with snapshot timestamp. |
+| `test_actor_factory_pre_tick_update` | **Lifecycle Sync**: Factory must update before physics step. | `actor_factory.update_available_objects()` called before `tick()`. |
+| `test_no_hardcoded_ego_id` | **Decoupling**: Validates dynamic actor identification. | No hardcoded integer lists for ego IDs. |

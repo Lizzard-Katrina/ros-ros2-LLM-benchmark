@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="7" time="0.039" timestamp="2026-04-10T13:13:39.684056" hostname="d17d8ed1f5a3"><testcase classname="src.task_003_Mobile_robot_control.tests.test_oracle_ros2" name="test_ros2_logging_style_compliance" time="0.001" /><testcase classname="src.task_003_Mobile_robot_control.tests.test_oracle_ros2" name="test_cmd_vel_timeout_assignment" time="0.001" /><testcase classname="src.task_003_Mobile_robot_control.tests.test_oracle_ros2" name="test_exception_message_exact_match" time="0.001" /><testcase classname="src.task_003_Mobile_robot_control.tests.test_oracle_ros2" name="test_covariance_vector_type" time="0.001" /><testcase classname="src.task_003_Mobile_robot_control.tests.test_oracle_ros2" name="test_size_logic_check" time="0.001" /><testcase classname="src.task_003_Mobile_robot_control.tests.test_oracle_ros2" name="test_absence_of_xmlrpc" time="0.004"><failure message="AssertionError: Found legacy ROS1 XmlRpc symbols.&#10;assert 'XmlRpc' not in '/**********...rollerBase);'&#10;  'XmlRpc' is contained here:&#10;      {&#10;          XmlRpc::XmlRpcValue wheel_list;&#10;  ?       ++++++&#10;          if (!controller_nh.getParam(wheel_param, wheel_list))&#10;          {&#10;            ROS_ERROR_STREAM_NAMED(name_,...&#10;  &#10;  ...Full output truncated (269 lines hidden), use '-vv' to show">E   AssertionError: Found legacy ROS1 XmlRpc symbols.
+    assert 'XmlRpc' not in '/**********...rollerBase);'
+      'XmlRpc' is contained here:
+          {
+              XmlRpc::XmlRpcValue wheel_list;
+      ?       ++++++
+              if (!controller_nh.getParam(wheel_param, wheel_list))
+              {
+                ROS_ERROR_STREAM_NAMED(name_,...
+      
+      ...Full output truncated (269 lines hidden), use '-vv' to show</failure></testcase><testcase classname="src.task_003_Mobile_robot_control.tests.test_oracle_ros2" name="test_no_ros1_nodehandle" time="0.003"><failure message="AssertionError: Found legacy ros::NodeHandle.&#10;assert 'ros::NodeHandle' not in '/**********...rollerBase);'&#10;  'ros::NodeHandle' is contained here:&#10;              ros::NodeHandle&amp; root_nh,&#10;                ros::NodeHandle &amp;controller_nh)&#10;      {&#10;        const std::string complete_ns = controller_nh.getNamespace();&#10;        std::size_t id = complete_ns.find_last_of(&quot;/&quot;);&#10;        name_ = complete_ns.substr(id + 1);...&#10;  &#10;  ...Full output truncated (646 lines hidden), use '-vv' to show">E   AssertionError: Found legacy ros::NodeHandle.
+    assert 'ros::NodeHandle' not in '/**********...rollerBase);'
+      'ros::NodeHandle' is contained here:
+                  ros::NodeHandle&amp; root_nh,
+                    ros::NodeHandle &amp;controller_nh)
+          {
+            const std::string complete_ns = controller_nh.getNamespace();
+            std::size_t id = complete_ns.find_last_of("/");
+            name_ = complete_ns.substr(id + 1);...
+      
+      ...Full output truncated (646 lines hidden), use '-vv' to show</failure></testcase></testsuite></testsuites>

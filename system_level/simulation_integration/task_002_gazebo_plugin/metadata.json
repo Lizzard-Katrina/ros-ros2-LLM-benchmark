@@ -1,12 +1,27 @@
 {
-  "task_id": "002",
-  "task_name": "Simulation Integration: Gazebo ↔ ROS Demo",
-  "source": "https://github.com/ros-simulation/gazebo_ros_demos",
-  "description": "Complete the missing parts of the launch file and Gazebo world plugin to enable full simulation integration. Students will need to spawn the robot, connect ROS topics, and implement plugin logic.",
-  "difficulty_level": "easy",
-  "expected_outcome": [
-    "Launch Gazebo with the custom hello world.",
-    "Implement ROS ↔ Gazebo plugin communication.",
-    "Subscribe and publish sensor topics correctly."
+  "task_id": "ros1_gazebo_plugin_world_load",
+  "category": "Gazebo Simulation",
+  "difficulty": "Medium",
+  "description": "Implementation of a Gazebo World Plugin Load signature and ROS 1 XML launch integration for custom world loading.",
+  "source_files": [
+    "gazebo_tutorials/src/simple_world_plugin.cpp",
+    "gazebo_tutorials/launch/hello.launch"
   ],
+  "target_files": [
+    "gazebo_tutorials/src/simple_world_plugin.cpp",
+    "gazebo_tutorials/launch/hello.launch"
+  ],
+  "technical_tags": [
+    "Gazebo Plugin API",
+    "C++",
+    "ROS 1 Launch XML",
+    "WorldPlugin",
+    "Resource Indexing"
+  ],
+  "evaluation_metrics": [
+    "API Signature Accuracy",
+    "Path Variable Correctness",
+    "Launch Argument Mapping",
+    "Namespace Integrity"
+  ]
 }

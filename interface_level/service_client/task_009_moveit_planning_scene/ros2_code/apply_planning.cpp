@@ -1,13 +1,9 @@
-Here is the converted ROS2 code:
-
-```cpp
 #include <chrono>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include <rclcpp/rclcpp.hpp>
-#include <rclcpp/qos.hpp>
 
 #include <geometry_msgs/msg/pose.hpp>
 #include <moveit_msgs/msg/planning_scene.hpp>
@@ -115,7 +111,7 @@ static void step_add_object_to_world(
  *   and set robot_state.is_diff = true.
  *
  */
-static void step_attach_object_and_remove_from_world(
+static void step_attach_object_and_remove_from_world__TODO(
     const rclcpp::Publisher<moveit_msgs::msg::PlanningScene>::SharedPtr& pub,
     rviz_visual_tools::RvizVisualTools& visual_tools,
     const moveit_msgs::msg::AttachedCollisionObject& attached_object)
@@ -124,14 +120,13 @@ static void step_attach_object_and_remove_from_world(
 
   moveit_msgs::msg::PlanningScene planning_scene;
 
-  // Remove original object from world
-  moveit_msgs::msg::CollisionObject remove_object;
-  remove_object.id = "box";
-  remove_object.header.frame_id = "panda_hand";
+  moveit_msgs::msg::CollisionObject remove_object = attached_object.object;
   remove_object.operation = moveit_msgs::msg::CollisionObject::REMOVE;
+
+  planning_scene.world.collision_objects.clear();
   planning_scene.world.collision_objects.push_back(remove_object);
 
-  // Attach object to robot
+  planning_scene.robot_state.attached_collision_objects.clear();
   planning_scene.robot_state.attached_collision_objects.push_back(attached_object);
   planning_scene.robot_state.is_diff = true;
 
@@ -205,7 +200,7 @@ int main(int argc, char** argv)
 
   // Planning scene diff publisher
   auto planning_scene_diff_publisher =
-      node->create_publisher<moveit_msgs::msg::PlanningScene>("planning_scene", rclcpp::QoS(1));
+      node->create_publisher<moveit_msgs::msg::PlanningScene>("planning_scene", 1);
 
   wait_for_subscribers(planning_scene_diff_publisher, node);
   visual_tools.prompt("Press 'next' in RViz to start: add object");
@@ -216,7 +211,8 @@ int main(int argc, char** argv)
   // Step through the demo
   step_add_object_to_world(planning_scene_diff_publisher, visual_tools, attached_object);
 
-  step_attach_object_and_remove_from_world(planning_scene_diff_publisher, visual_tools, attached_object);
+  // HOLLOWED semantic core:
+  step_attach_object_and_remove_from_world__TODO(planning_scene_diff_publisher, visual_tools, attached_object);
 
   step_detach_object_and_return_to_world(planning_scene_diff_publisher, visual_tools, attached_object);
   step_remove_object_from_world(planning_scene_diff_publisher, visual_tools);

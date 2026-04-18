@@ -1,5 +1,200 @@
+// Copyright (c) 2009, Willow Garage, Inc.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the Willow Garage nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
+#include "turtlesim/turtle.hpp"
+
+#include <QColor>
+#include <QRgb>
+
+#include <algorithm>
+#include <cmath>
+#include <functional>
+#include <limits>
+#include <string>
+
+#include "geometry_msgs/msg/twist.hpp"
+#include "rclcpp/rclcpp.hpp"
+
+#include "turtlesim_msgs/action/rotate_absolute.hpp"
+#include "turtlesim_msgs/msg/pose.hpp"
+#include "turtlesim_msgs/msg/color.hpp"
+#include "turtlesim_msgs/srv/set_pen.hpp"
+#include "turtlesim_msgs/srv/teleport_absolute.hpp"
+#include "turtlesim_msgs/srv/teleport_relative.hpp"
+#include "turtlesim/qos.hpp"
+
+#define DEFAULT_PEN_R 0xb3
+#define DEFAULT_PEN_G 0xb8
+#define DEFAULT_PEN_B 0xff
+
 namespace turtlesim
 {
+
+static double normalizeAngle(double angle)
+{
+  return angle - (TWO_PI * std::floor((angle + PI) / (TWO_PI)));
+}
+
+Turtle::Turtle(
+  rclcpp::Node::SharedPtr & nh, const std::string & real_name,
+  const QImage & turtle_image, const QPointF & pos, float orient)
+: nh_(nh)
+  , turtle_image_(turtle_image)
+  , pos_(pos)
+  , orient_(orient)
+  , lin_vel_x_(0.0)
+  , lin_vel_y_(0.0)
+  , ang_vel_(0.0)
+  , pen_on_(true)
+  , pen_(QColor(DEFAULT_PEN_R, DEFAULT_PEN_G, DEFAULT_PEN_B))
+{
+  pen_.setWidth(3);
+
+  const rclcpp::QoS qos = topic_qos();
+  velocity_sub_ = nh_->create_subscription<geometry_msgs::msg::Twist>(
+    real_name + "/cmd_vel", qos, std::bind(
+      &Turtle::velocityCallback, this,
+      std::placeholders::_1));
+  pose_pub_ = nh_->create_publisher<turtlesim_msgs::msg::Pose>(real_name + "/pose", qos);
+  color_pub_ = nh_->create_publisher<turtlesim_msgs::msg::Color>(real_name + "/color_sensor", qos);
+  set_pen_srv_ =
+    nh_->create_service<turtlesim_msgs::srv::SetPen>(
+    real_name + "/set_pen",
+    std::bind(&Turtle::setPenCallback, this, std::placeholders::_1, std::placeholders::_2));
+  teleport_relative_srv_ = nh_->create_service<turtlesim_msgs::srv::TeleportRelative>(
+    real_name + "/teleport_relative",
+    std::bind(
+      &Turtle::teleportRelativeCallback, this, std::placeholders::_1,
+      std::placeholders::_2));
+  teleport_absolute_srv_ = nh_->create_service<turtlesim_msgs::srv::TeleportAbsolute>(
+    real_name + "/teleport_absolute",
+    std::bind(
+      &Turtle::teleportAbsoluteCallback, this, std::placeholders::_1,
+      std::placeholders::_2));
+  rotate_absolute_action_server_ =
+    rclcpp_action::create_server<turtlesim_msgs::action::RotateAbsolute>(
+      nh,
+      real_name + "/rotate_absolute",
+    [](const rclcpp_action::GoalUUID &,
+    std::shared_ptr<const turtlesim_msgs::action::RotateAbsolute::Goal>)
+    {
+        // Accept all goals
+      return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
+      },
+    [](const std::shared_ptr<RotateAbsoluteGoalHandle>)
+    {
+        // Accept all cancel requests
+      return rclcpp_action::CancelResponse::ACCEPT;
+      },
+      std::bind(&Turtle::rotateAbsoluteAcceptCallback, this, std::placeholders::_1));
+
+  last_command_time_ = nh_->now();
+
+  meter_ = turtle_image_.height();
+  rotateImage();
+}
+
+
+void Turtle::velocityCallback(const geometry_msgs::msg::Twist::ConstSharedPtr vel)
+{
+  last_command_time_ = nh_->now();
+  lin_vel_x_ = vel->linear.x;
+  bool holonomic = false;
+  nh_->get_parameter_or("holonomic", holonomic, false);
+  if (holonomic) {
+    lin_vel_y_ = vel->linear.y;
+  }
+  ang_vel_ = vel->angular.z;
+
+  // Abort any active action
+  if (rotate_absolute_goal_handle_) {
+    RCLCPP_WARN(nh_->get_logger(), "Velocity command received during rotation goal. Aborting goal");
+    rotate_absolute_goal_handle_->abort(rotate_absolute_result_);
+    rotate_absolute_goal_handle_ = nullptr;
+  }
+}
+
+bool Turtle::setPenCallback(
+  const turtlesim_msgs::srv::SetPen::Request::SharedPtr req,
+  turtlesim_msgs::srv::SetPen::Response::SharedPtr)
+{
+  pen_on_ = !req->off;
+  if (req->off) {
+    return true;
+  }
+
+  QPen pen(QColor(req->r, req->g, req->b));
+  if (req->width != 0) {
+    pen.setWidth(req->width);
+  }
+
+  pen_ = pen;
+  return true;
+}
+
+bool Turtle::teleportRelativeCallback(
+  const turtlesim_msgs::srv::TeleportRelative::Request::SharedPtr req,
+  turtlesim_msgs::srv::TeleportRelative::Response::SharedPtr)
+{
+  teleport_requests_.push_back(TeleportRequest(0, 0, req->angular, req->linear, true));
+  return true;
+}
+
+bool Turtle::teleportAbsoluteCallback(
+  const turtlesim_msgs::srv::TeleportAbsolute::Request::SharedPtr req,
+  turtlesim_msgs::srv::TeleportAbsolute::Response::SharedPtr)
+{
+  teleport_requests_.push_back(TeleportRequest(req->x, req->y, req->theta, 0, false));
+  return true;
+}
+
+void Turtle::rotateAbsoluteAcceptCallback(
+  const std::shared_ptr<RotateAbsoluteGoalHandle> goal_handle)
+{
+  // Abort any existing goal
+  if (rotate_absolute_goal_handle_) {
+    RCLCPP_WARN(
+      nh_->get_logger(),
+      "Rotation goal received before a previous goal finished. Aborting previous goal");
+    rotate_absolute_goal_handle_->abort(rotate_absolute_result_);
+  }
+  rotate_absolute_goal_handle_ = goal_handle;
+  rotate_absolute_feedback_.reset(new turtlesim_msgs::action::RotateAbsolute::Feedback);
+  rotate_absolute_result_.reset(new turtlesim_msgs::action::RotateAbsolute::Result);
+  rotate_absolute_start_orient_ = orient_;
+}
+
+void Turtle::rotateImage()
+{
+  QTransform transform;
+  transform.rotate(-orient_ * 180.0 / PI + 90.0);
+  turtle_rotated_image_ = turtle_image_.transformed(transform);
+}
 
 bool Turtle::update(
   double dt, QPainter & path_painter, const QImage & path_image,
@@ -15,6 +210,7 @@ bool Turtle::update(
   for (; it != end; ++it) {
     const TeleportRequest & req = *it;
 
+    QPointF old_pos = pos_;
     if (req.relative) {
       orient_ += req.theta;
       pos_.rx() += std::cos(orient_) * req.linear;
@@ -73,98 +269,73 @@ bool Turtle::update(
     }
   }
 
-  // 1. MOTION: Update the turtle's 'orient_' and 'pos_' based on 'lin_vel_x_', 
-  //    'lin_vel_y_', and 'ang_vel_' over 'dt'. Support both holonomic and 
-  //    non-holonomic movements. Ensure 'orient_' remains normalized.
+  if (nh_->now() - last_command_time_ > rclcpp::Duration::from_seconds(1.0)) {
+    lin_vel_x_ = 0.0;
+    lin_vel_y_ = 0.0;
+    ang_vel_ = 0.0;
+  }
+
   bool holonomic = false;
   nh_->get_parameter_or("holonomic", holonomic, false);
 
+  orient_ = normalizeAngle(orient_ + ang_vel_ * dt);
+
   if (holonomic) {
-    pos_.rx() += lin_vel_x_ * dt;
-    pos_.ry() += lin_vel_y_ * dt;
+    pos_.rx() += (std::cos(orient_) * lin_vel_x_ - std::sin(orient_) * lin_vel_y_) * dt;
+    pos_.ry() += -(std::sin(orient_) * lin_vel_x_ + std::cos(orient_) * lin_vel_y_) * dt;
   } else {
     pos_.rx() += std::cos(orient_) * lin_vel_x_ * dt;
     pos_.ry() += -std::sin(orient_) * lin_vel_x_ * dt;
   }
-  orient_ += ang_vel_ * dt;
-  orient_ = normalizeAngle(orient_);
 
-  // 2. BOUNDARY SAFETY: Implement wall-collision logic. The turtle is 
-  //    constrained within [0, canvas_width] and [0, canvas_height]. 
-  //    Maintain the original requirement to log a warning upon collision.
-  bool collided = false;
-  if (pos_.x() < 0.0) {
-    pos_.setX(0.0);
-    collided = true;
-  }
-  if (pos_.x() > canvas_width) {
-    pos_.setX(canvas_width);
-    collided = true;
-  }
-  if (pos_.y() < 0.0) {
-    pos_.setY(0.0);
-    collided = true;
-  }
-  if (pos_.y() > canvas_height) {
-    pos_.setY(canvas_height);
-    collided = true;
-  }
-  if (collided) {
-    RCLCPP_WARN(nh_->get_logger(), "Turtle hit the wall and was constrained within boundaries");
+  bool hit_wall = false;
+  if (pos_.x() < 0.0 || pos_.x() > canvas_width || pos_.y() < 0.0 || pos_.y() > canvas_height) {
+    hit_wall = true;
   }
 
-  // 3. SONAR SENSING: Derive and implement a virtual sonar. 
-  //    - It must sample a 30-degree Field of View (FOV) centered at 'orient_'.
-  //    - Calculate the analytical intersection distance to the four window 
-  //      boundaries for rays within this FOV.
-  //    - Identify and store the 'shortest' distance (First Echo) to the nearest wall.
-  const double sonar_fov = 30.0 * M_PI / 180.0;  // 30 degrees in radians
-  const int num_rays = 31;  // sample rays within FOV
-  double min_distance = std::numeric_limits<double>::max();
+  pos_.setX(std::min(std::max(pos_.x(), 0.0), static_cast<double>(canvas_width)));
+  pos_.setY(std::min(std::max(pos_.y(), 0.0), static_cast<double>(canvas_height)));
 
-  for (int i = 0; i < num_rays; ++i) {
-    double ray_angle = orient_ - sonar_fov / 2.0 + i * (sonar_fov / (num_rays - 1));
-    ray_angle = normalizeAngle(ray_angle);
+  if (hit_wall) {
+    RCLCPP_WARN(nh_->get_logger(), "Turtle hit the wall");
+  }
 
-    // Ray direction vector
-    double dx = std::cos(ray_angle);
-    double dy = -std::sin(ray_angle);  // Qt y-axis is top-down
+  constexpr double kFov = 30.0 * PI / 180.0;
+  constexpr int kSamples = 31;
+  double shortest_echo = std::numeric_limits<double>::infinity();
 
-    // Calculate intersection distances to each boundary
-    // Left boundary (x=0)
-    double dist_left = std::numeric_limits<double>::max();
-    if (dx < 0.0) {
-      dist_left = (0.0 - pos_.x()) / dx;
-    }
-    // Right boundary (x=canvas_width)
-    double dist_right = std::numeric_limits<double>::max();
-    if (dx > 0.0) {
-      dist_right = (canvas_width - pos_.x()) / dx;
-    }
-    // Top boundary (y=0)
-    double dist_top = std::numeric_limits<double>::max();
-    if (dy < 0.0) {
-      dist_top = (0.0 - pos_.y()) / dy;
-    }
-    // Bottom boundary (y=canvas_height)
-    double dist_bottom = std::numeric_limits<double>::max();
-    if (dy > 0.0) {
-      dist_bottom = (canvas_height - pos_.y()) / dy;
+  auto test_intersection = [&](double t, double ix, double iy) {
+      if (t >= 0.0 && ix >= 0.0 && ix <= canvas_width && iy >= 0.0 && iy <= canvas_height) {
+        shortest_echo = std::min(shortest_echo, t);
+      }
+    };
+
+  for (int i = 0; i < kSamples; ++i) {
+    const double ratio = (kSamples == 1) ? 0.0 : static_cast<double>(i) / static_cast<double>(kSamples - 1);
+    const double ray_angle = normalizeAngle(orient_ - 0.5 * kFov + ratio * kFov);
+    const double dx = std::cos(ray_angle);
+    const double dy = -std::sin(ray_angle);
+
+    if (std::fabs(dx) > 1e-12) {
+      double t_left = (0.0 - pos_.x()) / dx;
+      test_intersection(t_left, 0.0, pos_.y() + t_left * dy);
+
+      double t_right = (canvas_width - pos_.x()) / dx;
+      test_intersection(t_right, canvas_width, pos_.y() + t_right * dy);
     }
 
-    // Find the minimal positive intersection distance
-    double dist = std::min({dist_left, dist_right, dist_top, dist_bottom});
-    if (dist > 0.0 && dist < min_distance) {
-      min_distance = dist;
+    if (std::fabs(dy) > 1e-12) {
+      double t_top = (0.0 - pos_.y()) / dy;
+      test_intersection(t_top, pos_.x() + t_top * dx, 0.0);
+
+      double t_bottom = (canvas_height - pos_.y()) / dy;
+      test_intersection(t_bottom, pos_.x() + t_bottom * dx, canvas_height);
     }
   }
 
-  sonar_distance_ = min_distance;
-
-  // 4. COORDINATE MAPPING: Respect the turtlesim convention where the internal 
-  //    'pos_.y()' is top-down (Qt frame), but the 'Pose' message expects 
-  //    bottom-up coordinates relative to 'canvas_height'.
-  // (Handled below in pose message publishing)
+  if (!std::isfinite(shortest_echo)) {
+    shortest_echo = 0.0;
+  }
 
   // Publish pose of the turtle
   auto p = std::make_unique<turtlesim_msgs::msg::Pose>();
@@ -186,8 +357,8 @@ bool Turtle::update(
   }
 
   RCLCPP_DEBUG(
-    nh_->get_logger(), "[%s]: pos_x: %f pos_y: %f theta: %f",
-    nh_->get_namespace(), pos_.x(), pos_.y(), orient_);
+    nh_->get_logger(), "[%s]: pos_x: %f pos_y: %f theta: %f sonar_first_echo: %f",
+    nh_->get_namespace(), pos_.x(), pos_.y(), orient_, shortest_echo);
 
   if (orient_ != old_orient) {
     rotateImage();
@@ -202,6 +373,14 @@ bool Turtle::update(
   }
 
   return modified;
+}
+
+void Turtle::paint(QPainter & painter)
+{
+  QPointF p = pos_ * meter_;
+  p.rx() -= 0.5 * turtle_rotated_image_.width();
+  p.ry() -= 0.5 * turtle_rotated_image_.height();
+  painter.drawImage(p, turtle_rotated_image_);
 }
 
 }  // namespace turtlesim

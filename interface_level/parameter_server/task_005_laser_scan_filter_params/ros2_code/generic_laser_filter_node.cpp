@@ -1,3 +1,49 @@
+/*
+ * Copyright (c) 2008, Willow Garage, Inc.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright
+ *       notice, this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the Willow Garage, Inc. nor the names of its
+ *       contributors may be used to endorse or promote products derived from
+ *       this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#include <rclcpp/rclcpp.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
+
+// TF
+#include <tf2_ros/transform_listener.hpp>
+#include <tf2_ros/message_filter.hpp>
+
+typedef tf2::TransformException TransformException;
+typedef tf2_ros::TransformListener TransformListener;
+
+#define NO_TIMER
+
+#include "message_filters/subscriber.hpp"
+#include "filters/filter_chain.hpp"
+
+using namespace std::chrono_literals;
+
 class GenericLaserScanFilterNode
 {
 protected:
@@ -23,6 +69,14 @@ protected:
 private:
   void foo(const sensor_msgs::msg::LaserScan::SharedPtr msg)
   {
+    (void)msg;
+  }
+
+  void deprecationTimerCallback()
+  {
+    RCLCPP_WARN(
+      nh_->get_logger(),
+      "This node is deprecated. Please migrate to 'scan_to_scan_filter_chain'.");
   }
 
 public:
@@ -31,30 +85,35 @@ public:
       : nh_(nh),
         buffer_(nh_->get_clock()),
         tf_(buffer_),
-        scan_sub_(nh_.get(), "scan", rclcpp::SensorDataQoS()),
-        tf_filter_(scan_sub_, buffer_, "base_link", 50, *nh_),
+        scan_sub_(nh_, "scan", rclcpp::SensorDataQoS()),
+        tf_filter_(
+          scan_sub_,
+          buffer_,
+          "base_link",
+          50,
+          nh_->get_node_logging_interface(),
+          nh_->get_node_clock_interface()),
         filter_chain_("sensor_msgs::msg::LaserScan")
   {
-    // Initialize filter chain with node parameters and interfaces
-    filter_chain_.configure(nh_->get_node_parameters_interface(),
-                            nh_->get_node_logging_interface(),
-                            nh_->get_node_topics_interface());
-
-    // Set message filter tolerance to 30ms
-    tf_filter_.setTolerance(std::chrono::milliseconds(30));
-
-    // Register callback for synchronized messages
+    tf_filter_.setTolerance(rclcpp::Duration(30ms));
     tf_filter_.registerCallback(std::bind(&GenericLaserScanFilterNode::callback, this, std::placeholders::_1));
 
-    // Create publisher for filtered scan
-    output_pub_ = nh_->create_publisher<sensor_msgs::msg::LaserScan>("output", rclcpp::SensorDataQoS());
+    output_pub_ = rclcpp::create_publisher<sensor_msgs::msg::LaserScan>(
+      nh_->get_node_topics_interface(),
+      "scan_filtered",
+      rclcpp::SensorDataQoS());
 
-    // Create recurring timer for deprecation warning every 5 seconds
-    deprecation_timer_ = nh_->create_wall_timer(
-        5s, [this]() {
-          RCLCPP_WARN(nh_->get_logger(),
-                      "This node is deprecated. Please migrate to 'scan_to_scan_filter_chain'.");
-        });
+    filter_chain_.configure(
+      "scan_filter_chain",
+      nh_->get_node_logging_interface(),
+      nh_->get_node_parameters_interface());
+
+    deprecation_timer_ = rclcpp::create_timer(
+      nh_->get_node_base_interface(),
+      nh_->get_node_timers_interface(),
+      nh_->get_clock(),
+      5s,
+      std::bind(&GenericLaserScanFilterNode::deprecationTimerCallback, this));
   }
 
   // Callback
@@ -67,3 +126,21 @@ public:
     output_pub_->publish(msg_);
   }
 };
+
+int main(int argc, char **argv)
+{
+  rclcpp::init(argc, argv);
+  auto nh = rclcpp::Node::make_shared("scan_filter_node");
+  GenericLaserScanFilterNode t(nh);
+
+  rclcpp::WallRate loop_rate(200);
+  rclcpp::executors::SingleThreadedExecutor executor;
+  executor.add_node(nh);
+  while (rclcpp::ok()) {
+
+    executor.spin_some();
+    loop_rate.sleep();
+  }
+
+  return 0;
+}

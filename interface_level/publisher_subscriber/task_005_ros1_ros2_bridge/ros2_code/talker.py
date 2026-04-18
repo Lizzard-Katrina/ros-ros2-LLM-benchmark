@@ -1,30 +1,30 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import rclpy
-from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import String as ROSString
 
-class StringPub(Node):
+
+# mock string class
+class String:
     def __init__(self):
-        super().__init__('string_pub')
-        self.publisher = self.create_publisher(String, 'chatter', 10)
-        self.timer = self.create_timer(1.0, self.publish_message)
+        self.data = ""
 
-    def publish_message(self):
-        msg = String()
-        msg.data = "hello from ros2"
-        self.publisher.publish(msg)
-        self.get_logger().info('Publishing: "%s"' % msg.data)
 
-def main(args=None):
-    rclpy.init(args=args)
-    string_pub = StringPub()
-    try:
-        rclpy.spin(string_pub)
-    except KeyboardInterrupt:
-        string_pub.get_logger().info('Keyboard Interrupt (SIGINT)')
-    finally:
-        string_pub.destroy_node()
-        rclpy.shutdown()
+def main():
+    rclpy.init()
+    node = rclpy.create_node("chatter_publisher")
+    publisher = node.create_publisher(ROSString, "/chatter", 10)
 
-if __name__ == '__main__':
+    rate = node.create_rate(1.0)
+    while rclpy.ok():
+        msg = ROSString()
+        msg.data = "hello from ros1"
+        publisher.publish(msg)
+        rclpy.spin_once(node, timeout_sec=0.0)
+        rate.sleep()
+
+    node.destroy_node()
+    rclpy.shutdown()
+
+
+if __name__ == "__main__":
     main()

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package>
+  <name>husky_navigation</name>
+  <version>0.6.10</version>
+  <description>Autonomous mapping and navigation demos for the Clearpath Husky</description>
+
+  <author email="pmukherj@clearpathrobotics.com">Prasenjit Mukherjee</author>
+  <author email="paul@bovbel.com">Paul Bovbel</author>
+
+  <maintainer email="tbaltovski@clearpathrobotics.com">Tony Baltovski</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/husky_navigation</url>
+  <url type="bugtracker">https://github.com/husky/husky/issues</url>
+  <url type="repository">https://github.com/husky/husky</url>
+
+  ``TODO: Universalize this manifest for ROS 2 Humble. You must resolve all functional dependencies required to support the Husky robot's navigation and simulation capabilities within the new middleware architecture.``
+  ``END OF TODO``
+</package>

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2019 Southwest Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include <reach_ros/ik/moveit_ik_solver.h>
 #include <reach_ros/utils.h>
 
@@ -46,13 +61,17 @@ MoveItIKSolver::MoveItIKSolver(moveit::core::RobotModelConstPtr model, const std
 std::vector<std::vector<double>> MoveItIKSolver::solveIK(const Eigen::Isometry3d& target,
                                                          const std::map<std::string, double>& seed) const
 {
-// TODO [TASK-010]:
-  //  Extract joint subset from seed map
-  //  Set joint group positions
-  //  Invoke MoveIt IK solver with a validity callback
-  //  If valid, return the solution in expected format
-// END
+// TODO: Implement the complete IK solving logic for the reach study.
+  // [STYLE CONSTRAINT]: You MUST use the 'state.setFromIK' method.
+  // [STYLE CONSTRAINT]: You MUST use 'boost::bind' to pass the 'isIKSolutionValid' callback.
+  // - Initialize the robot state and set the initial joint positions using the provided seed.
+  // - Solve Inverse Kinematics for the 'target' isometry.
+  // - You MUST use 'isIKSolutionValid' as the state validity callback.
+  // - Return the successful joint solution as a vector of vectors, or an empty vector if failed.
+  // - Ensure the robot state is updated before and after the IK call.
+//END TODO
 }
+
 bool MoveItIKSolver::isIKSolutionValid(moveit::core::RobotState* state, const moveit::core::JointModelGroup* jmg,
                                        const double* ik_solution) const
 {

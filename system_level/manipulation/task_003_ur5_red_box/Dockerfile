@@ -13,33 +13,37 @@ RUN apt-get update && apt-get install -y \
 # Install Python packages needed for oracle tests
 RUN apt-get update && apt-get install -y python3-pip
 RUN pip3 install --no-cache-dir pytest numpy pyquaternion
-
+RUN pip3 install pytest
 
 # Create ROS2 workspace
 RUN mkdir -p /ros2_ws/ros2_code
 WORKDIR /ros2_ws
 
-COPY ./ros2_code/robotic_arm_arm_ikfast_moveit_plugin.cpp /ros2_ws/src/motion_planning/ros2_code/robotic_arm_arm_ikfast_moveit_plugin.cpp
-COPY ./tests/CMakeLists.txt /ros2_ws/src/motion_planning/CMakeLists.txt
-COPY ./tests/package.xml /ros2_ws/src/motion_planning/package.xml
-COPY ./tests/test_ik_decision_loop.cpp /ros2_ws/src/motion_planning/test/test_ik_decision_loop.cpp
-COPY ./tests/include /ros2_ws/src/motion_planning/include
-COPY ./tests/include/kinematics/kinematics_query_options.h /ros2_ws/src/motion_planning/include/kinematics_base/kinematics_query_options.hpp
+COPY ./ros2_code /ros2_ws/src
+COPY ./tests \
+     /ros2_ws/src/test
+#for this task
+RUN touch /ros2_ws/src/__init__.py
 
-RUN mkdir src/motion_planning/scripts\
-    touch src/motion_planning/__init__.py && \
-    touch src/motion_planning/scripts/__init__.py
 	
 # Source ROS2
 SHELL ["/bin/bash", "-c"]
-RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
-RUN /bin/bash -c "source /opt/ros/humble/setup.bash"
+RUN source /opt/ros/humble/setup.bash && \
+    cd /ros2_ws && \
+#This is important!!! added here for automated test
+    python3 -m pytest src/test/test_oracle_ros2.py
+#    colcon build --symlink-install
 
 
 
 # Set ROS2 workspace
+RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc && \
+    echo "source /ros2_ws/install/setup.bash" >> ~/.bashrc
+
 WORKDIR /ros2_ws
-RUN . /opt/ros/humble/setup.bash && colcon build
+
 
 # Set entrypoint
-ENTRYPOINT ["/bin/bash"]
+#ENTRYPOINT ["/entrypoint.sh"]
+# Default command
+CMD ["/bin/bash"]

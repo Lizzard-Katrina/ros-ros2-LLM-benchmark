@@ -1,33 +1,31 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import rclpy
-from rclpy.node import Node
-from beginner_tutorials.srv import AddTwoInts, AddTwoInts_Response
+from beginner_tutorials.srv import AddTwoInts
 
-class AddTwoIntsServer(Node):
+_node = None
 
-    def __init__(self):
-        super().__init__('add_two_ints_server')
-        self.srv = self.create_service(AddTwoInts, 'add_two_ints', self.handle_add_two_ints)
 
-    def handle_add_two_ints(self, request, response):
-        # TODO: AI/user completes service logic
-        self.get_logger().info("Server received request: %s + %s" % (request.a, request.b))
-        response.sum = request.a + request.b
-        return response
-        # END OF TODO
+def handle_add_two_ints(req, response):
+    # TODO: AI/user completes service logic
+    _node.get_logger().info(f"Server received request: {req.a} + {req.b}")
+    response.sum = req.a + req.b
+    return response
+    # END OF TODO
 
-def main(args=None):
-    rclpy.init(args=args)
-    add_two_ints_server = AddTwoIntsServer()
-    try:
-        rclpy.spin(add_two_ints_server)
-    except KeyboardInterrupt:
-        add_two_ints_server.get_logger().info('Keyboard Interrupt (SIGINT)')
-    finally:
-        add_two_ints_server.destroy_node()
-        rclpy.shutdown()
+
+def server_node():
+    rclpy.init()
+    global _node
+    _node = rclpy.create_node('add_two_ints_server')
+    # TODO: advertise the service
+    _node.create_service(AddTwoInts, 'add_two_ints', handle_add_two_ints)
+    rclpy.spin(_node)
+    _node.destroy_node()
+    rclpy.shutdown()
+    # END OF TODO
+
 
 if __name__ == "__main__":
-    main()
+    server_node()

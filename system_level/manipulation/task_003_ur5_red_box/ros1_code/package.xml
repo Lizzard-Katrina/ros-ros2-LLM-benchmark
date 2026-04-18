@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>robotic_arm_algorithms</name>
+  <version>0.0.0</version>
+  <description>Package description</description>
+
+  <maintainer email="Kristyna.Kumpanova@akka.eu">Kumpanova Kristyna</maintainer>
+  <license></license>
+
+"TODO"
+"Replace all legacy ROS 1 communication and build dependencies with the appropriate ROS 2 rclpy and rosidl counterparts. Ensure the package is correctly exported as an ament_cmake build type and registered for interface generation."
+"END OF TODO"
+
+</package>

@@ -372,7 +372,8 @@ if __name__ == "__main__":
     #Implement the manipulation orchestration logic that consumes detected LEGO poses, 
     #computes appropriate grasp and approach actions, executes arm motion through the 
     #controller, and coordinates grasp attachment and release
-    # END OF todo
+    # You must name the service clients exactly as self.setstatic_srv, self.attach_srv, and self.detach_srv
+    # END OF TODO
 
     print("Moving to Default Position")
     controller.move_to(*DEFAULT_POS, DEFAULT_QUAT)

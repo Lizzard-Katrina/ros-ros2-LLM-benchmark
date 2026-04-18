@@ -247,16 +247,13 @@ class CarlaRosBridge(CompatibleNode):
                 return
 
     def _synchronous_mode_update(self):
-        """
-        execution loop for synchronous mode
-        """
-        #TODO: implement full closed-loop bridge update
-        #   1. process incoming vehicle control commands
-        #   2. update actor states and world info
-        #   3. tick CARLA world and collect snapshot
-        #   4. publish clock and status
-        #   5. wait for ego vehicle commands if required
-        # END
+        # TODO: Implement the Lockstep Simulation Barrier.
+            # This block is responsible for the atomic stepping of the simulation.
+            # You must synchronize the internal ActorFactory, the CARLA world tick,
+            # and the ROS system clock to ensure that all published sensor data 
+            # and TF transforms are temporally aligned with the simulation frame.
+        #END OF TODO
+
     def _carla_time_tick(self, carla_snapshot):
         """
         Private callback registered at carla.World.on_tick()

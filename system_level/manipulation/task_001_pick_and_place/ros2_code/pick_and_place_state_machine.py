@@ -13,78 +13,99 @@ Date:   Fall 2023
 """
 
 import rclpy
-from rclpy.node import Node
-from rclpy.executors import MultiThreadedExecutor
-from pick_and_place.msg import DetectedObjectsStamped
-from controller import Controller
-from vision_object_detector import VisionObjectDetector
+import os
+from ament_index_python.packages import get_package_share_directory
+from statemachine import State, StateMachine
+from statemachine.contrib.diagram import DotGraphMachine
+import time
 
-class PickAndPlaceStateMachine(Node):
+from controller import Controller
+
+
+class PickAndPlaceStateMachine(StateMachine):
 
     # States
-    home = 'home'
-    selecting_object = 'selecting_object'
-    picking_and_placing = 'picking_and_placing'
-    done = 'done'
+    home = State("Home", initial=True)
+    selecting_object = State("SelectingObject")                       
+    picking_and_placing = State("PickingAndPlacing")                         
+    done = State("Done", final=True)
 
     # Events & Transitions
-    def __init__(self, controller, object_detector):
-        super().__init__('pick_and_place_state_machine')
+    select_object = home.to(selecting_object, cond="are_objects_detected") | home.to(done, unless="are_objects_detected")
+    pick_object = selecting_object.to(picking_and_placing, cond="object_selected")
+    get_ready = picking_and_placing.to(home, cond="object_placed")
+    
+    def __init__(self, controller):
         self.controller = controller
-        self.object_detector = object_detector
         self.object_selected = False
         self.object_placed = False
         self.currently_selected_object = None
-        self.state = self.home
 
-        self.detected_objects_sub = self.create_subscription(
-            DetectedObjectsStamped,
-            'detected_objects',
-            self.detected_objects_callback,
-            QoSProfile(depth=10))
+        print('\n' + 80*'=')
+        self.controller.get_logger().info("*** Pick-and-Place Mission Begins! ***") 
+        print(80*'=')
 
-        self.get_logger().info('*** Pick-and-Place Mission Begins! ***')
+        super().__init__()
 
-    def detected_objects_callback(self, msg: DetectedObjectsStamped) -> None:
-        if self.state == self.home:
-            if msg.detected_objects:
-                self.state = self.selecting_object
-                self.select_object()
-            else:
-                self.state = self.done
-                self.done_state()
-        elif self.state == self.selecting_object:
-            self.select_object()
-        elif self.state == self.picking_and_placing:
-            self.pick_and_place()
-        elif self.state == self.done:
-            self.done_state()
+    def are_objects_detected(self) -> bool:
+        """Guard to transition to 'selecting_object' state when in 'home' state."""
+        return self.controller.are_objects_on_workbench()
 
-    def select_object(self) -> None:
-        # State transitions must be tethered to the actual completion of the controller's task.
-        self.currently_selected_object = self.object_detector.blocks_on_workbench[0]
-        self.state = self.picking_and_placing
-        self.pick_and_place()
+    # Actions that occur when entering states
+    def on_enter_home(self) -> None:
+        """Moves robot to home position and triggers the 'select_object' event."""
+        self.controller.get_logger().info("Moving to home position..") 
+        self.controller.panda.move_to_neutral()
+        self.object_selected = False
+        self.object_placed = False
+        time.sleep(0.2)
 
-    def pick_and_place(self) -> None:
+        self.send("select_object")
+
+    def on_enter_selecting_object(self) -> None:
+        self.controller.get_logger().info("Selecting an object from the workbench..")
+        self.currently_selected_object = self.controller.select_object()
+        self.object_selected = True
+        self.controller.get_logger().info(f"Selected object: {self.currently_selected_object}")
+        self.send("pick_object")
+
+    def on_enter_picking_and_placing(self) -> None:
+        """Picks and places the selected object to its bin and triggers the 'get_ready' event."""
+        self.controller.get_logger().info("Starting pick & place operation of selected object..") 
         self.controller.move_object(self.currently_selected_object)
         self.object_placed = True
-        self.state = self.home
-        self.get_logger().info('Object placed in its bin.')
+        self.controller.get_logger().info("Object placed in its bin.")
 
-    def done_state(self) -> None:
-        self.get_logger().info('*** Mission Complete! *** \nAll objects have been placed in their bins.')
-        rclpy.shutdown()
+        self.send("get_ready")
+    
+    def on_enter_done(self) -> None:
+        """Reports that the robot has finished its pick-and-place tasks."""
+        print('\n' + 60*'=')
+        self.controller.get_logger().info("*** Mission Complete! *** \nAll objects have been placed in their bins.") 
+        print(60*'=')
+        exit()
 
-def main(args=None):
-    rclpy.init(args=args)
-    object_detector = VisionObjectDetector()
+
+def create_state_machine_graph():
+    """Creates and saves an image of the state machine graph."""
+    graph = DotGraphMachine(PickAndPlaceStateMachine)
+    dot = graph()
+    file_path = os.path.join(get_package_share_directory('pick_and_place'), 'images/')
+    dot.write_png(file_path + "state_machine.png")
+    print("\n State machine image saved! \n")
+
+
+if __name__ == "__main__":     
+    rclpy.init()
     controller = Controller()
-    state_machine = PickAndPlaceStateMachine(controller, object_detector)
-    executor = MultiThreadedExecutor()
-    rclpy.spin(state_machine, executor=executor)
-    state_machine.destroy_node()
-    rclpy.shutdown()
-
-if __name__ == "__main__":
-    main()
+    sm = PickAndPlaceStateMachine(controller)
+    executor = rclpy.executors.MultiThreadedExecutor()
+    executor.add_node(controller)
+    try:
+        executor.spin()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        executor.shutdown()
+        controller.destroy_node()
+        rclpy.shutdown()

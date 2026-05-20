@@ -19,9 +19,6 @@
 #include <memory>
 #include <string>
 
-#include "rclcpp/parameter_client.hpp"
-#include "rcl_interfaces/msg/parameter_event.hpp"
-
 using robotis::turtlebot3::TurtleBot3;
 using namespace std::chrono_literals;
 
@@ -55,50 +52,6 @@ TurtleBot3::Motors * TurtleBot3::get_motors()
 void TurtleBot3::init_dynamixel_sdk_wrapper(const std::string & usb_port)
 {
   DynamixelSDKWrapper::Device opencr = {usb_port, 200, 1000000, 2.0f};
-
-  static bool parameter_monitor_initialized = false;
-  static rclcpp::AsyncParametersClient::SharedPtr parameter_client;
-  static rclcpp::Subscription<rcl_interfaces::msg::ParameterEvent>::SharedPtr parameter_event_sub;
-
-  if (!parameter_monitor_initialized) {
-    parameter_client = std::make_shared<rclcpp::AsyncParametersClient>(node_handle_, this->get_name());
-
-    while (!parameter_client->wait_for_service(1s)) {
-      if (!rclcpp::ok()) {
-        RCLCPP_WARN(
-          this->get_logger(),
-          "Interrupted while waiting for parameter service. Skipping parameter event monitor setup.");
-        break;
-      }
-    }
-
-    if (rclcpp::ok()) {
-      parameter_event_sub = parameter_client->on_parameter_event(
-        [this](const rcl_interfaces::msg::ParameterEvent::SharedPtr event) -> void
-        {
-          if (event->node != this->get_fully_qualified_name()) {
-            return;
-          }
-
-          for (const auto & changed_param : event->changed_parameters) {
-            if (changed_param.name == "motors.profile_acceleration") {
-              const auto param = rclcpp::Parameter::from_parameter_msg(changed_param);
-              const double physical_value = param.as_double();
-              if (motors_.profile_acceleration_constant != 0.0f) {
-                motors_.profile_acceleration = static_cast<float>(
-                  physical_value / static_cast<double>(motors_.profile_acceleration_constant));
-                RCLCPP_INFO(
-                  this->get_logger(),
-                  "Updated motors.profile_acceleration: %.3f rev/min2",
-                  physical_value);
-              }
-              break;
-            }
-          }
-        });
-      parameter_monitor_initialized = true;
-    }
-  }
 
   RCLCPP_INFO(this->get_logger(), "Init DynamixelSDKWrapper");
 
@@ -308,57 +261,35 @@ void TurtleBot3::heartbeat_timer(const std::chrono::milliseconds timeout)
 
 void TurtleBot3::parameter_event_callback()
 {
-  static bool parameter_monitor_initialized = false;
-  static rclcpp::AsyncParametersClient::SharedPtr parameter_client;
-  static rclcpp::Subscription<rcl_interfaces::msg::ParameterEvent>::SharedPtr parameter_event_sub;
-
-  if (parameter_monitor_initialized) {
-    return;
-  }
-
-  parameter_client = std::make_shared<rclcpp::AsyncParametersClient>(node_handle_, this->get_name());
-
-  while (!parameter_client->wait_for_service(1s)) {
+  priv_parameters_client_ = std::make_shared<rclcpp::AsyncParametersClient>(this);
+  while (!priv_parameters_client_->wait_for_service(std::chrono::seconds(1))) {
     if (!rclcpp::ok()) {
-      RCLCPP_WARN(
-        this->get_logger(),
-        "Interrupted while waiting for parameter service. Parameter monitor not started.");
+      RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
       return;
     }
+    RCLCPP_INFO(this->get_logger(), "service not available, waiting again...");
   }
 
-  parameter_event_sub = parameter_client->on_parameter_event(
+  auto param_event_callback =
     [this](const rcl_interfaces::msg::ParameterEvent::SharedPtr event) -> void
     {
-      if (event->node != this->get_fully_qualified_name()) {
-        return;
-      }
+      for (const auto & changed_parameter : event->changed_parameters) {
+        if (changed_parameter.name == "motors.profile_acceleration") {
+          motors_.profile_acceleration =
+            rclcpp::Parameter::from_parameter_msg(changed_parameter).as_double();
 
-      for (const auto & changed_param : event->changed_parameters) {
-        if (changed_param.name == "motors.profile_acceleration") {
-          const auto param = rclcpp::Parameter::from_parameter_msg(changed_param);
-          const double physical_value = param.as_double();
-
-          if (motors_.profile_acceleration_constant == 0.0f) {
-            RCLCPP_WARN(
-              this->get_logger(),
-              "motors.profile_acceleration_constant is zero, cannot convert profile acceleration.");
-            return;
-          }
-
-          motors_.profile_acceleration = static_cast<float>(
-            physical_value / static_cast<double>(motors_.profile_acceleration_constant));
+          motors_.profile_acceleration =
+            motors_.profile_acceleration / motors_.profile_acceleration_constant;
 
           RCLCPP_INFO(
             this->get_logger(),
-            "Changed motors.profile_acceleration: %.3f rev/min2",
-            physical_value);
-          return;
+            "changed motors.profile_acceleration : %f rev/min2",
+            motors_.profile_acceleration);
         }
       }
-    });
+    };
 
-  parameter_monitor_initialized = true;
+  parameter_event_sub_ = priv_parameters_client_->on_parameter_event(param_event_callback);
 }
 
 void TurtleBot3::cmd_vel_callback()

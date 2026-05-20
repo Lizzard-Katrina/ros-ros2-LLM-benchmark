@@ -14,15 +14,15 @@ import json
 import errno
 import rclpy
 from rclpy.node import Node
-from rclpy.executors import ExternalShutdownException
 import socket
+import std_srvs.srv
 import struct
 import sys
 import threading
 import time
 import traceback
 try:
-    import xmlrpcclient  # python 2 compatibility
+    import xmlrpclib as xmlrpcclient  # python 2 compatibility
 except ImportError:
     import xmlrpc.client as xmlrpcclient
 
@@ -41,7 +41,7 @@ from fkie_mas_pylib.websocket import ws_port, ws_port_from
 try:  # to avoid the problems with autodoc on ros.org/wiki site
     # , SyncMasterInfo, SyncTopicInfo
     from fkie_mas_msgs.msg import LinkState, LinkStatesStamped, MasterState, ROSMaster
-    from fkie_mas_msgs.srv import DiscoverMasters, DiscoverMastersResponse
+    from fkie_mas_msgs.srv import DiscoverMasters
 except:
     pass
 
@@ -177,14 +177,16 @@ class DiscoveredMaster(object):
                 # set the state to 'online'
                 self.online = True
                 if self.callback_master_state is not None:
-                    self.callback_master_state(MasterState(MasterState.STATE_CHANGED,
-                                                           ROSMaster(str(self.mastername),
-                                                                     self.masteruri,
-                                                                     rclpy.time.Time(seconds=int(self.timestamp), nanoseconds=int((self.timestamp - int(self.timestamp)) * 1000000000)),
-                                                                     rclpy.time.Time(seconds=int(self.timestamp_local), nanoseconds=int((self.timestamp_local - int(self.timestamp_local)) * 1000000000)),
-                                                                     self.online,
-                                                                     self.discoverername,
-                                                                     self.monitoruri)))
+                    msg = MasterState()
+                    msg.state = MasterState.STATE_CHANGED
+                    msg.master.name = str(self.mastername)
+                    msg.master.uri = self.masteruri
+                    msg.master.timestamp = float(self.timestamp)
+                    msg.master.timestamp_local = float(self.timestamp_local)
+                    msg.master.online = self.online
+                    msg.master.discoverer_name = self.discoverername
+                    msg.master.monitoruri = self.monitoruri
+                    self.callback_master_state(msg)
                     result = True
         if rate >= DiscoveredMaster.MIN_HZ_FOR_QUALITY:
             # reset the list, if the heartbeat is changed
@@ -248,14 +250,16 @@ class DiscoveredMaster(object):
             self.online = False
             if self.callback_master_state is not None:
                 Log.info('Set host to offline: %s' % self.mastername)
-                self.callback_master_state(MasterState(MasterState.STATE_CHANGED,
-                                                       ROSMaster(str(self.mastername),
-                                                                 self.masteruri,
-                                                                 rclpy.time.Time(seconds=int(self.timestamp), nanoseconds=int((self.timestamp - int(self.timestamp)) * 1000000000)),
-                                                                 rclpy.time.Time(seconds=int(self.timestamp_local), nanoseconds=int((self.timestamp_local - int(self.timestamp_local)) * 1000000000)),
-                                                                 False,
-                                                                 self.discoverername,
-                                                                 self.monitoruri)))
+                msg = MasterState()
+                msg.state = MasterState.STATE_CHANGED
+                msg.master.name = str(self.mastername)
+                msg.master.uri = self.masteruri
+                msg.master.timestamp = float(self.timestamp)
+                msg.master.timestamp_local = float(self.timestamp_local)
+                msg.master.online = False
+                msg.master.discoverer_name = self.discoverername
+                msg.master.monitoruri = self.monitoruri
+                self.callback_master_state(msg)
 
     def get_quality(self, interval=5, offline_after=1.4):
         '''
@@ -331,7 +335,7 @@ class DiscoveredMaster(object):
         '''
         if self.monitoruri is not None and not self._on_finish:
             timetosleep = 5.
-            if not rclpy.ok() and self.mastername is None:
+            if rclpy.ok() and self.mastername is None:
                 try:
                     Log.debug(
                         "Get additional connection info from %s" % self.monitoruri)
@@ -383,14 +387,16 @@ class DiscoveredMaster(object):
                             if self.callback_master_state is not None:
                                 Log.info(
                                     "Added master with ROS_MASTER_URI=%s" % (self.masteruri))
-                                self.callback_master_state(MasterState(MasterState.STATE_NEW,
-                                                                       ROSMaster(str(self.mastername),
-                                                                                 self.masteruri,
-                                                                                 rclpy.time.Time(seconds=int(self.timestamp), nanoseconds=int((self.timestamp - int(self.timestamp)) * 1000000000)),
-                                                                                 rclpy.time.Time(seconds=int(self.timestamp), nanoseconds=int((self.timestamp - int(self.timestamp)) * 1000000000)),
-                                                                                 self.online,
-                                                                                 self.discoverername,
-                                                                                 self.monitoruri)))
+                                msg_state = MasterState()
+                                msg_state.state = MasterState.STATE_NEW
+                                msg_state.master.name = str(self.mastername)
+                                msg_state.master.uri = self.masteruri
+                                msg_state.master.timestamp = float(self.timestamp)
+                                msg_state.master.timestamp_local = float(self.timestamp)
+                                msg_state.master.online = self.online
+                                msg_state.master.discoverer_name = self.discoverername
+                                msg_state.master.monitoruri = self.monitoruri
+                                self.callback_master_state(msg_state)
                                 timetosleep = 0
                             else:
                                 msg = "callback is None, should not happen...remove master %s" % self.monitoruri
@@ -406,7 +412,7 @@ class DiscoveredMaster(object):
                     self.__start_get_info_timer(timetosleep)
 
 
-class Discoverer(object):
+class Discoverer(Node):
     '''
     The class to publish the current state of the ROS master.
 
@@ -522,7 +528,7 @@ class Discoverer(object):
 
         :type monitor_port:  int
         '''
-#    threading.Thread.__init__(self)
+        super().__init__('master_discovery')
         self.do_finish = False
         self._services_initialized = False
         self.__lock = threading.RLock()
@@ -534,11 +540,8 @@ class Discoverer(object):
         self._json_reported_masters = set()
         self._last_datetime = time.time()
 
-        self.node = Node('discoverer')
-        self.linkstats_pub = self.node.create_publisher(
-            LinkStatesStamped, 'linkstats', 1)
-        self.changes_pub = self.node.create_publisher(
-            MasterState, 'changes', 10)
+        self.pubstats = self.create_publisher(LinkStatesStamped, '~/linkstats', 1)
+        self.pubchanges = self.create_publisher(MasterState, '~/changes', 10)
 
         # for cases with more then one master_discovery on the same host and
         # heartbeat rate is less then 0.1. In this case we have to send a multicast
@@ -580,10 +583,14 @@ class Discoverer(object):
             Log.info(
                 "Approx. mininum avg. network load: %.2f bytes/s" % netload)
         self.current_check_hz = self.ROSMASTER_HZ
+        # test the reachability of the ROS master
+        local_addr = get_local_address()
+        if (local_addr in ['localhost', '127.0.0.1']):
+            Log.warn(
+                "'%s' is not reachable for other systems. Change the ROS_MASTER_URI!" % local_addr)
         self.mcast_port = mcast_port
         self.mcast_group = mcast_group
         self._ts_received_mcast_request = 0
-        # initialize the ROS publishers
         # create a thread to monitor the ROS master state
         mgroup = DiscoverSocket.normalize_mgroup(mcast_group)
         is_ip6 = self._is_ipv6_group(mgroup)
@@ -604,7 +611,7 @@ class Discoverer(object):
             self._current_change_notification_count = self.CHANGE_NOTIFICATION_COUNT
         self._timer_heartbeat = threading.Timer(1.0, self.send_heartbeat)
         # set the callback to finish all running threads
-        self.node.on_shutdown(self.on_shutdown)
+        rclpy.get_default_context().on_shutdown(self.on_shutdown)
         self._recv_tread = threading.Thread(target=self._recv_loop_from_queue)
 
     def start(self):
@@ -612,7 +619,6 @@ class Discoverer(object):
         self._timer_ros_changes.start()
         self._timer_stats.start()
         self._timer_heartbeat.start()
-        rclpy.spin(self.node)
 
     def _is_ipv6_group(self, addr):
         try:
@@ -648,20 +654,22 @@ class Discoverer(object):
         except:
             pass
 
-    def on_shutdown(self):
+    def on_shutdown(self, *arg):
         with self.__lock:
             # tell other loops to finish
             self.do_finish = True
             for (_, master) in self.masters.items():
                 if master.mastername is not None:
-                    self.publish_masterstate(MasterState(MasterState.STATE_REMOVED,
-                                                         ROSMaster(str(master.mastername),
-                                                                   master.masteruri,
-                                                                   rclpy.time.Time(seconds=int(master.timestamp), nanoseconds=int((master.timestamp - int(master.timestamp)) * 1000000000)),
-                                                                   rclpy.time.Time(seconds=int(master.timestamp_local), nanoseconds=int((master.timestamp_local - int(master.timestamp_local)) * 1000000000)),
-                                                                   master.online,
-                                                                   master.discoverername,
-                                                                   master.monitoruri)))
+                    msg = MasterState()
+                    msg.state = MasterState.STATE_REMOVED
+                    msg.master.name = str(master.mastername)
+                    msg.master.uri = master.masteruri
+                    msg.master.timestamp = float(master.timestamp)
+                    msg.master.timestamp_local = float(master.timestamp_local)
+                    msg.master.online = master.online
+                    msg.master.discoverer_name = master.discoverername
+                    msg.master.monitoruri = master.monitoruri
+                    self.publish_masterstate(msg)
                 master.finish()
             # send notification that the master is going off
             msg = struct.pack(Discoverer.HEARTBEAT_FMT, b'R', Discoverer.VERSION,
@@ -703,7 +711,7 @@ class Discoverer(object):
             # publish the current state
             invalid_uri = (self.master_monitor.getMasteruri() is None)
             invalid_state = (self.master_monitor.getCurrentState() is None)
-            if not (invalid_uri or invalid_state or rclpy.ok() == False or self.do_finish):
+            if not (invalid_uri or invalid_state or not rclpy.ok() or self.do_finish):
                 self._publish_current_state()
                 # send update requests to group
                 if timer and self._listen_mcast and self._init_notifications < self.INIT_NOTIFICATION_COUNT:
@@ -722,20 +730,12 @@ class Discoverer(object):
 
     def _publish_current_state(self, address=None, msg=None):
         if msg is None:
-            t = 0
-            local_t = 0
-            if not self.master_monitor.getCurrentState() is None:
-                t = self.master_monitor.getCurrentState().timestamp
-                local_t = self.master_monitor.getCurrentState().timestamp_local
-                msg = struct.pack(Discoverer.HEARTBEAT_FMT, b'R', Discoverer.VERSION,
-                                  int(self.HEARTBEAT_HZ * 10),
-                                  int(t), int((t - (int(t))) * 1000000000),
-                                  self.master_monitor.rpc_port,
-                                  int(local_t), int((local_t - (int(local_t))) * 1000000000))
-        if address is not None:
-            self.socket.send_queued(msg, address)
-        elif self._send_mcast:
-            self.socket.send_queued(msg)
+            msg = self._create_current_state_msg()
+        if msg is not None:
+            if address is not None:
+                self.socket.send_queued(msg, address)
+            elif self._send_mcast:
+                self.socket.send_queued(msg)
 
     def _request_state(self, addresses=None, masters=[]):
         try:
@@ -793,7 +793,7 @@ class Discoverer(object):
         '''
         import os
         try_count = 0
-        if (not rclpy.ok() == False) and not self.do_finish:
+        if rclpy.ok() and not self.do_finish:
             try:
                 cputimes = os.times()
                 cputime_init = cputimes[0] + cputimes[1]
@@ -825,7 +825,7 @@ class Discoverer(object):
             # remove offline hosts or request updates
             self._remove_offline_hosts()
             # setup timer for next ROS master state check
-            if not rclpy.ok() == False:
+            if rclpy.ok():
                 self._timer_ros_changes = threading.Timer(
                     1.0 / self.current_check_hz, self.checkROSMaster_loop)
                 self._timer_ros_changes.start()
@@ -842,14 +842,16 @@ class Discoverer(object):
                 if self.REMOVE_AFTER > 0 and ts_since_last_hb > self.REMOVE_AFTER:
                     to_remove.append(k)
                     if v.mastername is not None:
-                        self.publish_masterstate(MasterState(MasterState.STATE_REMOVED,
-                                                             ROSMaster(str(v.mastername),
-                                                                       v.masteruri,
-                                                                       rclpy.time.Time(seconds=int(v.timestamp), nanoseconds=int((v.timestamp - int(v.timestamp)) * 1000000000)),
-                                                                       rclpy.time.Time(seconds=int(v.timestamp_local), nanoseconds=int((v.timestamp_local - int(v.timestamp_local)) * 1000000000)),
-                                                                       v.online,
-                                                                       v.discoverername,
-                                                                       v.monitoruri)))
+                        msg = MasterState()
+                        msg.state = MasterState.STATE_REMOVED
+                        msg.master.name = str(v.mastername)
+                        msg.master.uri = v.masteruri
+                        msg.master.timestamp = float(v.timestamp)
+                        msg.master.timestamp_local = float(v.timestamp_local)
+                        msg.master.online = v.online
+                        msg.master.discoverer_name = v.discoverername
+                        msg.master.monitoruri = v.monitoruri
+                        self.publish_masterstate(msg)
                         v.finish()
                 # request updates
                 elif ts_since_last_request > self.ACTIVE_REQUEST_AFTER or (v.requests_count() > 0 and v.online):
@@ -885,7 +887,7 @@ class Discoverer(object):
         '''
         This method handles the received udp messages.
         '''
-        if not rclpy.ok() == False and not self.do_finish:
+        if rclpy.ok() and not self.do_finish:
             with self.__lock:
                 self._check_timejump()
                 try:
@@ -925,14 +927,15 @@ class Discoverer(object):
                                 master = self.masters[master_key]
                                 if master.mastername is not None:
                                     # the contact info of the master is valied, publish the change
-                                    state_remove = MasterState(MasterState.STATE_REMOVED,
-                                                               ROSMaster(str(master.mastername),
-                                                                         master.masteruri,
-                                                                         rclpy.time.Time(seconds=int(master.timestamp), nanoseconds=int((master.timestamp - int(master.timestamp)) * 1000000000)),
-                                                                         rclpy.time.Time(seconds=int(master.timestamp_local), nanoseconds=int((master.timestamp_local - int(master.timestamp_local)) * 1000000000)),
-                                                                         False,
-                                                                         master.discoverername,
-                                                                         master.monitoruri))
+                                    state_remove = MasterState()
+                                    state_remove.state = MasterState.STATE_REMOVED
+                                    state_remove.master.name = str(master.mastername)
+                                    state_remove.master.uri = master.masteruri
+                                    state_remove.master.timestamp = float(master.timestamp)
+                                    state_remove.master.timestamp_local = float(master.timestamp_local)
+                                    state_remove.master.online = False
+                                    state_remove.master.discoverer_name = master.discoverername
+                                    state_remove.master.monitoruri = master.monitoruri
                                     master.finish()
                                     self.publish_masterstate(state_remove)
                                 Log.info("Remove master discovery: http://%s:%s, with ROS_MASTER_URI=%s" % (
@@ -1062,20 +1065,23 @@ class Discoverer(object):
          2. calculate the quality of known links
         '''
         result = LinkStatesStamped()
-        result.header.stamp = rclpy.time.Time.from_seconds(time.time())
+        result.header.stamp = self.get_clock().now().to_msg()
         with self.__lock:
             for (_, v) in self.masters.items():
                 quality = v.get_quality(
                     self.MEASUREMENT_INTERVALS, self.TIMEOUT_FACTOR)
                 if not (v.mastername is None) and v.online:
-                    result.links.append(
-                        LinkState(v.mastername, quality, rclpy.time.Time.from_seconds(v.last_heartbeat_ts)))
+                    ls = LinkState()
+                    ls.destination = v.mastername
+                    ls.quality = quality
+                    ls.timestamp = float(v.last_heartbeat_ts)
+                    result.links.append(ls)
                 if v.is_local:
                     result.header.frame_id = v.mastername
         # publish the results
         self.publish_stats(result)
         try:
-            if not rclpy.ok() == False:
+            if rclpy.ok():
                 self._timer_stats = threading.Timer(
                     1, self.timed_stats_calculation)
                 self._timer_stats.start()
@@ -1092,14 +1098,14 @@ class Discoverer(object):
         '''
         with self.__lock:
             try:
-                self.changes_pub.publish(master_state)
+                self.pubchanges.publish(master_state)
                 if not self._services_initialized:
                     # initialize the ROS services
                     self._services_initialized = True
-                    self.node.create_service(
-                        DiscoverMasters, 'list_masters', self.rosservice_list_masters)
-                    self.node.create_service(
-                        std_srvs.srv.Empty, 'refresh', self.rosservice_refresh)
+                    self.create_service(DiscoverMasters, '~/list_masters',
+                                  self.rosservice_list_masters)
+                    self.create_service(std_srvs.srv.Empty, '~/refresh',
+                                  self.rosservice_refresh)
                 if master_state.state in [MasterState.STATE_NEW, MasterState.STATE_CHANGED]:
                     self._json_publish_masters()
             except:
@@ -1113,10 +1119,10 @@ class Discoverer(object):
 
         :type stats:  `fkie_mas_discovery.msg.LinkStatesStamped <http://www.ros.org/doc/api/fkie_mas_discovery/html/msg/LinkStatesStamped.html>`_
         '''
-        if not rclpy.ok() == False:
+        if rclpy.ok():
             with self.__lock:
                 try:
-                    self.linkstats_pub.publish(stats)
+                    self.pubstats.publish(stats)
                 except:
                     traceback.print_exc()
 
@@ -1176,7 +1182,7 @@ class Discoverer(object):
         self.master_monitor.update_master_errors(result)
         self.master_monitor.update_errors_json(json_warnings)
 
-    def rosservice_list_masters(self, req):
+    def rosservice_list_masters(self, req, res):
         '''
         Callback for the ROS service to get the current list of the known ROS masters.
         '''
@@ -1185,18 +1191,21 @@ class Discoverer(object):
             try:
                 for (_, v) in self.masters.items():
                     if v.mastername is not None:
-                        masters.append(ROSMaster(str(v.mastername),
-                                                 v.masteruri,
-                                                 rclpy.time.Time(seconds=int(v.timestamp), nanoseconds=int((v.timestamp - int(v.timestamp)) * 1000000000)),
-                                                 rclpy.time.Time(seconds=int(v.timestamp_local), nanoseconds=int((v.timestamp_local - int(v.timestamp_local)) * 1000000000)),
-                                                 v.online,
-                                                 v.discoverername,
-                                                 v.monitoruri))
+                        m = ROSMaster()
+                        m.name = str(v.mastername)
+                        m.uri = v.masteruri
+                        m.timestamp = float(v.timestamp)
+                        m.timestamp_local = float(v.timestamp_local)
+                        m.online = v.online
+                        m.discoverer_name = v.discoverername
+                        m.monitoruri = v.monitoruri
+                        masters.append(m)
             except:
                 traceback.print_exc()
-        return DiscoverMastersResponse(masters)
+        res.masters = masters
+        return res
 
-    def rosservice_refresh(self, req):
+    def rosservice_refresh(self, req, res):
         '''
         Callback for the ROS service to send an active unicast and multicast request
         to each known master discovery.
@@ -1212,4 +1221,4 @@ class Discoverer(object):
 #        self._send_current_state()
             except:
                 traceback.print_exc()
-        return []
+        return res

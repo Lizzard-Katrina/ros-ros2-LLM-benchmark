@@ -1,0 +1,314 @@
+[
+    {
+        "task_id": "action_server/task_001_base_case",
+        "status": "FAILED",
+        "score": "6/9",
+        "pass_rate": "66.67%",
+        "tokens": 968,
+        "failed_cases": [
+            {
+                "test_function": "test_node_creation",
+                "error_message": "AssertionError: ROS2 Node creation not detected\nassert None\n +  where None = <function search at 0x7fed3ac55f30>('(create_node|Node\\\\s*\\\\()', '#!/usr/bin/env python3\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.action import ActionServer\\nfrom rclpy....    # END OF TODO\\n\\nif __name__ == \"__main__\":\\n    rclpy.init()\\n    CalibrationActionServer()\\n    rclpy.spin(None)')\n +    where <function search at 0x7fed3ac55f30> = re.search"
+            },
+            {
+                "test_function": "test_execute_callback_exists",
+                "error_message": "AssertionError: Execute callback function not defined\nassert None\n +  where None = <function search at 0x7fed3ac55f30>('(execute|handle_accepted)\\\\s*\\\\(.*\\\\)', '#!/usr/bin/env python3\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.action import ActionServer\\nfrom rclpy....    # END OF TODO\\n\\nif __name__ == \"__main__\":\\n    rclpy.init()\\n    CalibrationActionServer()\\n    rclpy.spin(None)')\n +    where <function search at 0x7fed3ac55f30> = re.search"
+            },
+            {
+                "test_function": "test_progress_loop_present",
+                "error_message": "AssertionError: Progress loop not found\nassert None\n +  where None = <function search at 0x7fed3ac55f30>('for\\\\s*\\\\(|while\\\\s*\\\\(', '#!/usr/bin/env python3\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.action import ActionServer\\nfrom rclpy....    # END OF TODO\\n\\nif __name__ == \"__main__\":\\n    rclpy.init()\\n    CalibrationActionServer()\\n    rclpy.spin(None)')\n +    where <function search at 0x7fed3ac55f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "action_server/task_002_turtlebot3_patrol_action",
+        "status": "FAILED",
+        "score": "4/7",
+        "pass_rate": "57.14%",
+        "tokens": 2762,
+        "failed_cases": [
+            {
+                "test_function": "test_node_creation",
+                "error_message": "AssertionError: ROS2 Node creation not detected\nassert None\n +  where None = <function search at 0x7f0faee61f30>('(Node\\\\s*\\\\(|create_node)', '#!/usr/bin/env python3\\n#\\n# Copyright 2018 ROBOTIS CO., LTD.\\n#\\n# Licensed under the Apache License, Version 2.0 (t...r = Turtlebot3PatrolServer()\\n\\n    rclpy.spin(turtlebot3_patrol_server)\\n\\n\\nif __name__ == \\'__main__\\':\\n    main()')\n +    where <function search at 0x7f0faee61f30> = re.search"
+            },
+            {
+                "test_function": "test_action_server_creation",
+                "error_message": "AssertionError: Action server instantiation not detected: create_server\nassert None\n +  where None = <function search at 0x7f0faee61f30>('create_server', '#!/usr/bin/env python3\\n#\\n# Copyright 2018 ROBOTIS CO., LTD.\\n#\\n# Licensed under the Apache License, Version 2.0 (t...r = Turtlebot3PatrolServer()\\n\\n    rclpy.spin(turtlebot3_patrol_server)\\n\\n\\nif __name__ == \\'__main__\\':\\n    main()')\n +    where <function search at 0x7f0faee61f30> = re.search"
+            },
+            {
+                "test_function": "test_execute_callback_contains_patrol_logic",
+                "error_message": "AssertionError: Patrol goal type not referenced in execute_callback\nassert None\n +  where None = <function search at 0x7f0faee61f30>('goal_msg\\\\.goal\\\\.x', '#!/usr/bin/env python3\\n#\\n# Copyright 2018 ROBOTIS CO., LTD.\\n#\\n# Licensed under the Apache License, Version 2.0 (t...r = Turtlebot3PatrolServer()\\n\\n    rclpy.spin(turtlebot3_patrol_server)\\n\\n\\nif __name__ == \\'__main__\\':\\n    main()')\n +    where <function search at 0x7f0faee61f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "action_server/task_003_pr2_gripper_action_server",
+        "status": "FAILED",
+        "score": "7/9",
+        "pass_rate": "77.78%",
+        "tokens": 5220,
+        "failed_cases": [
+            {
+                "test_function": "test_action_type_present",
+                "error_message": "AssertionError: JointTrajectoryAction type missing\nassert 'JointTrajectoryAction' in '/*\\n * Copyright (c) 2009, Willow Garage, Inc.\\n * All rights reserved.\\n *\\n * Redistribution and use in source and ... std::make_shared<JointTrajectoryExecuter>(node_options);\\n  rclcpp::spin(jte);\\n  rclcpp::shutdown();\\n  return 0;\\n}'"
+            },
+            {
+                "test_function": "test_goalCB_exists",
+                "error_message": "AssertionError: goalCB function not found\nassert None\n +  where None = <function search at 0x7fcbbd20df30>('goalCB\\\\s*\\\\(', '/*\\n * Copyright (c) 2009, Willow Garage, Inc.\\n * All rights reserved.\\n *\\n * Redistribution and use in source and ... std::make_shared<JointTrajectoryExecuter>(node_options);\\n  rclcpp::spin(jte);\\n  rclcpp::shutdown();\\n  return 0;\\n}')\n +    where <function search at 0x7fcbbd20df30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "action_server/task_004_turtle_bot_3",
+        "status": "FAILED",
+        "score": "9/12",
+        "pass_rate": "75.00%",
+        "tokens": 989,
+        "failed_cases": [
+            {
+                "test_function": "test_execute_callback_signature",
+                "error_message": "AssertionError: execute_callback must accept goal_handle\nassert None\n +  where None = <function search at 0x7ff7d4a35f30>('def\\\\s+execute_callback\\\\s*\\\\(\\\\s*self\\\\s*,\\\\s*goal_handle\\\\s*\\\\)', \"\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.action import ActionServer, GoalResponse, CancelResponse\\nfro...name__ == '__main__':\\n    rclpy.init()\\n    server = HeadActionServer()\\n    rclpy.spin(server)\\n    rclpy.shutdown()\")\n +    where <function search at 0x7ff7d4a35f30> = re.search"
+            },
+            {
+                "test_function": "test_execute_callback_no_return",
+                "error_message": "AssertionError: Service-style return detected in action server: return\\s+result\nassert not <re.Match object; span=(1355, 1368), match='return result'>\n +  where <re.Match object; span=(1355, 1368), match='return result'> = <function search at 0x7ff7d4a35f30>('return\\\\s+result', \"\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.action import ActionServer, GoalResponse, CancelResponse\\nfro...name__ == '__main__':\\n    rclpy.init()\\n    server = HeadActionServer()\\n    rclpy.spin(server)\\n    rclpy.shutdown()\")\n +    where <function search at 0x7ff7d4a35f30> = re.search"
+            },
+            {
+                "test_function": "test_feedback_published_iteratively",
+                "error_message": "AssertionError: Feedback not published iteratively\nassert 1 >= 2\n +  where 1 = len(['goal_handle.publish_feedback'])\n +    where ['goal_handle.publish_feedback'] = <function findall at 0x7ff7d4a36170>('goal_handle\\\\.publish_feedback', \"\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.action import ActionServer, GoalResponse, CancelResponse\\nfro...name__ == '__main__':\\n    rclpy.init()\\n    server = HeadActionServer()\\n    rclpy.spin(server)\\n    rclpy.shutdown()\")\n +      where <function findall at 0x7ff7d4a36170> = re.findall"
+            }
+        ]
+    },
+    {
+        "task_id": "action_server/task_005_robot_voice_action",
+        "status": "FAILED",
+        "score": "4/7",
+        "pass_rate": "57.14%",
+        "tokens": 3021,
+        "failed_cases": [
+            {
+                "test_function": "test_control_logic_inside_timer_callback",
+                "error_message": "AssertionError: Timer callback not found\nassert None"
+            },
+            {
+                "test_function": "test_ros_time_semantics_preserved",
+                "error_message": "AssertionError: Wall-clock time 'std::chrono' breaks ROS time semantics\nassert 'std::chrono' not in '/**********...return 0;\\n}'\n  'std::chrono' is contained here:\n    namespace std::chrono;\n    using namespace std::chrono_literals;\n    using namespace px4_msgs::msg;\n    \n    class OffboardControl : public rclcpp::Node\n    {...\n  \n  ...Full output truncated (130 lines hidden), use '-vv' to show"
+            },
+            {
+                "test_function": "test_px4_qos_semantics_explicit",
+                "error_message": "AssertionError: QoS not explicitly configured\nassert 'QoS' in '/****************************************************************************\\n *\\n * Copyright 2020 PX4 Development ...lcpp::init(argc, argv);\\n\\trclcpp::spin(std::make_shared<OffboardControl>());\\n\\n\\trclcpp::shutdown();\\n\\treturn 0;\\n}'"
+            }
+        ]
+    },
+    {
+        "task_id": "action_server/task_006_amcl_navigation",
+        "status": "FAILED",
+        "score": "3/10",
+        "pass_rate": "30.00%",
+        "tokens": 29471,
+        "failed_cases": [
+            {
+                "test_function": "test_action_server_creation",
+                "error_message": "AssertionError: Missing ROS2 Action Server creation for UpdatePose action.\nassert None\n +  where None = <function search at 0x7fa0ce1a1f30>('rclcpp_action::create_server<\\\\s*UpdatePose\\\\s*>', '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...o large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, \"OK\");\\n  }\\n}')\n +    where <function search at 0x7fa0ce1a1f30> = re.search"
+            },
+            {
+                "test_function": "test_handle_goal_defined",
+                "error_message": "AssertionError: handle_goal callback function is not implemented.\nassert None\n +  where None = <function search at 0x7fa0ce1a1f30>('handle_goal\\\\s*\\\\(', '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...o large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, \"OK\");\\n  }\\n}')\n +    where <function search at 0x7fa0ce1a1f30> = re.search"
+            },
+            {
+                "test_function": "test_handle_cancel_defined",
+                "error_message": "AssertionError: handle_cancel callback function is not implemented.\nassert None\n +  where None = <function search at 0x7fa0ce1a1f30>('handle_cancel\\\\s*\\\\(', '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...o large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, \"OK\");\\n  }\\n}')\n +    where <function search at 0x7fa0ce1a1f30> = re.search"
+            },
+            {
+                "test_function": "test_handle_accepted_defined",
+                "error_message": "AssertionError: handle_accepted callback function is not implemented.\nassert None\n +  where None = <function search at 0x7fa0ce1a1f30>('handle_accepted\\\\s*\\\\(', '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...o large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, \"OK\");\\n  }\\n}')\n +    where <function search at 0x7fa0ce1a1f30> = re.search"
+            },
+            {
+                "test_function": "test_todo_comment_present",
+                "error_message": "AssertionError: Missing TODO comment for particle filter update.\nassert None\n +  where None = <function search at 0x7fa0ce1a1f30>('//\\\\s*TODO: Implement particle filter update', '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...o large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, \"OK\");\\n  }\\n}')\n +    where <function search at 0x7fa0ce1a1f30> = re.search"
+            },
+            {
+                "test_function": "test_thread_usage_for_async",
+                "error_message": "AssertionError: Async thread handling for action execution missing.\nassert None\n +  where None = <function search at 0x7fa0ce1a1f30>('std::thread\\\\s*\\\\(', '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...o large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, \"OK\");\\n  }\\n}')\n +    where <function search at 0x7fa0ce1a1f30> = re.search"
+            },
+            {
+                "test_function": "test_feedback_or_result_mentioned",
+                "error_message": "AssertionError: Action feedback/result handling missing in handle_accepted.\nassert None\n +  where None = <function search at 0x7fa0ce1a1f30>('(Feedback|Result|goal_handle->succeed)', '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...o large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, \"OK\");\\n  }\\n}')\n +    where <function search at 0x7fa0ce1a1f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "action_server/task_007_move_base_navigation_action",
+        "status": "FAILED",
+        "score": "5/9",
+        "pass_rate": "55.56%",
+        "tokens": 20314,
+        "failed_cases": [
+            {
+                "test_function": "test_feedback_publishing_exists",
+                "error_message": "AssertionError: ROS2 code must still publish feedback via action server.\nassert None\n +  where None = <function search at 0x7f0116c99f30>('as_->publishFeedback', '/*********************************************************************\\n*\\n* Software License Agreement (BSD License)...e.header.stamp).seconds(), costmap->getTransformTolerance());\\n      return false;\\n    }\\n\\n    return true;\\n  }\\n};')\n +    where <function search at 0x7f0116c99f30> = re.search"
+            },
+            {
+                "test_function": "test_plan_swap_under_lock",
+                "error_message": "AssertionError: Plan swap under mutex missing: controller_plan_ = latest_plan_\nassert None\n +  where None = <function search at 0x7f0116c99f30>('controller_plan_ = latest_plan_', '/*********************************************************************\\n*\\n* Software License Agreement (BSD License)...e.header.stamp).seconds(), costmap->getTransformTolerance());\\n      return false;\\n    }\\n\\n    return true;\\n  }\\n};')\n +    where <function search at 0x7f0116c99f30> = re.search"
+            },
+            {
+                "test_function": "test_recovery_behavior_loop",
+                "error_message": "AssertionError: ROS2 code must still iterate over recovery behaviors and call runBehavior().\nassert None\n +  where None = <function search at 0x7f0116c99f30>('recovery_behaviors_\\\\[recovery_index_\\\\]->runBehavior', '/*********************************************************************\\n*\\n* Software License Agreement (BSD License)...e.header.stamp).seconds(), costmap->getTransformTolerance());\\n      return false;\\n    }\\n\\n    return true;\\n  }\\n};')\n +    where <function search at 0x7f0116c99f30> = re.search"
+            },
+            {
+                "test_function": "test_action_server_success_abort_calls",
+                "error_message": "AssertionError: Action server success/abort call missing: as_->setSucceeded\nassert None\n +  where None = <function search at 0x7f0116c99f30>('as_->setSucceeded', '/*********************************************************************\\n*\\n* Software License Agreement (BSD License)...e.header.stamp).seconds(), costmap->getTransformTolerance());\\n      return false;\\n    }\\n\\n    return true;\\n  }\\n};')\n +    where <function search at 0x7f0116c99f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "action_server/task_008_follow_joint_trajectory_action",
+        "status": "FAILED",
+        "score": "5/9",
+        "pass_rate": "55.56%",
+        "tokens": 13493,
+        "failed_cases": [
+            {
+                "test_function": "test_class_exists",
+                "error_message": "AssertionError: TrajectoryPlannerROS class not found\nassert None\n +  where None = <function search at 0x7fa914bf5f30>('class\\\\s+TrajectoryPlannerROS', '\\n\\n#include <base_local_planner/trajectory_planner_ros.h>\\n\\n#ifdef HAVE_SYS_TIME_H\\n#include <sys/time.h>\\n#endif\\n... call initialize() before using this planner\");\\n      return false;\\n    }\\n    \\n    return reached_goal_; \\n  }\\n};')\n +    where <function search at 0x7fa914bf5f30> = re.search"
+            },
+            {
+                "test_function": "test_odom_lock_usage",
+                "error_message": "AssertionError: odom_lock usage missing\nassert None\n +  where None = <function search at 0x7fa914bf5f30>('boost::recursive_mutex::scoped_lock', '\\n\\n#include <base_local_planner/trajectory_planner_ros.h>\\n\\n#ifdef HAVE_SYS_TIME_H\\n#include <sys/time.h>\\n#endif\\n... call initialize() before using this planner\");\\n      return false;\\n    }\\n    \\n    return reached_goal_; \\n  }\\n};')\n +    where <function search at 0x7fa914bf5f30> = re.search"
+            },
+            {
+                "test_function": "test_warns_on_pose_fail",
+                "error_message": "AssertionError: Missing ROS_WARN for failed getRobotPose\nassert None\n +  where None = <function search at 0x7fa914bf5f30>('ROS_WARN.*Failed to get the pose', '\\n\\n#include <base_local_planner/trajectory_planner_ros.h>\\n\\n#ifdef HAVE_SYS_TIME_H\\n#include <sys/time.h>\\n#endif\\n... call initialize() before using this planner\");\\n      return false;\\n    }\\n    \\n    return reached_goal_; \\n  }\\n};')\n +    where <function search at 0x7fa914bf5f30> = re.search"
+            },
+            {
+                "test_function": "test_no_ros1_api_leftovers",
+                "error_message": "AssertionError: ROS1 API leftover detected: ros::\nassert not <re.Match object; span=(1180, 1185), match='ros::'>\n +  where <re.Match object; span=(1180, 1185), match='ros::'> = <function search at 0x7fa914bf5f30>('ros::', '\\n\\n#include <base_local_planner/trajectory_planner_ros.h>\\n\\n#ifdef HAVE_SYS_TIME_H\\n#include <sys/time.h>\\n#endif\\n... call initialize() before using this planner\");\\n      return false;\\n    }\\n    \\n    return reached_goal_; \\n  }\\n};')\n +    where <function search at 0x7fa914bf5f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "action_server/task_009_moveit_motion_planning_action",
+        "status": "FAILED",
+        "score": "1/8",
+        "pass_rate": "12.50%",
+        "tokens": 4529,
+        "failed_cases": [
+            {
+                "test_function": "test_class_exists",
+                "error_message": "AssertionError: MoveGroupMoveAction class not defined.\nassert None\n +  where None = <function search at 0x7f528bf81f30>('class\\\\s+MoveGroupMoveAction', '/*********************************************************************\\n * Software License Agreement (BSD License)\\n...oader/class_loader.hpp>\\nCLASS_LOADER_REGISTER_CLASS(move_group::MoveGroupMoveAction, move_group::MoveGroupCapability)')\n +    where <function search at 0x7f528bf81f30> = re.search"
+            },
+            {
+                "test_function": "test_action_server_usage",
+                "error_message": "AssertionError: ROS2 action server not instantiated with MoveGroup action.\nassert False\n +  where False = any(<generator object test_action_server_usage.<locals>.<genexpr> at 0x7f528aa443c0>)"
+            },
+            {
+                "test_function": "test_rclcpp_node_exists",
+                "error_message": "AssertionError: ROS2 node not created.\nassert False\n +  where False = any(<generator object test_rclcpp_node_exists.<locals>.<genexpr> at 0x7f528aa44820>)"
+            },
+            {
+                "test_function": "test_initialize_creates_server_with_callback",
+                "error_message": "AssertionError: initialize() does not create ROS2 action server.\nassert False\n +  where False = any(<generator object test_initialize_creates_server_with_callback.<locals>.<genexpr> at 0x7f528aa44c80>)"
+            },
+            {
+                "test_function": "test_execute_callback_sets_result",
+                "error_message": "AssertionError: executeMoveCallback() does not set action result (succeed/abort/cancel).\nassert False\n +  where False = any(<generator object test_execute_callback_sets_result.<locals>.<genexpr> at 0x7f528aa450e0>)"
+            },
+            {
+                "test_function": "test_preempt_callback_handles_cancel_and_flag",
+                "error_message": "AssertionError: preemptMoveCallback() does not handle preemption/cancel properly.\nassert False\n +  where False = any(<generator object test_preempt_callback_handles_cancel_and_flag.<locals>.<genexpr> at 0x7f528aa45540>)"
+            },
+            {
+                "test_function": "test_setMoveState_publishes_feedback_with_state",
+                "error_message": "AssertionError: setMoveState() does not publish feedback or set state.\nassert False\n +  where False = any(<generator object test_setMoveState_publishes_feedback_with_state.<locals>.<genexpr> at 0x7f528ab4fa00>)"
+            }
+        ]
+    },
+    {
+        "task_id": "action_server/task_010_pick_place",
+        "status": "FAILED",
+        "score": "2/6",
+        "pass_rate": "33.33%",
+        "tokens": 6360,
+        "failed_cases": [
+            {
+                "test_function": "test_move_group_interface_created",
+                "error_message": "AssertionError: MoveGroupInterface instance missing\nassert None\n +  where None = <function search at 0x7fe86a8edf30>('moveit::planning_interface::MoveGroupInterface\\\\s+\\\\w+\\\\s*\\\\(\\\\s*\\\\\"panda_arm\\\\\"\\\\s*\\\\)', '/*********************************************************************\\n * Software License Agreement (BSD License)\\n...per\\n// CALL_SUB_TUTORIAL pick3\\n//\\n// Place Pipeline\\n// ^^^^^^^^^^^^^^\\n// CALL_SUB_TUTORIAL place\\n// END_TUTORIAL')\n +    where <function search at 0x7fe86a8edf30> = re.search"
+            },
+            {
+                "test_function": "test_ros2_node_and_spinner",
+                "error_message": "AssertionError: ROS2 node or async spinner missing\nassert None\n +  where None = <function search at 0x7fe86a8edf30>('rclcpp::init\\\\s*\\\\(.*\\\\).*?rclcpp::AsyncSpinner', '/*********************************************************************\\n * Software License Agreement (BSD License)\\n...per\\n// CALL_SUB_TUTORIAL pick3\\n//\\n// Place Pipeline\\n// ^^^^^^^^^^^^^^\\n// CALL_SUB_TUTORIAL place\\n// END_TUTORIAL', re.DOTALL)\n +    where <function search at 0x7fe86a8edf30> = re.search\n +    and   re.DOTALL = re.DOTALL"
+            },
+            {
+                "test_function": "test_gripper_operations",
+                "error_message": "AssertionError: openGripper for pre_grasp_posture missing\nassert None\n +  where None = <function search at 0x7fe86a8edf30>('openGripper\\\\s*\\\\(\\\\s*\\\\w+\\\\.pre_grasp_posture\\\\s*\\\\)', '/*********************************************************************\\n * Software License Agreement (BSD License)\\n...per\\n// CALL_SUB_TUTORIAL pick3\\n//\\n// Place Pipeline\\n// ^^^^^^^^^^^^^^\\n// CALL_SUB_TUTORIAL place\\n// END_TUTORIAL')\n +    where <function search at 0x7fe86a8edf30> = re.search"
+            },
+            {
+                "test_function": "test_post_place_open_gripper",
+                "error_message": "AssertionError: openGripper for post_place_posture missing\nassert None"
+            }
+        ]
+    },
+    {
+        "task_id": "action_server/task_011_pr2_door",
+        "status": "FAILED",
+        "score": "1/7",
+        "pass_rate": "14.29%",
+        "tokens": 2254,
+        "failed_cases": [
+            {
+                "test_function": "test_door_action_client_created",
+                "error_message": "AssertionError: Door ActionClient creation missing\nassert None\n +  where None = <function search at 0x7f2a027c1f30>('ActionClient\\\\s*\\\\(\\\\s*.*[\\'\\\\\"]move_through_door[\\'\\\\\"].*,\\\\s*Door\\\\s*\\\\)', \"#!/usr/bin/env python3\\n# Software License Agreement (BSD License)\\n#\\n# Copyright (c) 2008, Willow Garage, Inc.\\n# A... \\n\\n\\nif __name__ == '__main__':\\n    rostest.run(PKG, sys.argv[0], TestDoorNoExecutive, sys.argv) #, text_mode=True)\")\n +    where <function search at 0x7f2a027c1f30> = re.search"
+            },
+            {
+                "test_function": "test_move_base_action_client_created",
+                "error_message": "AssertionError: MoveBase ActionClient creation missing\nassert None\n +  where None = <function search at 0x7f2a027c1f30>('ActionClient\\\\s*\\\\(\\\\s*.*[\\'\\\\\"]move_base_local[\\'\\\\\"].*,\\\\s*MoveBase\\\\s*\\\\)', \"#!/usr/bin/env python3\\n# Software License Agreement (BSD License)\\n#\\n# Copyright (c) 2008, Willow Garage, Inc.\\n# A... \\n\\n\\nif __name__ == '__main__':\\n    rostest.run(PKG, sys.argv[0], TestDoorNoExecutive, sys.argv) #, text_mode=True)\")\n +    where <function search at 0x7f2a027c1f30> = re.search"
+            },
+            {
+                "test_function": "test_wait_for_server_called",
+                "error_message": "AssertionError: wait_for_server() not called for both action clients\nassert 1 >= 2\n +  where 1 = len(['.wait_for_server()'])"
+            },
+            {
+                "test_function": "test_send_goal_and_wait_called",
+                "error_message": "AssertionError: send_goal or wait not called for both action clients\nassert 1 >= 2\n +  where 1 = len(['.send_goal_async(goal)'])"
+            },
+            {
+                "test_function": "test_subscriber_exists",
+                "error_message": "AssertionError: Subscriber to /test_output missing\nassert None\n +  where None = <function search at 0x7f2a027c1f30>('Subscriber\\\\s*\\\\(\\\\s*[\\'\\\\\"]\\\\/test_output[\\'\\\\\"]', \"#!/usr/bin/env python3\\n# Software License Agreement (BSD License)\\n#\\n# Copyright (c) 2008, Willow Garage, Inc.\\n# A... \\n\\n\\nif __name__ == '__main__':\\n    rostest.run(PKG, sys.argv[0], TestDoorNoExecutive, sys.argv) #, text_mode=True)\")\n +    where <function search at 0x7f2a027c1f30> = re.search"
+            },
+            {
+                "test_function": "test_goal_initialization",
+                "error_message": "AssertionError: MoveBaseGoal not initialized\nassert None\n +  where None = <function search at 0x7f2a027c1f30>('MoveBaseGoal\\\\s*\\\\(\\\\s*\\\\)', \"#!/usr/bin/env python3\\n# Software License Agreement (BSD License)\\n#\\n# Copyright (c) 2008, Willow Garage, Inc.\\n# A... \\n\\n\\nif __name__ == '__main__':\\n    rostest.run(PKG, sys.argv[0], TestDoorNoExecutive, sys.argv) #, text_mode=True)\")\n +    where <function search at 0x7f2a027c1f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "action_server/task_012_move_arm_cartesian_action",
+        "status": "FAILED",
+        "score": "4/9",
+        "pass_rate": "44.44%",
+        "tokens": 10384,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_node_initialization",
+                "error_message": "AssertionError: ROS2 node or async spinner missing\nassert None\n +  where None = <function search at 0x7fcf4c655f30>('rclcpp::init\\\\s*\\\\(.*\\\\).*?rclcpp::AsyncSpinner', '/*********************************************************************\\n * Software License Agreement (BSD License)\\n...ce the collision object disappears\");\\n\\n  // END_TUTORIAL\\n\\n  rclcpp::shutdown();\\n  spinner.join();\\n  return 0;\\n}', re.DOTALL)\n +    where <function search at 0x7fcf4c655f30> = re.search\n +    and   re.DOTALL = re.DOTALL"
+            },
+            {
+                "test_function": "test_move_group_interface_exists",
+                "error_message": "AssertionError: MoveGroupInterface instance missing\nassert None\n +  where None = <function search at 0x7fcf4c655f30>('moveit::planning_interface::MoveGroupInterface\\\\s+\\\\w+\\\\s*\\\\(\\\\s*PLANNING_GROUP\\\\s*\\\\)', '/*********************************************************************\\n * Software License Agreement (BSD License)\\n...ce the collision object disappears\");\\n\\n  // END_TUTORIAL\\n\\n  rclcpp::shutdown();\\n  spinner.join();\\n  return 0;\\n}')\n +    where <function search at 0x7fcf4c655f30> = re.search"
+            },
+            {
+                "test_function": "test_path_constraints",
+                "error_message": "AssertionError: Path constraints object missing\nassert None\n +  where None = <function search at 0x7fcf4c655f30>('moveit_msgs::Constraints\\\\s+\\\\w+', '/*********************************************************************\\n * Software License Agreement (BSD License)\\n...ce the collision object disappears\");\\n\\n  // END_TUTORIAL\\n\\n  rclcpp::shutdown();\\n  spinner.join();\\n  return 0;\\n}')\n +    where <function search at 0x7fcf4c655f30> = re.search"
+            },
+            {
+                "test_function": "test_cartesian_path_computation",
+                "error_message": "AssertionError: Waypoints vector missing\nassert None\n +  where None = <function search at 0x7fcf4c655f30>('std::vector<geometry_msgs::Pose>\\\\s+\\\\w+', '/*********************************************************************\\n * Software License Agreement (BSD License)\\n...ce the collision object disappears\");\\n\\n  // END_TUTORIAL\\n\\n  rclcpp::shutdown();\\n  spinner.join();\\n  return 0;\\n}')\n +    where <function search at 0x7fcf4c655f30> = re.search"
+            },
+            {
+                "test_function": "test_collision_object_added",
+                "error_message": "AssertionError: Collision object not defined\nassert None\n +  where None = <function search at 0x7fcf4c655f30>('moveit_msgs::CollisionObject\\\\s+\\\\w+', '/*********************************************************************\\n * Software License Agreement (BSD License)\\n...ce the collision object disappears\");\\n\\n  // END_TUTORIAL\\n\\n  rclcpp::shutdown();\\n  spinner.join();\\n  return 0;\\n}')\n +    where <function search at 0x7fcf4c655f30> = re.search"
+            }
+        ]
+    }
+]

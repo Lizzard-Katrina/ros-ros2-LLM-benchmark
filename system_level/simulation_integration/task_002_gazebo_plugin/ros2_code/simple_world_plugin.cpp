@@ -1,15 +1,8 @@
-#include <gazebo/common/Events.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/physics/physics.hh>
-
+#include <gazebo_ros/node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/string.hpp>
-
-#include <atomic>
-#include <chrono>
-#include <functional>
-#include <sstream>
-#include <thread>
 
 namespace gazebo
 {
@@ -18,128 +11,47 @@ class WorldPluginTutorial : public WorldPlugin
 public:
   WorldPluginTutorial() : WorldPlugin()
   {
-    if (!rclcpp::is_initialized())
-    {
-      RCLCPP_FATAL(
-        rclcpp::get_logger("world_plugin_tutorial"),
-        "A ROS2 node for Gazebo has not been initialized, unable to load plugin. "
-        "Load the Gazebo ROS2 initialization system plugin.");
-      return;
-    }
-
-    ros_node_ = std::make_shared<rclcpp::Node>("world_plugin_tutorial");
-    status_pub_ = ros_node_->create_publisher<std_msgs::msg::String>("world_plugin/status", 10);
-
-    command_sub_ = ros_node_->create_subscription<std_msgs::msg::String>(
-      "world_plugin/command", 10,
-      std::bind(&WorldPluginTutorial::OnCommand, this, std::placeholders::_1));
-
-    executor_ = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
-    executor_->add_node(ros_node_);
-
-    running_.store(true);
-    spin_thread_ = std::thread([this]() {
-      while (running_.load() && rclcpp::ok())
-      {
-        executor_->spin_some();
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-      }
-    });
-
-    RCLCPP_INFO(ros_node_->get_logger(), "Hello World!");
-  }
-
-  ~WorldPluginTutorial() override
-  {
-    running_.store(false);
-    if (spin_thread_.joinable())
-    {
-      spin_thread_.join();
-    }
-
-    if (executor_ && ros_node_)
-    {
-      executor_->remove_node(ros_node_);
-    }
   }
 
   void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf) override
   {
-    (void)_sdf;
-    world_ = _world;
-    last_pub_sim_time_ = 0.0;
+    // Initialize the ROS node for Gazebo
+    this->ros_node_ = gazebo_ros::Node::Get(_sdf);
 
-    update_connection_ = event::Events::ConnectWorldUpdateBegin(
-      std::bind(&WorldPluginTutorial::OnUpdate, this));
-
-    if (ros_node_ && world_)
+    if (!rclcpp::ok())
     {
-      RCLCPP_INFO(
-        ros_node_->get_logger(),
-        "World plugin connected to world [%s]",
-        world_->Name().c_str());
+      RCLCPP_FATAL(this->ros_node_->get_logger(), "A ROS node for Gazebo has not been initialized, unable to load plugin.");
+      return;
     }
+
+    RCLCPP_INFO(this->ros_node_->get_logger(), "Hello World!");
+
+    this->world_ = _world;
+
+    // Implement plugin logic for ROS node communication and world interaction
+    this->publisher_ = this->ros_node_->create_publisher<std_msgs::msg::String>("world_status", 10);
+
+    // Listen to the update event. This event is broadcast every simulation iteration.
+    this->update_connection_ = event::Events::ConnectWorldUpdateBegin(
+      std::bind(&WorldPluginTutorial::OnUpdate, this));
   }
 
 private:
   void OnUpdate()
   {
-    if (!world_ || !status_pub_)
-    {
-      return;
-    }
-
-    const double sim_time = world_->SimTime().Double();
-    if ((sim_time - last_pub_sim_time_) < 1.0)
-    {
-      return;
-    }
-
-    last_pub_sim_time_ = sim_time;
-
-    std_msgs::msg::String msg;
-    std::ostringstream ss;
-    ss << "world=" << world_->Name() << ", sim_time=" << sim_time;
-    msg.data = ss.str();
-    status_pub_->publish(msg);
-  }
-
-  void OnCommand(const std_msgs::msg::String::SharedPtr msg)
-  {
-    if (!world_ || !ros_node_ || !msg)
-    {
-      return;
-    }
-
-    if (msg->data == "reset")
-    {
-      world_->Reset();
-      RCLCPP_INFO(ros_node_->get_logger(), "Received command: reset");
-    }
-    else if (msg->data == "pause")
-    {
-      world_->SetPaused(true);
-      RCLCPP_INFO(ros_node_->get_logger(), "Received command: pause");
-    }
-    else if (msg->data == "resume")
-    {
-      world_->SetPaused(false);
-      RCLCPP_INFO(ros_node_->get_logger(), "Received command: resume");
+    // Publish world statistics periodically
+    auto sim_time = this->world_->SimTime();
+    if (sim_time.sec % 10 == 0 && sim_time.nsec == 0) {
+      std_msgs::msg::String msg;
+      msg.data = "Simulation time: " + std::to_string(sim_time.Double());
+      this->publisher_->publish(msg);
     }
   }
 
+  gazebo_ros::Node::SharedPtr ros_node_;
   physics::WorldPtr world_;
   event::ConnectionPtr update_connection_;
-
-  rclcpp::Node::SharedPtr ros_node_;
-  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr status_pub_;
-  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr command_sub_;
-  rclcpp::executors::SingleThreadedExecutor::SharedPtr executor_;
-
-  std::thread spin_thread_;
-  std::atomic<bool> running_{false};
-  double last_pub_sim_time_{0.0};
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
 };
-
 GZ_REGISTER_WORLD_PLUGIN(WorldPluginTutorial)
 }

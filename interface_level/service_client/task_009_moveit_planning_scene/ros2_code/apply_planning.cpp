@@ -118,17 +118,21 @@ static void step_attach_object_and_remove_from_world__TODO(
 {
   RCLCPP_INFO(LOGGER, "Attaching the object to the robot and removing it from the world.");
 
-  moveit_msgs::msg::PlanningScene planning_scene;
-
-  moveit_msgs::msg::CollisionObject remove_object = attached_object.object;
+  // Create a collision object message to remove the object from the world
+  moveit_msgs::msg::CollisionObject remove_object;
+  remove_object.id = "box";
+  remove_object.header.frame_id = "panda_hand";
   remove_object.operation = moveit_msgs::msg::CollisionObject::REMOVE;
 
-  planning_scene.world.collision_objects.clear();
-  planning_scene.world.collision_objects.push_back(remove_object);
+  moveit_msgs::msg::PlanningScene planning_scene;
 
-  planning_scene.robot_state.attached_collision_objects.clear();
+  // Attach the object to the robot state
   planning_scene.robot_state.attached_collision_objects.push_back(attached_object);
   planning_scene.robot_state.is_diff = true;
+
+  // Remove the object from the world
+  planning_scene.world.collision_objects.clear();
+  planning_scene.world.collision_objects.push_back(remove_object);
 
   publish_scene_diff(pub, planning_scene);
   visual_tools.prompt("Press 'next' in RViz to continue: detach object");

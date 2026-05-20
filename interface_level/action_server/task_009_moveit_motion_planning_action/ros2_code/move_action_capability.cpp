@@ -36,8 +36,6 @@
 
 #include "move_action_capability.h"
 
-#include <thread>
-
 #include <moveit/planning_pipeline/planning_pipeline.h>
 #include <moveit/plan_execution/plan_execution.h>
 #include <moveit/plan_execution/plan_with_sensing.h>
@@ -55,82 +53,67 @@ MoveGroupMoveAction::MoveGroupMoveAction()
 
 void MoveGroupMoveAction::initialize()
 {
-  using MoveGroupAction = moveit_msgs::action::MoveGroup;
-  using GoalHandleMoveGroup = rclcpp_action::ServerGoalHandle<MoveGroupAction>;
-
-  move_action_server_ = rclcpp_action::create_server<MoveGroupAction>(
+  // start the move action server
+  using namespace std::placeholders;
+  move_action_server_ = rclcpp_action::create_server<moveit_msgs::action::MoveGroup>(
       node_, MOVE_ACTION,
-      [this](const rclcpp_action::GoalUUID& /*uuid*/, std::shared_ptr<const MoveGroupAction::Goal> /*goal*/) {
+      [](const rclcpp_action::GoalUUID& /*uuid*/, std::shared_ptr<const moveit_msgs::action::MoveGroup::Goal> /*goal*/) {
         return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
       },
-      [this](const std::shared_ptr<GoalHandleMoveGroup> /*goal_handle*/) {
+      [this](const std::shared_ptr<rclcpp_action::ServerGoalHandle<moveit_msgs::action::MoveGroup>>& /*goal_handle*/) {
         preemptMoveCallback();
         return rclcpp_action::CancelResponse::ACCEPT;
       },
-      [this](const std::shared_ptr<GoalHandleMoveGroup> goal_handle) {
-        goal_handle_ = goal_handle;
-        std::thread([this, goal_handle]() {
-          executeMoveCallback(goal_handle->get_goal());
-        }).detach();
+      [this](const std::shared_ptr<rclcpp_action::ServerGoalHandle<moveit_msgs::action::MoveGroup>>& goal_handle) {
+        executeMoveCallback(goal_handle);
       });
 }
 
-void MoveGroupMoveAction::executeMoveCallback(const std::shared_ptr<const moveit_msgs::action::MoveGroup::Goal>& goal)
+void MoveGroupMoveAction::executeMoveCallback(const std::shared_ptr<rclcpp_action::ServerGoalHandle<moveit_msgs::action::MoveGroup>>& goal_handle)
 {
-  // TODO:
-  // 1. Transition the action server into a planning state and publish feedback.
-  // 2. Check whether a preempt or cancel request has been issued
-  // 3. Simulate a motion planning result:
-  // 4. Set the appropriate result and terminal state.
-  // 5. Reset the internal state
-  //END OF TODO
-  moveit_msgs::action::MoveGroup::Result action_res;
+  setMoveState(PLANNING, goal_handle);
 
-  setMoveState(PLANNING);
-
-  if (!goal_handle_ || !goal_handle_->is_active() || preempt_requested_ || goal_handle_->is_canceling())
+  auto action_res = std::make_shared<moveit_msgs::action::MoveGroup::Result>();
+  if (goal_handle->is_canceling() || preempt_requested_)
   {
-    action_res.error_code.val = moveit_msgs::msg::MoveItErrorCodes::PREEMPTED;
-    if (goal_handle_ && goal_handle_->is_active())
-      goal_handle_->canceled(std::make_shared<moveit_msgs::action::MoveGroup::Result>(action_res));
-    setMoveState(IDLE);
-    preempt_requested_ = false;
+    action_res->error_code.val = moveit_msgs::msg::MoveItErrorCodes::PREEMPTED;
+    goal_handle->canceled(action_res);
+    setMoveState(IDLE, goal_handle);
     return;
   }
 
+  const auto goal = goal_handle->get_goal();
   if (goal->planning_options.plan_only)
-    executeMoveCallbackPlanOnly(goal, action_res);
-  else
-    executeMoveCallbackPlanAndExecute(goal, action_res);
-
-  auto result = std::make_shared<moveit_msgs::action::MoveGroup::Result>(action_res);
-  if (action_res.error_code.val == moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
   {
-    if (goal_handle_ && goal_handle_->is_active())
-      goal_handle_->succeed(result);
-  }
-  else if (action_res.error_code.val == moveit_msgs::msg::MoveItErrorCodes::PREEMPTED || preempt_requested_ ||
-           (goal_handle_ && goal_handle_->is_canceling()))
-  {
-    if (goal_handle_ && goal_handle_->is_active())
-      goal_handle_->canceled(result);
+    executeMoveCallbackPlanOnly(goal, *action_res);
   }
   else
   {
-    if (goal_handle_ && goal_handle_->is_active())
-      goal_handle_->abort(result);
+    executeMoveCallbackPlanAndExecute(goal, *action_res);
   }
 
-  setMoveState(IDLE);
+  if (action_res->error_code.val == moveit_msgs::msg::MoveItErrorCodes::SUCCESS)
+  {
+    goal_handle->succeed(action_res);
+  }
+  else if (action_res->error_code.val == moveit_msgs::msg::MoveItErrorCodes::PREEMPTED || preempt_requested_)
+  {
+    goal_handle->canceled(action_res);
+  }
+  else
+  {
+    goal_handle->abort(action_res);
+  }
+
+  setMoveState(IDLE, goal_handle);
   preempt_requested_ = false;
 }
 
-void MoveGroupMoveAction::executeMoveCallbackPlanAndExecute(
-    const std::shared_ptr<const moveit_msgs::action::MoveGroup::Goal>& goal, moveit_msgs::action::MoveGroup::Result& action_res)
+void MoveGroupMoveAction::executeMoveCallbackPlanAndExecute(const std::shared_ptr<const moveit_msgs::action::MoveGroup::Goal>& goal,
+                                                            moveit_msgs::action::MoveGroup::Result& action_res)
 {
-  RCLCPP_INFO(node_->get_logger(),
-              "Combined planning and execution request received for MoveGroup action. "
-              "Forwarding to planning and execution pipeline.");
+  RCLCPP_INFO(node_->get_logger(), "Combined planning and execution request received for MoveGroup action. "
+                                   "Forwarding to planning and execution pipeline.");
 
   plan_execution::PlanExecution::Options opt;
 
@@ -176,11 +159,10 @@ void MoveGroupMoveAction::executeMoveCallbackPlanAndExecute(
   action_res.error_code = plan.error_code_;
 }
 
-void MoveGroupMoveAction::executeMoveCallbackPlanOnly(
-    const std::shared_ptr<const moveit_msgs::action::MoveGroup::Goal>& goal, moveit_msgs::action::MoveGroup::Result& action_res)
+void MoveGroupMoveAction::executeMoveCallbackPlanOnly(const std::shared_ptr<const moveit_msgs::action::MoveGroup::Goal>& goal,
+                                                      moveit_msgs::action::MoveGroup::Result& action_res)
 {
-  RCLCPP_INFO(node_->get_logger(),
-              "Planning request received for MoveGroup action. Forwarding to planning pipeline.");
+  RCLCPP_INFO(node_->get_logger(), "Planning request received for MoveGroup action. Forwarding to planning pipeline.");
 
   planning_interface::MotionPlanResponse res;
 
@@ -215,10 +197,10 @@ void MoveGroupMoveAction::executeMoveCallbackPlanOnly(
   action_res.planning_time = res.planning_time_;
 }
 
-bool MoveGroupMoveAction::planUsingPlanningPipeline(const planning_interface::MotionPlanRequest& req,
+bool MoveGroupMoveAction::planUsingPlanningPipeline(const moveit_msgs::msg::MotionPlanRequest& req,
                                                     plan_execution::ExecutableMotionPlan& plan)
 {
-  setMoveState(PLANNING);
+  setMoveState(PLANNING, nullptr);
 
   bool solved = false;
   planning_interface::MotionPlanResponse res;
@@ -252,59 +234,48 @@ bool MoveGroupMoveAction::planUsingPlanningPipeline(const planning_interface::Mo
 
 void MoveGroupMoveAction::startMoveExecutionCallback()
 {
-  setMoveState(MONITOR);
+  setMoveState(MONITOR, nullptr);
 }
 
 void MoveGroupMoveAction::startMoveLookCallback()
 {
-  setMoveState(LOOK);
+  setMoveState(LOOK, nullptr);
 }
 
 void MoveGroupMoveAction::preemptMoveCallback()
 {
-  // TODO:
-  // Mark the current goal as preempted or canceled
-  // and ensure ongoing execution is stopped.
-  //END OF TODO
   preempt_requested_ = true;
-  if (context_ && context_->plan_execution_)
+  if (context_->plan_execution_)
+  {
     context_->plan_execution_->stop();
+  }
 }
 
-void MoveGroupMoveAction::setMoveState(MoveGroupState state)
+void MoveGroupMoveAction::setMoveState(MoveGroupState state, const std::shared_ptr<rclcpp_action::ServerGoalHandle<moveit_msgs::action::MoveGroup>>& goal_handle)
 {
-  // TODO:
-  // Update internal state and publish action feedback
-  // reflecting the current MoveGroupState.
-  //END OF TODO
   move_state_ = state;
-
-  std::string state_str = "IDLE";
-  switch (state)
-  {
-    case PLANNING:
-      state_str = "PLANNING";
-      break;
-    case LOOK:
-      state_str = "LOOK";
-      break;
-    case MONITOR:
-      state_str = "MONITOR";
-      break;
-    case IDLE:
-    default:
-      state_str = "IDLE";
-      break;
-  }
-
-  if (goal_handle_ && goal_handle_->is_active())
+  if (goal_handle)
   {
     auto feedback = std::make_shared<moveit_msgs::action::MoveGroup::Feedback>();
-    feedback->state = state_str;
-    goal_handle_->publish_feedback(feedback);
+    switch (state)
+    {
+      case PLANNING:
+        feedback->state = "PLANNING";
+        break;
+      case MONITOR:
+        feedback->state = "MONITOR";
+        break;
+      case LOOK:
+        feedback->state = "LOOK";
+        break;
+      default:
+        feedback->state = "IDLE";
+        break;
+    }
+    goal_handle->publish_feedback(feedback);
   }
 }
 }  // namespace move_group
 
-#include <class_loader/class_loader.hpp>
-CLASS_LOADER_REGISTER_CLASS(move_group::MoveGroupMoveAction, move_group::MoveGroupCapability)
+#include <pluginlib/class_list_macros.hpp>
+PLUGINLIB_EXPORT_CLASS(move_group::MoveGroupMoveAction, move_group::MoveGroupCapability)

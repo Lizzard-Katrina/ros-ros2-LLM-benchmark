@@ -14,40 +14,30 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#include <chrono>
-#include <memory>
-#include <string>
-#include <vector>
-
-#include <rclcpp/rclcpp.hpp>
-#include <rclcpp/serialization.hpp>
-#include <rclcpp/serialized_message.hpp>
-
 #include <rosbag2_cpp/reader.hpp>
-#include <rosbag2_storage/storage_options.hpp>
-#include <rosbag2_cpp/converter_options.hpp>
+#include <rosbag2_cpp/readers/sequential_reader.hpp>
 
 #include <sensor_msgs/msg/imu.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <geometry_msgs/msg/twist_with_covariance_stamped.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
-#include <std_msgs/msg/header.hpp>
 
 #include <radar_ego_velocity_estimator/ros_helper.h>
 #include <radar_ego_velocity_estimator/radar_ego_velocity_estimator_ros.h>
 
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/serialization.hpp>
+
 using namespace reve;
 
-RadarEgoVelocityEstimatorRos::RadarEgoVelocityEstimatorRos(const rclcpp::Node::SharedPtr& nh)
+RadarEgoVelocityEstimatorRos::RadarEgoVelocityEstimatorRos(rclcpp::Node::SharedPtr nh)
+: node_(nh)
 {
-  reconfigure_server_.setCallback(
-      std::bind(&RadarEgoVelocityEstimatorRos::reconfigureCallback, this, std::placeholders::_1, std::placeholders::_2));
-
   run_without_trigger = false;
   getRosParameter(nh, kPrefix, RosParameterType::Recommended, "run_without_trigger", run_without_trigger);
 
   if (run_without_trigger)
-    RCLCPP_WARN_STREAM(rclcpp::get_logger(kPrefix), kPrefix << "Running without radar trigger");
+    RCLCPP_WARN_STREAM(node_->get_logger(), kPrefix << "Running without radar trigger");
 
   std::string topic_twist = "twist";
   getRosParameter(nh, kPrefix, RosParameterType::Recommended, "topic_twist", topic_twist);
@@ -63,16 +53,11 @@ RadarEgoVelocityEstimatorRos::RadarEgoVelocityEstimatorRos(const rclcpp::Node::S
       nh, kPrefix, RosParameterType::Recommended, "topic_twist_radar_ground_truth", topic_twist_ego_ground_truth);
 
   sub_radar_scan_ = nh->create_subscription<sensor_msgs::msg::PointCloud2>(
-      topic_radar_scan, rclcpp::QoS(50),
-      std::bind(&RadarEgoVelocityEstimatorRos::callbackRadarScan, this, std::placeholders::_1));
-
+      topic_radar_scan, 50, std::bind(&RadarEgoVelocityEstimatorRos::callbackRadarScan, this, std::placeholders::_1));
   sub_radar_trigger_ = nh->create_subscription<std_msgs::msg::Header>(
-      topic_radar_trigger, rclcpp::QoS(50),
-      std::bind(&RadarEgoVelocityEstimatorRos::callbackRadarTrigger, this, std::placeholders::_1));
-
-  pub_twist_ = nh->create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>(topic_twist, rclcpp::QoS(5));
-  pub_twist_ground_truth_ =
-      nh->create_publisher<geometry_msgs::msg::TwistStamped>(topic_twist_ego_ground_truth, rclcpp::QoS(5));
+      topic_radar_trigger, 50, std::bind(&RadarEgoVelocityEstimatorRos::callbackRadarTrigger, this, std::placeholders::_1));
+  pub_twist_              = nh->create_publisher<geometry_msgs::msg::TwistWithCovarianceStamped>(topic_twist, 5);
+  pub_twist_ground_truth_ = nh->create_publisher<geometry_msgs::msg::TwistStamped>(topic_twist_ego_ground_truth, 5);
 }
 
 void RadarEgoVelocityEstimatorRos::runFromRosbag(const std::string& rosbag_path,
@@ -81,80 +66,57 @@ void RadarEgoVelocityEstimatorRos::runFromRosbag(const std::string& rosbag_path,
                                                  const double sleep_ms)
 {
   rosbag2_cpp::Reader reader;
-  rosbag2_storage::StorageOptions storage_options;
-  storage_options.uri        = rosbag_path;
-  storage_options.storage_id = "sqlite3";
+  reader.open(rosbag_path);
 
-  rosbag2_cpp::ConverterOptions converter_options;
-  converter_options.input_serialization_format  = "cdr";
-  converter_options.output_serialization_format = "cdr";
-
-  reader.open(storage_options, converter_options);
-
-  std::vector<std::string> topics;
-  topics.push_back(sub_radar_scan_->get_topic_name());
-  topics.push_back(sub_radar_trigger_->get_topic_name());
-  topics.push_back(pub_twist_ground_truth_->get_topic_name());
-
-  bool first_timestamp_initialized = false;
-  rclcpp::Time first_timestamp(0, 0, RCL_ROS_TIME);
-
-  rclcpp::Serialization<sensor_msgs::msg::PointCloud2> radar_scan_serialization;
+  auto first_timestamp = rclcpp::Time(0, 0, RCL_ROS_TIME);
+  rclcpp::Serialization<sensor_msgs::msg::PointCloud2> scan_serialization;
   rclcpp::Serialization<std_msgs::msg::Header> trigger_serialization;
-  rclcpp::Serialization<geometry_msgs::msg::TwistStamped> twist_gt_serialization;
+  rclcpp::Serialization<geometry_msgs::msg::TwistStamped> gt_serialization;
 
-  while (rclcpp::ok() && reader.has_next())
+  while (reader.has_next() && rclcpp::ok())
   {
-    auto bag_msg = reader.read_next();
-    if (!bag_msg)
-      continue;
+    auto m = reader.read_next();
+    rclcpp::Time msg_time(m->time_stamp);
 
-    const auto topic = bag_msg->topic_name;
-    if (std::find(topics.begin(), topics.end(), topic) == topics.end())
-      continue;
-
-    const rclcpp::Time msg_time(bag_msg->time_stamp, RCL_ROS_TIME);
-
-    if (!first_timestamp_initialized)
-    {
+    if (first_timestamp.nanoseconds() == 0)
       first_timestamp = msg_time;
-      first_timestamp_initialized = true;
-    }
 
-    const double dt = (msg_time - first_timestamp).seconds();
-    if (dt < bag_start)
+    if ((msg_time - first_timestamp).seconds() < bag_start)
       continue;
-    if (dt > bag_duration)
+
+    if ((msg_time - first_timestamp).seconds() > bag_duration)
       break;
 
-    rclcpp::SerializedMessage serialized_msg(*bag_msg->serialized_data);
+    const auto topic = m->topic_name;
+    rclcpp::SerializedMessage serialized_msg(*m->serialized_data);
 
     if (topic == sub_radar_scan_->get_topic_name())
     {
-      sensor_msgs::msg::PointCloud2 radar_scan;
-      radar_scan_serialization.deserialize_message(&serialized_msg, &radar_scan);
-      callbackRadarScan(std::make_shared<sensor_msgs::msg::PointCloud2>(radar_scan));
-      if (sleep_ms > 0.0)
-        rclcpp::sleep_for(std::chrono::duration<double, std::milli>(sleep_ms));
+      auto radar_scan = std::make_shared<sensor_msgs::msg::PointCloud2>();
+      scan_serialization.deserialize_message(&serialized_msg, radar_scan.get());
+      callbackRadarScan(radar_scan);
+      if (sleep_ms > 0)
+        rclcpp::sleep_for(std::chrono::milliseconds(static_cast<int>(sleep_ms)));
     }
     else if (topic == sub_radar_trigger_->get_topic_name())
     {
-      std_msgs::msg::Header radar_trigger_msg;
-      trigger_serialization.deserialize_message(&serialized_msg, &radar_trigger_msg);
-      callbackRadarTrigger(std::make_shared<std_msgs::msg::Header>(radar_trigger_msg));
+      auto radar_trigger_msg = std::make_shared<std_msgs::msg::Header>();
+      trigger_serialization.deserialize_message(&serialized_msg, radar_trigger_msg.get());
+      callbackRadarTrigger(radar_trigger_msg);
     }
     else if (topic == pub_twist_ground_truth_->get_topic_name())
     {
-      geometry_msgs::msg::TwistStamped msg;
-      twist_gt_serialization.deserialize_message(&serialized_msg, &msg);
-      pub_twist_ground_truth_->publish(msg);
+      auto msg = std::make_shared<geometry_msgs::msg::TwistStamped>();
+      gt_serialization.deserialize_message(&serialized_msg, msg.get());
+      pub_twist_ground_truth_->publish(*msg);
     }
+
+    rclcpp::spin_some(node_);
   }
 
-  RCLCPP_INFO(rclcpp::get_logger(kPrefix),
-              "%s Final Runtime statistics: %s",
-              kPrefix.c_str(),
-              profiler.getStatistics("ego_velocity_estimation").toStringMs().c_str());
+  RCLCPP_INFO(node_->get_logger(), "%s Final Runtime statistics: %s",
+           kPrefix.c_str(),
+           profiler.getStatistics("ego_velocity_estimation").toStringMs().c_str());
 }
 
 void RadarEgoVelocityEstimatorRos::processRadarData(const sensor_msgs::msg::PointCloud2& radar_scan,
@@ -168,8 +130,8 @@ void RadarEgoVelocityEstimatorRos::processRadarData(const sensor_msgs::msg::Poin
     profiler.stop("ego_velocity_estimation");
 
     geometry_msgs::msg::TwistWithCovarianceStamped msg;
-    msg.header.stamp    = trigger_stamp;
-    msg.header.frame_id = (radar_scan.header.frame_id.empty()) ? "radar" : radar_scan.header.frame_id;
+    msg.header.stamp         = trigger_stamp;
+    msg.header.frame_id      = (radar_scan.header.frame_id.empty())? "radar" : radar_scan.header.frame_id;
     msg.twist.twist.linear.x = v_b_r.x();
     msg.twist.twist.linear.y = v_b_r.y();
     msg.twist.twist.linear.z = v_b_r.z();
@@ -181,61 +143,45 @@ void RadarEgoVelocityEstimatorRos::processRadarData(const sensor_msgs::msg::Poin
   else
   {
     profiler.stop("ego_velocity_estimation");
-    RCLCPP_ERROR_STREAM(rclcpp::get_logger(kPrefix), kPrefix << "Radar ego velocity estimation failed");
+    RCLCPP_ERROR_STREAM(node_->get_logger(), kPrefix << "Radar ego velocity estimation failed");
   }
 
-  static rclcpp::Clock steady_clock(RCL_STEADY_TIME);
-  RCLCPP_INFO_THROTTLE(rclcpp::get_logger(kPrefix),
-                       steady_clock,
-                       5000,
-                       "%s Runtime statistics: %s",
-                       kPrefix.c_str(),
-                       profiler.getStatistics("ego_velocity_estimation").toStringMs().c_str());
+  auto& clk = *node_->get_clock();
+  RCLCPP_INFO_THROTTLE(node_->get_logger(), clk, 5000,
+                    "%s Runtime statistics: %s",
+                    kPrefix.c_str(),
+                    profiler.getStatistics("ego_velocity_estimation").toStringMs().c_str());
 }
 
-void RadarEgoVelocityEstimatorRos::callbackRadarScan(const sensor_msgs::msg::PointCloud2::SharedPtr radar_scan_msg)
+void RadarEgoVelocityEstimatorRos::callbackRadarScan(const sensor_msgs::msg::PointCloud2::ConstSharedPtr radar_scan_msg)
 {
-  if (!radar_scan_msg)
-  {
-    RCLCPP_ERROR_STREAM(rclcpp::get_logger(kPrefix), kPrefix << "Received null radar scan message");
-    return;
-  }
+  mutex_.lock();
+  rclcpp::Time current_trigger_stamp = trigger_stamp;
+  mutex_.unlock();
 
   if (run_without_trigger)
   {
-    processRadarData(*radar_scan_msg, rclcpp::Time(radar_scan_msg->header.stamp));
-    return;
+    processRadarData(*radar_scan_msg, radar_scan_msg->header.stamp);
   }
-
-  rclcpp::Time trigger_to_use(0, 0, RCL_ROS_TIME);
-  bool has_trigger = false;
-
+  else
   {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (trigger_stamp.nanoseconds() > 0)
+    if (current_trigger_stamp.nanoseconds() == 0)
     {
-      trigger_to_use = trigger_stamp;
-      trigger_stamp = rclcpp::Time(0, 0, trigger_stamp.get_clock_type());
-      has_trigger = true;
+      RCLCPP_WARN(node_->get_logger(), "%s Received radar scan but no trigger stamp available", kPrefix.c_str());
+    }
+    else
+    {
+      processRadarData(*radar_scan_msg, current_trigger_stamp);
+      mutex_.lock();
+      trigger_stamp = rclcpp::Time(0, 0, RCL_ROS_TIME);
+      mutex_.unlock();
     }
   }
-
-  if (!has_trigger)
-  {
-    static rclcpp::Clock steady_clock(RCL_STEADY_TIME);
-    RCLCPP_WARN_THROTTLE(rclcpp::get_logger(kPrefix),
-                         steady_clock,
-                         5000,
-                         "%s Missing radar trigger. Skipping radar scan.",
-                         kPrefix.c_str());
-    return;
-  }
-
-  processRadarData(*radar_scan_msg, trigger_to_use);
 }
 
-void RadarEgoVelocityEstimatorRos::callbackRadarTrigger(const std_msgs::msg::Header::SharedPtr trigger_msg)
+void RadarEgoVelocityEstimatorRos::callbackRadarTrigger(const std_msgs::msg::Header::ConstSharedPtr trigger_msg)
 {
-  std::lock_guard<std::mutex> lock(mutex_);
-  trigger_stamp = rclcpp::Time(trigger_msg->stamp);
+  mutex_.lock();
+  trigger_stamp = trigger_msg->stamp;
+  mutex_.unlock();
 }

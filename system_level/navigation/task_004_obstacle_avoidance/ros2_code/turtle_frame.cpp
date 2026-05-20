@@ -73,22 +73,43 @@ TurtleFrame::TurtleFrame(rclcpp::Node::SharedPtr & node_handle, QWidget * parent
   nh_ = node_handle;
   executor_.add_node(nh_);
 
+  rcl_interfaces::msg::ParameterDescriptor desc;
   rcl_interfaces::msg::IntegerRange range;
   range.from_value = 0;
-  range.to_value = 255;
   range.step = 1;
+  range.to_value = 255;
+  desc.integer_range.push_back(range);
 
-  rcl_interfaces::msg::ParameterDescriptor background_descriptor;
-  background_descriptor.integer_range.push_back(range);
-
-  nh_->declare_parameter<int>("background_r", DEFAULT_BG_R, background_descriptor);
-  nh_->declare_parameter<int>("background_g", DEFAULT_BG_G, background_descriptor);
-  nh_->declare_parameter<int>("background_b", DEFAULT_BG_B, background_descriptor);
-  nh_->declare_parameter<bool>("holonomic", false);
+  nh_->declare_parameter("background_r", DEFAULT_BG_R, desc);
+  nh_->declare_parameter("background_g", DEFAULT_BG_G, desc);
+  nh_->declare_parameter("background_b", DEFAULT_BG_B, desc);
+  nh_->declare_parameter("holonomic", false);
 
   parameter_event_sub_ = nh_->create_subscription<rcl_interfaces::msg::ParameterEvent>(
     "/parameter_events", rclcpp::SensorDataQoS(),
     std::bind(&TurtleFrame::parameterEventCallback, this, std::placeholders::_1));
+
+  clear_srv_ = nh_->create_service<std_srvs::srv::Empty>(
+    "clear", std::bind(&TurtleFrame::clearCallback, this, std::placeholders::_1, std::placeholders::_2));
+  reset_srv_ = nh_->create_service<std_srvs::srv::Empty>(
+    "reset", std::bind(&TurtleFrame::resetCallback, this, std::placeholders::_1, std::placeholders::_2));
+  spawn_srv_ = nh_->create_service<turtlesim_msgs::srv::Spawn>(
+    "spawn", std::bind(&TurtleFrame::spawnCallback, this, std::placeholders::_1, std::placeholders::_2));
+  kill_srv_ = nh_->create_service<turtlesim_msgs::srv::Kill>(
+    "kill", std::bind(&TurtleFrame::killCallback, this, std::placeholders::_1, std::placeholders::_2));
+
+  meter_ = nh_->declare_parameter("pixels_per_meter", 50.0);
+  width_in_meters_ = (width() - 1) / meter_;
+  height_in_meters_ = (height() - 1) / meter_;
+
+  QString images_path = (ament_index_cpp::get_package_share_directory("turtlesim") + "/images/").c_str();
+  for (int i = 0; i < 3; ++i) {
+    QImage img;
+    img.load(images_path + QString("turtle%1.png").arg(i + 1));
+    turtle_images_.append(img);
+  }
+
+  spawnTurtle("", width_in_meters_ / 2.0, height_in_meters_ / 2.0, 0);
 }
 
 void TurtleFrame::parameterEventCallback(

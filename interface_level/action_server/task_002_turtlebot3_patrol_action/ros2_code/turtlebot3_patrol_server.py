@@ -122,47 +122,20 @@ class Turtlebot3PatrolServer(Node):
         return GoalResponse.ACCEPT
 
     def execute_callback(self, goal_handle):
+        self.get_logger().info('Executing patrol goal...')
         feedback_msg = Patrol.Feedback()
-        result = Patrol.Result()
 
-        goal = goal_handle.request
-        patrol_type = str(getattr(goal, 'patrol_type', 'square')).lower()
-        length = float(getattr(goal, 'patrol_length', 1.0))
-        patrol_count = int(getattr(goal, 'patrol_count', 1))
-
-        if patrol_count < 1:
-            patrol_count = 1
-
-        for i in range(patrol_count):
-            if goal_handle.is_cancel_requested:
-                self.init_twist()
-                goal_handle.canceled()
-                if hasattr(result, 'success'):
-                    result.success = False
-                if hasattr(result, 'result'):
-                    result.result = 'canceled'
-                if hasattr(result, 'message'):
-                    result.message = 'Patrol canceled'
-                return result
-
-            if hasattr(feedback_msg, 'state'):
-                feedback_msg.state = f'patrol {i + 1}/{patrol_count}'
-            goal_handle.publish_feedback(feedback_msg)
-
-            if patrol_type == 'triangle':
-                self.triangle(feedback_msg, goal_handle, length)
-            else:
-                self.square(feedback_msg, goal_handle, length)
+        if self.goal_msg.radius > 0.0:
+            self.square(feedback_msg, goal_handle, self.goal_msg.radius)
+        else:
+            self.triangle(feedback_msg, goal_handle, abs(self.goal_msg.radius))
 
         goal_handle.succeed()
-
-        if hasattr(result, 'success'):
-            result.success = True
-        if hasattr(result, 'result'):
-            result.result = f'completed {patrol_count} {patrol_type} patrol(s)'
-        if hasattr(result, 'message'):
-            result.message = 'Patrol completed successfully'
-
+        
+        result = Patrol.Result()
+        result.success = True
+        self.get_logger().info('Patrol goal succeeded.')
+        
         return result
 
     def square(self, feedback_msg, goal_handle, length):

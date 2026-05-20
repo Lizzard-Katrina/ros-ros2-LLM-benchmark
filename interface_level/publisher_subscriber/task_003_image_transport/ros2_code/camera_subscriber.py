@@ -1,35 +1,28 @@
 #!/usr/bin/env python3
 import rclpy
-from sensor_msgs.msg import Image
+from rclpy.node import Node
 
-try:
-    from image_transport import ImageTransport
-except ImportError:
-    from image_transport_py import ImageTransport
-
-_node = None
-
+#mock Image Class
+class Image:
+    # minimal mock attributes for Image message
+    width = 640
+    height = 480
+    encoding = "rgb8"
+    data = b''
 
 def callback(msg):
-    # image_transport-based callback
-    _node.get_logger().info("Received an image")
+    rclpy.logging.get_logger('camera_subscriber_node').info("Received an image")
 
+def main(args=None):
+    rclpy.init(args=args)
+    node = rclpy.create_node('camera_subscriber_node')
+    
+    sub = node.create_subscription(Image, 'camera/image', callback, 10)
 
-def main():
-    global _node
-    rclpy.init()
-    _node = rclpy.create_node('camera_subscriber_node')
-
-    # use image_transport to construct subscriber
-    image_transport = ImageTransport(_node)
-    sub = image_transport.subscribe('camera/image', callback, 'raw')
-
-    rclpy.spin(_node)
-
-    _node.destroy_node()
+    rclpy.spin(node)
+    
+    node.destroy_node()
     rclpy.shutdown()
-    # END OF TODO
-
 
 if __name__ == '__main__':
     main()

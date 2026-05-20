@@ -8,7 +8,7 @@ from openai import OpenAI
 
 # ================= CONFIGURATION =================
 # "navigation","simulation_integration","manipulation",
-CATEGORIES = [ "manipulation","multi_node"] 
+CATEGORIES = [ "navigation","simulation_integration","manipulation","multi_node"] 
 BASE_IMAGE = "ros2-benchmark-base"
 MODELS_TO_TEST = [
 #    "openai/gpt-5.4",

@@ -22,9 +22,9 @@
 
 #include <chrono>
 #include <cmath>
-#include <functional>
 #include <iostream>
 #include <stdio.h>
+#include <functional>
 
 namespace gazebo {
 
@@ -35,9 +35,7 @@ GazeboImuPlugin::GazeboImuPlugin()
 }
 
 GazeboImuPlugin::~GazeboImuPlugin() {
-  if (updateConnection_) {
-    updateConnection_.reset();
-  }
+  updateConnection_.reset();
 }
 
 
@@ -62,7 +60,7 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
     gzerr << "[gazebo_imu_plugin] Please specify a linkName.\n";
   // Get the pointer to the link
   link_ = model_->GetLink(link_name_);
-  if (link_ == nullptr)
+  if (link_ == NULL)
     gzthrow("[gazebo_imu_plugin] Couldn't find specified link \"" << link_name_ << "\".");
 
   frame_id_ = link_name_;
@@ -110,11 +108,7 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
   imu_pub_ = node_handle_->Advertise<sensor_msgs::msgs::Imu>("~/" + model_->GetName() + imu_topic_, 10);
 
   // Fill imu message.
-  gazebo::msgs::Header* header = imu_message_.mutable_header();
-  gazebo::msgs::Header::Map* frame = header->add_data();
-  frame->set_key("frame_id");
-  frame->add_value(frame_id_);
-
+  // imu_message_.header.frame_id = frame_id_; TODO Add header
   // We assume uncorrelated noise on the 3 channels -> only set diagonal
   // elements. Only the broadband noise component is considered, specified as a
   // continuous-time density (two-sided spectrum); not the true covariance of
@@ -192,39 +186,31 @@ void GazeboImuPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) {
 void GazeboImuPlugin::addNoise(Eigen::Vector3d* linear_acceleration,
                                Eigen::Vector3d* angular_velocity,
                                const double dt) {
-  if (linear_acceleration == nullptr || angular_velocity == nullptr) {
-    return;
-  }
-  if (dt <= 0.0) {
-    return;
-  }
+  assert(linear_acceleration != nullptr);
+  assert(angular_velocity != nullptr);
 
-  const double tau_g = imu_parameters_.gyroscope_bias_correlation_time;
-  const double tau_a = imu_parameters_.accelerometer_bias_correlation_time;
+  if (dt <= 0.0) return;
 
-  const double phi_g = std::exp(-dt / tau_g);
-  const double phi_a = std::exp(-dt / tau_a);
-
-  const double sigma_g_d = imu_parameters_.gyroscope_noise_density / std::sqrt(dt);
-  const double sigma_a_d = imu_parameters_.accelerometer_noise_density / std::sqrt(dt);
-
-  const double sigma_bg_d = std::sqrt(
-      std::max(0.0, imu_parameters_.gyroscope_random_walk * imu_parameters_.gyroscope_random_walk *
-                        tau_g * 0.5 * (1.0 - std::exp(-2.0 * dt / tau_g))));
-  const double sigma_ba_d = std::sqrt(
-      std::max(0.0, imu_parameters_.accelerometer_random_walk * imu_parameters_.accelerometer_random_walk *
-                        tau_a * 0.5 * (1.0 - std::exp(-2.0 * dt / tau_a))));
+  // Gyroscope noise
+  double tau_g = imu_parameters_.gyroscope_bias_correlation_time;
+  double sigma_g_d = 1 / sqrt(dt) * imu_parameters_.gyroscope_noise_density;
+  double sigma_b_g = imu_parameters_.gyroscope_random_walk;
+  double sigma_b_g_d = sqrt(dt) * sigma_b_g;
 
   for (int i = 0; i < 3; ++i) {
-    gyroscope_bias_[i] = phi_g * gyroscope_bias_[i] +
-                         sigma_bg_d * standard_normal_distribution_(random_generator_);
-    accelerometer_bias_[i] = phi_a * accelerometer_bias_[i] +
-                             sigma_ba_d * standard_normal_distribution_(random_generator_);
+    gyroscope_bias_[i] += sigma_b_g_d * standard_normal_distribution_(random_generator_) - gyroscope_bias_[i] * dt / tau_g;
+    (*angular_velocity)[i] += gyroscope_bias_[i] + sigma_g_d * standard_normal_distribution_(random_generator_);
+  }
 
-    (*angular_velocity)[i] += gyroscope_bias_[i] +
-                              sigma_g_d * standard_normal_distribution_(random_generator_);
-    (*linear_acceleration)[i] += accelerometer_bias_[i] +
-                                 sigma_a_d * standard_normal_distribution_(random_generator_);
+  // Accelerometer noise
+  double tau_a = imu_parameters_.accelerometer_bias_correlation_time;
+  double sigma_a_d = 1 / sqrt(dt) * imu_parameters_.accelerometer_noise_density;
+  double sigma_b_a = imu_parameters_.accelerometer_random_walk;
+  double sigma_b_a_d = sqrt(dt) * sigma_b_a;
+
+  for (int i = 0; i < 3; ++i) {
+    accelerometer_bias_[i] += sigma_b_a_d * standard_normal_distribution_(random_generator_) - accelerometer_bias_[i] * dt / tau_a;
+    (*linear_acceleration)[i] += accelerometer_bias_[i] + sigma_a_d * standard_normal_distribution_(random_generator_);
   }
 }
 
@@ -298,8 +284,10 @@ void GazeboImuPlugin::OnUpdate(const common::UpdateInfo& _info) {
   angular_velocity->set_z(angular_velocity_I[2]);
 
   // Fill IMU message.
-  gazebo::msgs::Set(imu_message_.mutable_header()->mutable_stamp(), current_time);
-  imu_message_.set_time_usec(static_cast<uint64_t>(current_time.Double() * 1e6));
+  // ADD HEaders
+  // imu_message_.header.stamp.sec = current_time.sec;
+  // imu_message_.header.stamp.nsec = current_time.nsec;
+  imu_message_.set_time_usec(_info.simTime.sec * 1000000 + _info.simTime.nsec / 1000);
   imu_message_.set_seq(seq_++);
 
   // TODO(burrimi): Add orientation estimator.

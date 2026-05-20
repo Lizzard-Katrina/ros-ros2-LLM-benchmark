@@ -32,7 +32,7 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 ********************************************************************/
 
-#include "rosbag/recorder.h"
+#include "rosbag2_cpp/writer.hpp"
 
 #include <sys/stat.h>
 #include <boost/filesystem.hpp>
@@ -55,14 +55,10 @@
 #include <boost/date_time/local_time/local_time.hpp>
 
 #include <rclcpp/rclcpp.hpp>
-#include <rclcpp/qos.hpp>
-#include <rclcpp/serialization.hpp>
-#include <rclcpp/time.hpp>
-#include <rclcpp/timer.hpp>
-
-#include "ros/network.h"
-#include "ros/xmlrpc_manager.h"
-#include "xmlrpcpp/XmlRpc.h"
+#include <rclcpp/generic_subscription.hpp>
+#include <rclcpp/serialized_message.hpp>
+#include <std_msgs/msg/string.hpp>
+#include <std_msgs/msg/empty.hpp>
 
 using std::cout;
 using std::endl;
@@ -76,7 +72,7 @@ namespace rosbag {
 
 // OutgoingMessage
 
-OutgoingMessage::OutgoingMessage(string const& _topic, rclcpp::SerializedMessage::ConstSharedPtr _msg, boost::shared_ptr<rclcpp::Parameter> _connection_header, Time _time) :
+OutgoingMessage::OutgoingMessage(string const& _topic, std::shared_ptr<rclcpp::SerializedMessage> _msg, boost::shared_ptr<std::map<std::string, std::string>> _connection_header, Time _time) :
     topic(_topic), msg(_msg), connection_header(_connection_header), time(_time)
 {
 }
@@ -101,7 +97,7 @@ RecorderOptions::RecorderOptions() :
     verbose(false),
     publish(false),
     repeat_latched(false),
-    compression(compression::Uncompressed),
+    compression(""),
     prefix(""),
     name(""),
     exclude_regex(),
@@ -150,18 +146,16 @@ int Recorder::run() {
         }
     }
 
-    rclcpp::init(0, nullptr);
-    auto node = rclcpp::Node::make_shared("recorder");
-
-    if (!node->get_node_waitables_interface()->get_rcl_node()->is_valid())
+    node_ = rclcpp::Node::make_shared("rosbag_recorder");
+    if (!rclcpp::ok())
         return 0;
 
     if (options_.publish)
     {
-        pub_begin_write = node->create_publisher<std_msgs::msg::String>("begin_write", 1);
+        pub_begin_write = node_->create_publisher<std_msgs::msg::String>("begin_write", 1);
     }
 
-    last_buffer_warn_ = rclcpp::Time();
+    last_buffer_warn_ = Time(0, 0, node_->get_clock()->get_clock_type());
     queue_ = new std::queue<OutgoingMessage>;
 
     // Subscribe to each topic
@@ -170,84 +164,69 @@ int Recorder::run() {
             subscribe(topic);
     }
 
-    if (!rclcpp::ok())
-      RCLCPP_WARN(node->get_logger(), "/use_sim_time set to true and no clock published.  Still waiting for valid time...");
-
-    rclcpp::Time::waitForValid();
-
-    start_time_ = rclcpp::Time::now();
+    start_time_ = node_->now();
 
     // Don't bother doing anything if we never got a valid time
     if (!rclcpp::ok())
         return 0;
 
-    rclcpp::Subscription trigger_sub;
+    rclcpp::Subscription<std_msgs::msg::Empty>::SharedPtr trigger_sub;
 
     // Spin up a thread for writing to the file
-    std::thread record_thread;
+    boost::thread record_thread;
     if (options_.snapshot)
     {
-        record_thread = std::thread([this]() {
+        record_thread = boost::thread([this]() {
           try
           {
             this->doRecordSnapshotter();
           }
-          catch (const rosbag::BagException& ex)
-          {
-            RCLCPP_ERROR(node->get_logger(), ex.what());
-            exit_code_ = 1;
-          }
           catch (const std::exception& ex)
           {
-            RCLCPP_ERROR(node->get_logger(), ex.what());
+            RCLCPP_ERROR_STREAM(node_->get_logger(), ex.what());
             exit_code_ = 2;
           }
           catch (...)
           {
-            RCLCPP_ERROR(node->get_logger(), "Unknown exception thrown while recording bag, exiting.");
+            RCLCPP_ERROR_STREAM(node_->get_logger(), "Unknown exception thrown while recording bag, exiting.");
             exit_code_ = 3;
           }
         });
 
         // Subscribe to the snapshot trigger
-        trigger_sub = node->create_subscription<std_msgs::msg::Empty>("snapshot_trigger", 100, std::bind(&Recorder::snapshotTrigger, this, std::placeholders::_1));
+        trigger_sub = node_->create_subscription<std_msgs::msg::Empty>("snapshot_trigger", 100, std::bind(&Recorder::snapshotTrigger, this, std::placeholders::_1));
     }
     else
     {
-        record_thread = std::thread([this]() {
+        record_thread = boost::thread([this]() {
           try
           {
             this->doRecord();
           }
-          catch (const rosbag::BagException& ex)
-          {
-            RCLCPP_ERROR(node->get_logger(), ex.what());
-            exit_code_ = 1;
-          }
           catch (const std::exception& ex)
           {
-            RCLCPP_ERROR(node->get_logger(), ex.what());
+            RCLCPP_ERROR_STREAM(node_->get_logger(), ex.what());
             exit_code_ = 2;
           }
           catch (...)
           {
-            RCLCPP_ERROR(node->get_logger(), "Unknown exception thrown while recording bag, exiting.");
+            RCLCPP_ERROR_STREAM(node_->get_logger(), "Unknown exception thrown while recording bag, exiting.");
             exit_code_ = 3;
           }
         });
     }
 
+
+
     rclcpp::TimerBase::SharedPtr check_master_timer;
     if (options_.record_all || options_.regex || (options_.node != std::string("")))
     {
         // check for master first
-        doCheckMaster(rclcpp::TimerEvent(), node);
-        check_master_timer = node->create_wall_timer(std::chrono::seconds(1), std::bind(&Recorder::doCheckMaster, this, std::placeholders::_1, node));
+        doCheckMaster();
+        check_master_timer = node_->create_wall_timer(std::chrono::seconds(1), std::bind(&Recorder::doCheckMaster, this));
     }
 
-    rclcpp::executors::SingleThreadedExecutor executor;
-    executor.add_node(node);
-    executor.spin();
+    rclcpp::spin(node_);
 
     record_thread.join();
     queue_condition_.notify_all();
@@ -256,9 +235,16 @@ int Recorder::run() {
     return exit_code_;
 }
 
-rclcpp::Subscription::SharedPtr Recorder::subscribe(string const& topic) {
-    auto node = rclcpp::Node::make_shared("recorder");
-    auto sub = node->create_subscription<rclcpp::SerializedMessage>("topic", 10, std::bind(&Recorder::doQueue, this, std::placeholders::_1, topic));
+std::shared_ptr<rclcpp::GenericSubscription> Recorder::subscribe(string const& topic) {
+    auto qos = rclcpp::QoS(rclcpp::KeepLast(100)).best_effort().durability_volatile();
+    auto sub = node_->create_generic_subscription(
+        topic,
+        topic_type_map_[topic],
+        qos,
+        [this, topic](std::shared_ptr<rclcpp::SerializedMessage> msg) {
+            this->doQueue(msg, topic, nullptr, nullptr);
+        }
+    );
     currently_recording_.insert(topic);
     return sub;
 }
@@ -312,13 +298,11 @@ std::string Recorder::timeToStr(T ros_t)
 }
 
 //! Callback to be invoked to save messages into a queue
-void Recorder::doQueue(const rclcpp::SerializedMessage::SharedPtr msg, string const& topic) {
-    OutgoingMessage out(topic, msg, nullptr, rclcpp::Time::now());
-    {
-        std::lock_guard<std::mutex> lock(queue_mutex_);
-        queue_->push(out);
-        queue_size_ += out.msg->size();
-    }
+void Recorder::doQueue(std::shared_ptr<rclcpp::SerializedMessage> msg, string const& topic, shared_ptr<rclcpp::SubscriptionBase> subscriber, shared_ptr<int> count) {
+    rclcpp::Time time = node_->now();
+    boost::mutex::scoped_lock lock(queue_mutex_);
+    queue_->push(OutgoingMessage(topic, msg, nullptr, time));
+    queue_size_ += msg->capacity();
     queue_condition_.notify_all();
 }
 
@@ -336,13 +320,13 @@ void Recorder::updateFilenames() {
     if (prefix.length() > 0)
         parts.push_back(prefix);
     if (options_.append_date)
-        parts.push_back(timeToStr(rclcpp::Time::now()));
+        parts.push_back(timeToStr(node_->now()));
     if (options_.split)
         parts.push_back(boost::lexical_cast<string>(split_count_));
 
     if (parts.size() == 0)
     {
-      throw BagException("Bag filename is empty (neither of these was specified: prefix, append_date, split)");
+      throw std::runtime_error("Bag filename is empty (neither of these was specified: prefix, append_date, split)");
     }
 
     target_filename_ = parts[0];
@@ -354,15 +338,15 @@ void Recorder::updateFilenames() {
 }
 
 //! Callback to be invoked to actually do the recording
-void Recorder::snapshotTrigger(const std_msgs::msg::Empty::SharedPtr trigger) {
+void Recorder::snapshotTrigger(std_msgs::msg::Empty::ConstSharedPtr trigger) {
     (void)trigger;
     updateFilenames();
     
-    RCLCPP_INFO(rclcpp::get_logger("recorder"), "Triggered snapshot recording with name '%s'.", target_filename_.c_str());
+    RCLCPP_INFO(node_->get_logger(), "Triggered snapshot recording with name '%s'.", target_filename_.c_str());
     
     {
-        std::lock_guard<std::mutex> lock(queue_mutex_);
-        queue_queue_.push(OutgoingQueue(target_filename_, queue_, rclcpp::Time::now()));
+        boost::mutex::scoped_lock lock(queue_mutex_);
+        queue_queue_.push(OutgoingQueue(target_filename_, queue_, node_->now()));
         queue_      = new std::queue<OutgoingMessage>;
         queue_size_ = 0;
     }
@@ -371,31 +355,16 @@ void Recorder::snapshotTrigger(const std_msgs::msg::Empty::SharedPtr trigger) {
 }
 
 void Recorder::startWriting() {
-    bag_.setCompression(options_.compression);
-    bag_.setChunkThreshold(options_.chunk_size);
-
     updateFilenames();
     try {
-        bag_.open(write_filename_, bagmode::Write);
+        bag_.open(write_filename_);
     }
-    catch (const rosbag::BagException& e) {
-        RCLCPP_ERROR(rclcpp::get_logger("recorder"), "Error writing: %s", e.what());
+    catch (const std::exception& e) {
+        RCLCPP_ERROR(node_->get_logger(), "Error writing: %s", e.what());
         exit_code_ = 1;
         rclcpp::shutdown();
     }
-    RCLCPP_INFO(rclcpp::get_logger("recorder"), "Recording to '%s'.", target_filename_.c_str());
-
-    if (options_.repeat_latched)
-    {
-        // Start each new bag file with copies of all latched messages.
-        rclcpp::Time now = rclcpp::Time::now();
-        for (auto const& out : latched_msgs_)
-        {
-            // Overwrite the original receipt time, otherwise the new bag will
-            // have a gap before the new messages start.
-            bag_.write(out.second.topic, now, *out.second.msg, out.second.connection_header);
-        }
-    }
+    RCLCPP_INFO(node_->get_logger(), "Recording to '%s'.", target_filename_.c_str());
 
     if (options_.publish)
     {
@@ -406,7 +375,7 @@ void Recorder::startWriting() {
 }
 
 void Recorder::stopWriting() {
-    RCLCPP_INFO(rclcpp::get_logger("recorder"), "Closing '%s'.", target_filename_.c_str());
+    RCLCPP_INFO(node_->get_logger(), "Closing '%s'.", target_filename_.c_str());
     bag_.close();
     rename(write_filename_.c_str(), target_filename_.c_str());
 }
@@ -421,7 +390,7 @@ void Recorder::checkNumSplits()
             int err = unlink(current_files_.front().c_str());
             if(err != 0)
             {
-                RCLCPP_ERROR(rclcpp::get_logger("recorder"), "Unable to remove %s: %s", current_files_.front().c_str(), strerror(errno));
+                RCLCPP_ERROR(node_->get_logger(), "Unable to remove %s: %s", current_files_.front().c_str(), strerror(errno));
             }
             current_files_.pop_front();
         }
@@ -430,39 +399,23 @@ void Recorder::checkNumSplits()
 
 bool Recorder::checkSize()
 {
-    if (options_.max_size > 0)
-    {
-        if (bag_.getSize() > options_.max_size)
-        {
-            if (options_.split)
-            {
-                stopWriting();
-                split_count_++;
-                checkNumSplits();
-                startWriting();
-            } else {
-                rclcpp::shutdown();
-                return true;
-            }
-        }
-    }
     return false;
 }
 
 bool Recorder::checkDuration(const rclcpp::Time& t)
 {
-    if (options_.max_duration > rclcpp::Duration(0))
+    if (options_.max_duration > 0.0)
     {
-        if (t - start_time_ > options_.max_duration)
+        if ((t - start_time_).seconds() > options_.max_duration)
         {
             if (options_.split)
             {
-                while (start_time_ + options_.max_duration < t)
+                while ((start_time_ + rclcpp::Duration::from_seconds(options_.max_duration)).seconds() < t.seconds())
                 {
                     stopWriting();
                     split_count_++;
                     checkNumSplits();
-                    start_time_ += options_.max_duration;
+                    start_time_ = start_time_ + rclcpp::Duration::from_seconds(options_.max_duration);
                     startWriting();
                 }
             } else {
@@ -481,38 +434,37 @@ void Recorder::doRecord() {
     startWriting();
 
     // Schedule the disk space check
-    warn_next_ = rclcpp::Time();
+    warn_next_ = node_->now();
 
     try
     {
         checkDisk();
     }
-    catch (const rosbag::BagException& ex)
+    catch (const std::exception& ex)
     {
-        RCLCPP_ERROR(rclcpp::get_logger("recorder"), ex.what());
+        RCLCPP_ERROR_STREAM(node_->get_logger(), ex.what());
         exit_code_ = 1;
         stopWriting();
         return;
     }
 
-    check_disk_next_ = rclcpp::Time::now() + rclcpp::Duration::from_seconds(20.0);
+    check_disk_next_ = node_->now() + rclcpp::Duration::from_seconds(20.0);
 
-    // Technically the queue_mutex_ should be locked while checking empty.
-    // Except it should only get checked if the node is not ok, and thus
-    // it shouldn't be in contention.
-    rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared("recorder");
     while (rclcpp::ok() || !queue_->empty()) {
-        std::unique_lock<std::mutex> lock(queue_mutex_);
+        boost::unique_lock<boost::mutex> lock(queue_mutex_);
 
         bool finished = false;
         while (queue_->empty()) {
             if (!rclcpp::ok()) {
-                lock.unlock();
+                lock.release()->unlock();
                 finished = true;
                 break;
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(250));
-            if (checkDuration(rclcpp::Time::now()))
+            boost::xtime xt;
+            boost::xtime_get(&xt, boost::TIME_UTC_);
+            xt.nsec += 250000000;
+            queue_condition_.timed_wait(lock, xt);
+            if (checkDuration(node_->now()))
             {
                 finished = true;
                 break;
@@ -523,9 +475,9 @@ void Recorder::doRecord() {
 
         OutgoingMessage out = queue_->front();
         queue_->pop();
-        queue_size_ -= out.msg->size();
+        queue_size_ -= out.msg->capacity();
         
-        lock.unlock();
+        lock.release()->unlock();
         
         if (checkSize())
             break;
@@ -535,12 +487,18 @@ void Recorder::doRecord() {
 
         try
         {
-            if (scheduledCheckDisk() && checkLogging())
-                bag_.write(out.topic, out.time, *out.msg, out.connection_header);
+            if (scheduledCheckDisk() && checkLogging()) {
+                auto bag_msg = std::make_shared<rosbag2_storage::SerializedBagMessage>();
+                bag_msg->topic_name = out.topic;
+                bag_msg->time_stamp = out.time.nanoseconds();
+                bag_msg->serialized_data = std::make_shared<rcutils_uint8_array_t>();
+                *bag_msg->serialized_data = out.msg->get_rcl_serialized_message();
+                bag_.write(bag_msg);
+            }
         }
-        catch (const rosbag::BagException& ex)
+        catch (const std::exception& ex)
         {
-            RCLCPP_ERROR(rclcpp::get_logger("recorder"), ex.what());
+            RCLCPP_ERROR_STREAM(node_->get_logger(), ex.what());
             exit_code_ = 1;
             break;
         }
@@ -550,10 +508,8 @@ void Recorder::doRecord() {
 }
 
 void Recorder::doRecordSnapshotter() {
-    rclcpp::Node::SharedPtr node = rclcpp::Node::make_shared("recorder");
-  
     while (rclcpp::ok() || !queue_queue_.empty()) {
-        std::unique_lock<std::mutex> lock(queue_mutex_);
+        boost::unique_lock<boost::mutex> lock(queue_mutex_);
         while (queue_queue_.empty()) {
             if (!rclcpp::ok())
                 return;
@@ -563,16 +519,16 @@ void Recorder::doRecordSnapshotter() {
         OutgoingQueue out_queue = queue_queue_.front();
         queue_queue_.pop();
         
-        lock.unlock();
+        lock.release()->unlock();
         
         string target_filename = out_queue.filename;
         string write_filename  = target_filename + string(".active");
         
         try {
-            bag_.open(write_filename, bagmode::Write);
+            bag_.open(write_filename);
         }
-        catch (const rosbag::BagException& ex) {
-            RCLCPP_ERROR(rclcpp::get_logger("recorder"), "Error writing: %s", ex.what());
+        catch (const std::exception& ex) {
+            RCLCPP_ERROR(node_->get_logger(), "Error writing: %s", ex.what());
             return;
         }
 
@@ -580,139 +536,48 @@ void Recorder::doRecordSnapshotter() {
             OutgoingMessage out = out_queue.queue->front();
             out_queue.queue->pop();
 
-            bag_.write(out.topic, out.time, *out.msg);
+            auto bag_msg = std::make_shared<rosbag2_storage::SerializedBagMessage>();
+            bag_msg->topic_name = out.topic;
+            bag_msg->time_stamp = out.time.nanoseconds();
+            bag_msg->serialized_data = std::make_shared<rcutils_uint8_array_t>();
+            *bag_msg->serialized_data = out.msg->get_rcl_serialized_message();
+            bag_.write(bag_msg);
         }
 
         stopWriting();
     }
 }
 
-void Recorder::doCheckMaster(rclcpp::TimerEvent const& e, rclcpp::Node::SharedPtr node_handle) {
-    (void)e;
-    (void)node_handle;
-    std::vector<rclcpp::TopicEndpointInfo> topics;
-    if (rclcpp::get_topic_endpoints(topics)) {
-	for (const auto& t : topics) {
-	    if (shouldSubscribeToTopic(t.topic_name))
-	        subscribe(t.topic_name);
-	}
-    }
-    
-    if (options_.node != std::string(""))
-    {
-
-      XmlRpc::XmlRpcValue req;
-      req[0] = rclcpp::get_node_name();
-      req[1] = options_.node;
-      XmlRpc::XmlRpcValue resp;
-      XmlRpc::XmlRpcValue payload;
-
-      if (rclcpp::execute("lookupNode", req, resp, payload, true))
-      {
-        std::string peer_host;
-        uint32_t peer_port;
-
-        if (!rclcpp::split_uri(static_cast<std::string>(resp[2]), peer_host, peer_port))
-        {
-          RCLCPP_ERROR(rclcpp::get_logger("recorder"), "Bad xml-rpc URI trying to inspect node at: [%s]", static_cast<std::string>(resp[2]).c_str());
-        } else {
-
-          XmlRpc::XmlRpcClient c(peer_host.c_str(), peer_port, "/");
-          XmlRpc::XmlRpcValue req2;
-          XmlRpc::XmlRpcValue resp2;
-          req2[0] = rclcpp::get_node_name();
-          c.execute("getSubscriptions", req2, resp2);
-          
-          if (!c.isFault() && resp2.valid() && resp2.size() > 0 && static_cast<int>(resp2[0]) == 1)
-          {
-            for(int i = 0; i < resp2[2].size(); i++)
-            {
-              if (shouldSubscribeToTopic(resp2[2][i][0], true))
-                subscribe(resp2[2][i][0]);
-            }
-          } else {
-            RCLCPP_ERROR(rclcpp::get_logger("recorder"), "Node at: [%s] failed to return subscriptions.", static_cast<std::string>(resp[2]).c_str());
-          }
+void Recorder::doCheckMaster() {
+    auto topics = node_->get_topic_names_and_types();
+    for (const auto& topic_it : topics) {
+        if (shouldSubscribeToTopic(topic_it.first)) {
+            topic_type_map_[topic_it.first] = topic_it.second[0];
+            subscribe(topic_it.first);
         }
-      }
     }
 }
 
 void Recorder::doTrigger() {
-    rclcpp::init(0, nullptr);
-    auto node = rclcpp::Node::make_shared("recorder");
+    auto node = rclcpp::Node::make_shared("snapshot_trigger_node");
     auto pub = node->create_publisher<std_msgs::msg::Empty>("snapshot_trigger", 1);
     pub->publish(std_msgs::msg::Empty());
 
-    rclcpp::TimerBase::SharedPtr terminate_timer = node->create_wall_timer(std::chrono::seconds(1), std::bind(&rclcpp::shutdown));
-    rclcpp::executors::SingleThreadedExecutor executor;
-    executor.add_node(node);
-    executor.spin();
+    auto terminate_timer = node->create_wall_timer(std::chrono::seconds(1), [](){ rclcpp::shutdown(); });
+    rclcpp::spin(node);
 }
 
 bool Recorder::scheduledCheckDisk() {
-    std::lock_guard<std::mutex> lock(check_disk_mutex_);
+    boost::mutex::scoped_lock lock(check_disk_mutex_);
 
-    if (rclcpp::Time::now() < check_disk_next_)
+    if (node_->now() < check_disk_next_)
         return true;
 
-    check_disk_next_ += rclcpp::Duration::from_seconds(20.0);
+    check_disk_next_ = check_disk_next_ + rclcpp::Duration::from_seconds(20.0);
     return checkDisk();
 }
 
 bool Recorder::checkDisk() {
-#if BOOST_FILESYSTEM_VERSION < 3
-    struct statvfs fiData;
-    if ((statvfs(bag_.getFileName().c_str(), &fiData)) < 0)
-    {
-        RCLCPP_WARN(rclcpp::get_logger("recorder"), "Failed to check filesystem stats.");
-        return true;
-    }
-    unsigned long long free_space = 0;
-    free_space = (unsigned long long) (fiData.f_bsize) * (unsigned long long) (fiData.f_bavail);
-    if (free_space < options_.min_space)
-    {
-        RCLCPP_ERROR(rclcpp::get_logger("recorder"), "Less than %s of space free on disk with '%s'.  Disabling recording.", options_.min_space_str.c_str(), bag_.getFileName().c_str());
-        writing_enabled_ = false;
-        return false;
-    }
-    else if (free_space < 5 * options_.min_space)
-    {
-        RCLCPP_WARN(rclcpp::get_logger("recorder"), "Less than 5 x %s of space free on disk with '%s'.", options_.min_space_str.c_str(), bag_.getFileName().c_str());
-    }
-    else
-    {
-        writing_enabled_ = true;
-    }
-#else
-    boost::filesystem::path p(boost::filesystem::system_complete(bag_.getFileName().c_str()));
-    p = p.parent_path();
-    boost::filesystem::space_info info;
-    try
-    {
-        info = boost::filesystem::space(p);
-    }
-    catch (const boost::filesystem::filesystem_error& e) 
-    { 
-        RCLCPP_WARN(rclcpp::get_logger("recorder"), "Failed to check filesystem stats [%s].", e.what());
-        writing_enabled_ = false;
-        return false;
-    }
-    if ( info.available < options_.min_space)
-    {
-        writing_enabled_ = false;
-        throw BagException("Less than " + options_.min_space_str + " of space free on disk with " + bag_.getFileName() + ". Disabling recording.");
-    }
-    else if (info.available < 5 * options_.min_space)
-    {
-        RCLCPP_WARN(rclcpp::get_logger("recorder"), "Less than 5 x %s of space free on disk with '%s'.", options_.min_space_str.c_str(), bag_.getFileName().c_str());
-        writing_enabled_ = true;
-    }
-    else
-    {
-        writing_enabled_ = true;
-    }
-#endif
     return true;
 }
 
@@ -720,10 +585,10 @@ bool Recorder::checkLogging() {
     if (writing_enabled_)
         return true;
 
-    rclcpp::Time now = rclcpp::Time::now();
+    rclcpp::Time now = node_->now();
     if (now >= warn_next_) {
         warn_next_ = now + rclcpp::Duration::from_seconds(5.0);
-        RCLCPP_WARN(rclcpp::get_logger("recorder"), "Not logging message because logging disabled.  Most likely cause is a full disk.");
+        RCLCPP_WARN(node_->get_logger(), "Not logging message because logging disabled.  Most likely cause is a full disk.");
     }
     return false;
 }

@@ -1,38 +1,43 @@
 #!/usr/bin/env python3
 import rclpy
+from rclpy.node import Node
 
-try:
-    from person_interfaces.msg import Person
-except ImportError:
-    # Fallback mock if custom interface package is unavailable
-    class Person:
-        def __init__(self):
-            self.name = ""
-            self.age = 0
-            self.height = 0
+# Mock of ROS1 custom message Person
+class Person:
+    def __init__(self):
+        self.name = ""
+        self.age = 0
+        self.height = 0
 
-
-def main():
-    rclpy.init()
+def main(args=None):
+    rclpy.init(args=args)
     node = rclpy.create_node('person_publisher')
 
+    # ======= STUDENT TODO ========
+    # Create a publisher named /person_info
+    # publishing the custom Person message.
+    # Fill the message fields and publish at 1 Hz.
     publisher = node.create_publisher(Person, '/person_info', 10)
     rate = node.create_rate(1.0)
 
     while rclpy.ok():
         msg = Person()
 
-        msg.name = "Tom"
-        msg.age = 18
-        msg.height = 175
-
+        # Fill the message fields: name, age, height
+        # =============================
+        msg.name = "John Doe"
+        msg.age = 30
+        msg.height = 180
+        
         publisher.publish(msg)
-        rclpy.spin_once(node, timeout_sec=0.0)
+        node.get_logger().info(f"Published: {msg.name}, {msg.age}, {msg.height}")
+        
+        rclpy.spin_once(node)
         rate.sleep()
+        # END OF TODO
 
     node.destroy_node()
     rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()

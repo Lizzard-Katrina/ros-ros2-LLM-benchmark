@@ -180,33 +180,31 @@ size_t _recv_fake_svr_pack_data(char *buf)
 
 TmCommRC TmCommRecv::spin_once(int timeval_ms, int *n)
 {
-    fd_set readfs = _masterfs;
+    if (_sockfd < 0) return TmCommRC::ERR;
+
+    FD_ZERO(&_readfs);
+    FD_SET(_sockfd, &_readfs);
+
     struct timeval tv;
     tv.tv_sec = timeval_ms / 1000;
     tv.tv_usec = (timeval_ms % 1000) * 1000;
-    int rv = select(_sockfd + 1, &readfs, NULL, NULL, &tv);
-    if (rv < 0) {
-        _rc = TmCommRC::ERR;
-        return _rc;
-    }
-    if (rv == 0) {
-        _rc = TmCommRC::TIMEOUT;
-        return _rc;
-    }
-    if (FD_ISSET(_sockfd, &readfs)) {
-        _rn = recv(_sockfd, _recv_buf, _recv_buf_len, 0);
-        if (_rn == 0) {
-            _rc = TmCommRC::DISCONNECT;
-            return _rc;
+
+    int rv = select(_sockfd + 1, &_readfs, NULL, NULL, &tv);
+    if (rv < 0) return TmCommRC::ERR;
+    if (rv == 0) return TmCommRC::TIMEOUT;
+
+    if (FD_ISSET(_sockfd, &_readfs)) {
+        int bytes_read;
+        if ((bytes_read = recv(_sockfd, _recv_buf, _recv_buf_len, 0)) == 0) {
+            return TmCommRC::ERR;
+        } else if (bytes_read > 0) {
+            _sbuf.append(_recv_buf, bytes_read);
+            if (n) *n = bytes_read;
+        } else {
+            return TmCommRC::ERR;
         }
-        if (_rn < 0) {
-            _rc = TmCommRC::ERR;
-            return _rc;
-        }
-        _sbuf.append(_recv_buf, _rn);
     }
-    if (n) *n = _rn;
-    return _rc;
+    return TmCommRC::OK;
 }
 
 //

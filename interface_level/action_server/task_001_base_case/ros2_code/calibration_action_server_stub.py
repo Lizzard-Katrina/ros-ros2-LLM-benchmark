@@ -1,28 +1,24 @@
 #!/usr/bin/env python3
-import time
-
 import rclpy
-from rclpy.action import ActionServer
 from rclpy.node import Node
+from rclpy.action import ActionServer
+import time
 
 from robot_calibration_action.action import RobotCalibration
 
-
 class CalibrationActionServer(Node):
     def __init__(self):
-        super().__init__("calibration_action_server")
+        super().__init__('calibration_action_server')
         # TODO 1: fill action server name and action type
         self.server = ActionServer(
             self,
             RobotCalibration,
-            "robot_calibration",
-            execute_callback=self.execute_cb,
+            'robot_calibration',
+            self.execute_cb
         )
 
         # start the server (method call) and log startup message
-
-        # log startup message
-        self.get_logger().info("Robot Calibration Action Server started.")
+        self.get_logger().info("Calibration action server started.")
         # END OF TODO
 
     def execute_cb(self, goal_handle):
@@ -32,21 +28,18 @@ class CalibrationActionServer(Node):
         result = RobotCalibration.Result()
 
         # log received goal contents (goal fields)
-        self.get_logger().info(f"Received goal: {goal_handle.request}")
+        self.get_logger().info(f"Received goal request: {goal_handle.request}")
 
         # choose proper loop iterator (e.g., range(0, N))
-        # and prepare preemption handling
+        # and prepare preemption handling   
         # update feedback fields and numeric progress
-        for i in range(0, 10):
+        for i in range(1, 6):
             if goal_handle.is_cancel_requested:
-                result.success = False
-                result.message = "Calibration canceled."
                 goal_handle.canceled()
+                self.get_logger().info("Goal canceled")
                 return result
 
-            feedback.current_status = f"Calibration step {i + 1}/10"
-            feedback.progress = float(i + 1) * 10.0
-
+            feedback.progress = float(i * 20)
             # publish feedback
             goal_handle.publish_feedback(feedback)
 
@@ -54,20 +47,21 @@ class CalibrationActionServer(Node):
 
         # TODO: fill result fields (success flag and message)
         result.success = True
-        result.message = "Calibration completed successfully."
+        result.message = "Calibration completed successfully"
 
         # log completion
-        self.get_logger().info("Calibration completed successfully.")
+        self.get_logger().info("Calibration completed")
 
         # mark action succeeded with result
         goal_handle.succeed()
         return result
         # END OF TODO
 
-
-if __name__ == "__main__":
-    rclpy.init()
+def main(args=None):
+    rclpy.init(args=args)
     node = CalibrationActionServer()
     rclpy.spin(node)
-    node.destroy_node()
     rclpy.shutdown()
+
+if __name__ == "__main__":
+    main()

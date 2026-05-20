@@ -247,47 +247,35 @@ class CarlaRosBridge(CompatibleNode):
                 return
 
     def _synchronous_mode_update(self):
-        while roscomp.ok() and not self.shutdown.is_set():
+        while not self.shutdown.is_set() and roscomp.ok():
             self.process_run_state()
-            if self.shutdown.is_set() or not roscomp.ok():
-                break
-
-            self.actor_factory.update_available_objects()
 
             if self.parameters['synchronous_mode_wait_for_vehicle_control_command']:
-                expected_ids = []
-                if hasattr(self.actor_factory, "actors"):
-                    for actor_id, actor in self.actor_factory.actors.items():
-                        if isinstance(actor, EgoVehicle):
-                            expected_ids.append(actor_id)
-
-                with self._expected_ego_vehicle_control_command_ids_lock:
-                    self._expected_ego_vehicle_control_command_ids = expected_ids
-                    if expected_ids:
-                        self._all_vehicle_control_commands_received.clear()
-                    else:
-                        self._all_vehicle_control_commands_received.set()
-
-                if expected_ids:
-                    received_in_time = self._all_vehicle_control_commands_received.wait(
-                        CarlaRosBridge.VEHICLE_CONTROL_TIMEOUT)
-                    if not received_in_time and not self.shutdown.is_set():
-                        with self._expected_ego_vehicle_control_command_ids_lock:
-                            missing = list(self._expected_ego_vehicle_control_command_ids)
+                if self._expected_ego_vehicle_control_command_ids:
+                    if not self._all_vehicle_control_commands_received.wait(
+                            CarlaRosBridge.VEHICLE_CONTROL_TIMEOUT):
                         self.logwarn(
-                            "Timeout while waiting for vehicle control commands. Missing ids: {}".format(missing))
+                            "Timeout ({}s) while waiting for vehicle control commands. "
+                            "Missing command from actor ids {}".format(
+                                CarlaRosBridge.VEHICLE_CONTROL_TIMEOUT,
+                                self._expected_ego_vehicle_control_command_ids))
+                    self._all_vehicle_control_commands_received.clear()
 
-            frame = self.carla_world.tick()
-            carla_snapshot = self.carla_world.get_snapshot()
-            if carla_snapshot is None:
-                continue
+            if self.carla_run_state == CarlaControl.PLAY:
+                frame = self.carla_world.tick()
+                snapshot = self.carla_world.get_snapshot()
+                if snapshot:
+                    self.update_clock(snapshot.timestamp)
+                    self.status_publisher.set_frame(snapshot.frame)
+                    self._update(snapshot.frame, snapshot.timestamp.elapsed_seconds)
 
-            if carla_snapshot.frame != frame:
-                frame = carla_snapshot.frame
-
-            self.update_clock(carla_snapshot.timestamp)
-            self.status_publisher.set_frame(frame)
-            self._update(frame, carla_snapshot.timestamp.elapsed_seconds)
+                if self.parameters['synchronous_mode_wait_for_vehicle_control_command']:
+                    with self._expected_ego_vehicle_control_command_ids_lock:
+                        self._expected_ego_vehicle_control_command_ids = []
+                        for actor_id, actor in self.actor_factory.actors.items():
+                            if isinstance(actor, EgoVehicle):
+                                self._expected_ego_vehicle_control_command_ids.append(
+                                    actor_id)
 
     def _carla_time_tick(self, carla_snapshot):
         """

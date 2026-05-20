@@ -4,6 +4,7 @@
 // Editor: Hibo (sh-yang @ wonik.com)
 
 #include "allegro_node.h"
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
 std::string jointNames[DOF_JOINTS] =
         {
@@ -17,7 +18,7 @@ std::vector<std::string> frame_ids = {"link_3_0_tip", "link_7_0_tip", "link_11_0
 std::vector<std::string> namespaces = {"fingertip_[0]", "fingertip_[1]", "fingertip_[2]", "fingertip_[3]"};
 std::vector<visualization_msgs::msg::Marker> markers(4);
 
-AllegroNode::AllegroNode(bool sim /* = false */) {
+AllegroNode::AllegroNode(bool sim /* = false */) : Node("allegro_node") {
   mutex = new boost::mutex();
   
   // Create arrays 16 long for each of the four joint state components
@@ -38,23 +39,29 @@ AllegroNode::AllegroNode(bool sim /* = false */) {
 
   
   // Get Allegro Hand information from parameter server
-  // This information is found in the Hand-specific "zero.yaml" file from the allegro_hand_description package
   std::string robot_name, manufacturer, origin, serial;
   double version;
-  auto node = rclcpp::Node::make_shared("allegro_hand_driver");
-  node->get_parameter("~hand_info/robot_name", robot_name);
-  node->get_parameter("~hand_info/which_hand", whichHand);
-  node->get_parameter("~hand_info/which_type", whichType);
-  node->get_parameter("~hand_info/manufacturer", manufacturer);
-  node->get_parameter("~hand_info/origin", origin);
-  node->get_parameter("~hand_info/serial", serial);
-  node->get_parameter("~hand_info/version", version);
+  this->declare_parameter("hand_info.robot_name", "");
+  this->declare_parameter("hand_info.which_hand", "");
+  this->declare_parameter("hand_info.which_type", "");
+  this->declare_parameter("hand_info.manufacturer", "");
+  this->declare_parameter("hand_info.origin", "");
+  this->declare_parameter("hand_info.serial", "");
+  this->declare_parameter("hand_info.version", 0.0);
+
+  this->get_parameter("hand_info.robot_name", robot_name);
+  this->get_parameter("hand_info.which_hand", whichHand);
+  this->get_parameter("hand_info.which_type", whichType);
+  this->get_parameter("hand_info.manufacturer", manufacturer);
+  this->get_parameter("hand_info.origin", origin);
+  this->get_parameter("hand_info.serial", serial);
+  this->get_parameter("hand_info.version", version);
 
   // Initialize CAN device
   canDevice = 0;
   if(!sim) {
     canDevice = new allegro::AllegroHandDrv();
-    if (canDevice->init()) {
+    if (canDevice->init(0)) {
         usleep(3000);
     }
     else {
@@ -64,18 +71,20 @@ AllegroNode::AllegroNode(bool sim /* = false */) {
   }
 
   // Start ROS time
-  tstart = node->get_clock()->now();
+  tstart = this->now();
   
   // Advertise current joint state publisher and subscribe to desired joint
   // states.
-  joint_state_pub = node->create_publisher<sensor_msgs::msg::JointState>("joint_states", 3);
-  joint_cmd_sub = node->create_subscription<sensor_msgs::msg::JointState>("joint_states_desired", 1, 
-                                std::bind(&AllegroNode::desiredStateCallback, this, std::placeholders::_1));
+  joint_state_pub = this->create_publisher<sensor_msgs::msg::JointState>(JOINT_STATE_TOPIC, 3);
+  joint_cmd_sub = this->create_subscription<sensor_msgs::msg::JointState>(
+      DESIRED_STATE_TOPIC, 1, std::bind(&AllegroNode::desiredStateCallback, this, std::placeholders::_1));
  
-  time_sub = node->create_subscription<std_msgs::msg::Float32>("timechange", 10, std::bind(&AllegroNode::ControltimeCallback, this, std::placeholders::_1));
-  force_sub = node->create_subscription<std_msgs::msg::Float32>("forcechange", 10, std::bind(&AllegroNode::GraspforceCallback, this, std::placeholders::_1));
+  time_sub = this->create_subscription<std_msgs::msg::Float32>(
+      "timechange", 10, std::bind(&AllegroNode::ControltimeCallback, this, std::placeholders::_1));
+  force_sub = this->create_subscription<std_msgs::msg::Float32>(
+      "forcechange", 10, std::bind(&AllegroNode::GraspforceCallback, this, std::placeholders::_1));
  
-  marker_pub = node->create_publisher<visualization_msgs::msg::Marker>("fingertip_arrow_markers", 1);
+  marker_pub = this->create_publisher<visualization_msgs::msg::Marker>("fingertip_arrow_markers", 1);
 }
 
 AllegroNode::~AllegroNode() {
@@ -84,9 +93,9 @@ AllegroNode::~AllegroNode() {
 }
 
 // Get Allegro Hand desired joint position
-void AllegroNode::desiredStateCallback(const sensor_msgs::msg::JointState &msg) {
+void AllegroNode::desiredStateCallback(const sensor_msgs::msg::JointState::SharedPtr msg) {
   mutex->lock();
-  desired_joint_state = msg;
+  desired_joint_state = *msg;
   mutex->unlock();
 }
 
@@ -94,7 +103,7 @@ void AllegroNode::desiredStateCallback(const sensor_msgs::msg::JointState &msg) 
 void AllegroNode::ControltimeCallback(const std_msgs::msg::Float32::SharedPtr msg)
 {
     motion_time = msg->data;
-    pBHand->SetMotiontime(motion_time);
+    if (pBHand) pBHand->SetMotiontime(motion_time);
 }
 
 // Get Allegro Hand grasping force from gui
@@ -106,6 +115,7 @@ void AllegroNode::GraspforceCallback(const std_msgs::msg::Float32::SharedPtr msg
 // Main publisher
 void AllegroNode::publishData() {
   // current position, velocity and effort (torque), fingertip_sensor (Rviz) published
+  tnow = this->now();
   current_joint_state.header.stamp = tnow;
   
   for (int i = 0; i < DOF_JOINTS; i++) {
@@ -118,9 +128,7 @@ void AllegroNode::publishData() {
   // fingertip_sensor_Rviz
   for (const auto& marker : markers) {
     marker_pub->publish(marker);
-    std::this_thread::sleep_for(std::chrono::nanoseconds(1));
-    }
-
+  }
 }
 
 
@@ -145,33 +153,35 @@ void AllegroNode::Rviz_Arrow(){
 }
 
 void AllegroNode::updateController() {
-
-    if (canDevice->readCANFrames() < 0) {
-        rclcpp::shutdown();
-    }
-
-    if (canDevice->isJointInfoReady()) {
-        for (int i = 0; i < DOF_JOINTS; i++) {
-            previous_position[i] = current_position[i];
+    if (canDevice) {
+        if (canDevice->readCANFrames() < 0) {
+            rclcpp::shutdown();
+            return;
+        }
+        
+        if (canDevice->isJointInfoReady()) {
+            for (int i = 0; i < DOF_JOINTS; i++) {
+                previous_position[i] = current_position[i];
+            }
+            
+            canDevice->getJointInfo(current_position);
+            
+            double dt = 0.003; // Assuming 3ms loop time
+            for (int i = 0; i < DOF_JOINTS; i++) {
+                current_velocity[i] = (current_position[i] - previous_position[i]) / dt;
+            }
+            
+            canDevice->resetJointInfoReady();
         }
     }
-
-    double dt = (tnow - tprev).seconds();
-    for (int i = 0; i < DOF_JOINTS; i++) {
-        current_position[i] = canDevice->getJointInfo()[i];
-        current_velocity[i] = (current_position[i] - previous_position[i]) / dt;
-    }
-
-    canDevice->resetJointInfoReady();
 }
 
-// Interrupt-based control is not recommended by Wonik Robotics. I have not tested it.
 void AllegroNode::timerCallback() {
   updateController();
 }
 
-rclcpp::TimerBase::SharedPtr AllegroNode::startTimerCallback(rclcpp::Node::SharedPtr node) {
-  auto timer = node->create_wall_timer(std::chrono::milliseconds(1),
-                                    std::bind(&AllegroNode::timerCallback, this));
-  return timer;
+rclcpp::TimerBase::SharedPtr AllegroNode::startTimerCallback() {
+  return this->create_wall_timer(
+      std::chrono::milliseconds(1),
+      std::bind(&AllegroNode::timerCallback, this));
 }

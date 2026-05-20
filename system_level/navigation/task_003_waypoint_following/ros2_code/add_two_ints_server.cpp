@@ -34,71 +34,69 @@
 *
 * Author: Eitan Marder-Eppstein
 *********************************************************************/
-#include <chrono>
 #include <functional>
 #include <memory>
 #include <thread>
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
-#include "actionlib/action/two_ints.hpp"
+#include "example_interfaces/action/add_two_ints.hpp" // Hypothetical action interface
 
 class AddTwoIntsServer : public rclcpp::Node
 {
 public:
-  using TwoInts = actionlib::action::TwoInts;
-  using GoalHandleTwoInts = rclcpp_action::ServerGoalHandle<TwoInts>;
+  using AddTwoInts = example_interfaces::action::AddTwoInts;
+  using GoalHandleAddTwoInts = rclcpp_action::ServerGoalHandle<AddTwoInts>;
 
-  AddTwoIntsServer()
-  : Node("add_two_ints_server")
+  explicit AddTwoIntsServer(const rclcpp::NodeOptions & options = rclcpp::NodeOptions())
+  : Node("add_two_ints_server", options)
   {
-    action_server_ = rclcpp_action::create_server<TwoInts>(
+    using namespace std::placeholders;
+
+    this->action_server_ = rclcpp_action::create_server<AddTwoInts>(
       this,
       "add_two_ints",
-      std::bind(&AddTwoIntsServer::handle_goal, this, std::placeholders::_1, std::placeholders::_2),
-      std::bind(&AddTwoIntsServer::handle_cancel, this, std::placeholders::_1),
-      std::bind(&AddTwoIntsServer::handle_accepted, this, std::placeholders::_1));
+      std::bind(&AddTwoIntsServer::handle_goal, this, _1, _2),
+      std::bind(&AddTwoIntsServer::handle_cancel, this, _1),
+      std::bind(&AddTwoIntsServer::handle_accepted, this, _1));
   }
 
 private:
-  rclcpp_action::Server<TwoInts>::SharedPtr action_server_;
+  rclcpp_action::Server<AddTwoInts>::SharedPtr action_server_;
 
   rclcpp_action::GoalResponse handle_goal(
-    const rclcpp_action::GoalUUID &,
-    std::shared_ptr<const TwoInts::Goal> goal)
+    const rclcpp_action::GoalUUID & uuid,
+    std::shared_ptr<const AddTwoInts::Goal> goal)
   {
-    RCLCPP_INFO(get_logger(), "Received goal request: a=%ld b=%ld", goal->a, goal->b);
+    (void)uuid;
+    RCLCPP_INFO(this->get_logger(), "Received goal request with a: %ld, b: %ld", goal->a, goal->b);
     return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
   }
 
   rclcpp_action::CancelResponse handle_cancel(
-    const std::shared_ptr<GoalHandleTwoInts> goal_handle)
+    const std::shared_ptr<GoalHandleAddTwoInts> goal_handle)
   {
+    RCLCPP_INFO(this->get_logger(), "Received request to cancel goal");
     (void)goal_handle;
-    RCLCPP_INFO(get_logger(), "Received request to cancel goal");
     return rclcpp_action::CancelResponse::ACCEPT;
   }
 
-  void handle_accepted(const std::shared_ptr<GoalHandleTwoInts> goal_handle)
+  void handle_accepted(const std::shared_ptr<GoalHandleAddTwoInts> goal_handle)
   {
-    std::thread{std::bind(&AddTwoIntsServer::execute, this, std::placeholders::_1), goal_handle}.detach();
+    using namespace std::placeholders;
+    std::thread{std::bind(&AddTwoIntsServer::execute, this, _1), goal_handle}.detach();
   }
 
-  void execute(const std::shared_ptr<GoalHandleTwoInts> goal_handle)
+  void execute(const std::shared_ptr<GoalHandleAddTwoInts> goal_handle)
   {
+    RCLCPP_INFO(this->get_logger(), "Executing goal");
     const auto goal = goal_handle->get_goal();
-    auto result = std::make_shared<TwoInts::Result>();
-
-    if (goal_handle->is_canceling()) {
-      result->sum = 0;
-      goal_handle->canceled(result);
-      RCLCPP_INFO(get_logger(), "Goal canceled");
-      return;
-    }
-
+    auto result = std::make_shared<AddTwoInts::Result>();
+    
     result->sum = goal->a + goal->b;
+    
     goal_handle->succeed(result);
-    RCLCPP_INFO(get_logger(), "Goal succeeded, sum=%ld", result->sum);
+    RCLCPP_INFO(this->get_logger(), "Goal succeeded");
   }
 };
 

@@ -27,7 +27,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from threading import Event
-from time import monotonic
 
 from rcl_interfaces.msg import Parameter as ParameterMsg
 from rcl_interfaces.msg import ParameterEvent
@@ -115,36 +114,25 @@ class ParamClient(object):
         self._node.destroy_client(self._get_params_client)
 
     def _call_service(self, client, request, timeout=1.0):
-        start_time = monotonic()
-
-        if not client.wait_for_service(timeout_sec=timeout):
+        if not client.wait_for_service(timeout=timeout):
             raise AsyncServiceCallFailed(hint='timed out waiting for service')
 
         future = client.call_async(request)
-        if future is None:
+        event = Event()
+
+        def done_callback(f):
+            event.set()
+
+        future.add_done_callback(done_callback)
+
+        if not event.wait(timeout=timeout):
             raise AsyncServiceCallFailed(hint='the target node may not be spinning')
 
-        done_event = Event()
-        future.add_done_callback(lambda _: done_event.set())
-
-        elapsed = monotonic() - start_time
-        remaining_timeout = timeout - elapsed
-        if remaining_timeout < 0.0:
-            remaining_timeout = 0.0
-
-        if not done_event.wait(timeout=remaining_timeout):
-            raise AsyncServiceCallFailed(hint='timed out waiting for response')
-
-        try:
-            response = future.result()
-        except Exception as ex:
-            raise AsyncServiceCallFailed(hint=str(ex))
-
-        if response is None:
+        result = future.result()
+        if result is None:
             raise AsyncServiceCallFailed(hint='the target node may not be spinning')
 
-        return response
-
+        return result
 
 def create_param_client(node, remote_node_name, param_change_callback=None):
     return ParamClient(node, remote_node_name, param_change_callback)

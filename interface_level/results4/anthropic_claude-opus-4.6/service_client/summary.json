@@ -1,0 +1,170 @@
+[
+    {
+        "task_id": "service_client/task_001_simple_service",
+        "status": "FAILED",
+        "score": "7/8",
+        "pass_rate": "87.50%",
+        "tokens": 1095,
+        "failed_cases": [
+            {
+                "test_function": "test_client_uses_rclpy_and_node",
+                "error_message": "AssertionError: ROS2 client must create or use a Node abstraction\nassert None\n +  where None = <function search at 0x7f1409a0df30>('Node\\\\s*\\\\(', 'import rclpy\\nfrom rclpy.node import Node\\nfrom beginner_tutorials.srv import AddTwoInts\\n\\n\\ndef client_node():\\n   ...ient node running\\')\\n    node.destroy_node()\\n    rclpy.shutdown()\\n\\n\\nif __name__ == \"__main__\":\\n    client_node()')\n +    where <function search at 0x7f1409a0df30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "service_client/task_002_custom_srv",
+        "status": "FAILED",
+        "score": "5/7",
+        "pass_rate": "71.43%",
+        "tokens": 1130,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_server_uses_node_subclass",
+                "error_message": "AssertionError: ROS2 server should define a class inheriting from rclpy.node.Node\nassert None\n +  where None = <function search at 0x7fcd12a91f30>('class\\\\s+\\\\w+\\\\s*\\\\(\\\\s*Node\\\\s*\\\\)', '#!/usr/bin/env python\\n# -*- coding: utf-8 -*-\\n\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom your_package.srv im...    rclpy.spin(node)\\n    node.destroy_node()\\n    rclpy.shutdown()\\n\\n\\nif __name__ == \"__main__\":\\n    server_node()')\n +    where <function search at 0x7fcd12a91f30> = re.search"
+            },
+            {
+                "test_function": "test_server_defines_handler_and_accesses_request",
+                "error_message": "AssertionError: Handler must access request fields (e.g., req.a, req.b, req.c)\nassert None\n +  where None = <function search at 0x7fcd12a91f30>('req\\\\.\\\\w+', '#!/usr/bin/env python\\n# -*- coding: utf-8 -*-\\n\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom your_package.srv im...    rclpy.spin(node)\\n    node.destroy_node()\\n    rclpy.shutdown()\\n\\n\\nif __name__ == \"__main__\":\\n    server_node()')\n +    where <function search at 0x7fcd12a91f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "service_client/task_003_mp3_db_service",
+        "status": "FAILED",
+        "score": "3/7",
+        "pass_rate": "42.86%",
+        "tokens": 1886,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_client_uses_node",
+                "error_message": "AssertionError: ROS2 client must define a Node subclass\nassert None\n +  where None = <function search at 0x7f5a7603df30>('class\\\\s+\\\\w+\\\\s*\\\\(\\\\s*Node\\\\s*\\\\)', '#!/usr/bin/env python3\\n\\n#  Software License Agreement (BSD License)\\n#  \\n#  Copyright (c) 2015, Jan Winkler, Insti...% str(e))\\n\\n    node.destroy_node()\\n    rclpy.shutdown()\\n\\n\\nif __name__ == \"__main__\":\\n    mp3_inventory_client()')\n +    where <function search at 0x7f5a7603df30> = re.search"
+            },
+            {
+                "test_function": "test_ros2_client_creates_service_client",
+                "error_message": "AssertionError: Client must create a service client using MP3InventoryService\nassert None\n +  where None = <function search at 0x7f5a7603df30>('create_client\\\\s*\\\\(\\\\s*MP3InventoryService\\\\s*,', '#!/usr/bin/env python3\\n\\n#  Software License Agreement (BSD License)\\n#  \\n#  Copyright (c) 2015, Jan Winkler, Insti...% str(e))\\n\\n    node.destroy_node()\\n    rclpy.shutdown()\\n\\n\\nif __name__ == \"__main__\":\\n    mp3_inventory_client()')\n +    where <function search at 0x7f5a7603df30> = re.search"
+            },
+            {
+                "test_function": "test_client_accesses_response_list",
+                "error_message": "AssertionError: Client must access response.list_strings from MP3InventoryService\nassert None\n +  where None = <function search at 0x7f5a7603df30>('response\\\\.\\\\s*list_strings', '#!/usr/bin/env python3\\n\\n#  Software License Agreement (BSD License)\\n#  \\n#  Copyright (c) 2015, Jan Winkler, Insti...% str(e))\\n\\n    node.destroy_node()\\n    rclpy.shutdown()\\n\\n\\nif __name__ == \"__main__\":\\n    mp3_inventory_client()')\n +    where <function search at 0x7f5a7603df30> = re.search"
+            },
+            {
+                "test_function": "test_client_uses_response_to_drive_loop",
+                "error_message": "AssertionError: Client should iterate over response.list_strings\nassert None\n +  where None = <function search at 0x7f5a7603df30>('for\\\\s+\\\\w+\\\\s+in\\\\s+response\\\\.list_strings', '#!/usr/bin/env python3\\n\\n#  Software License Agreement (BSD License)\\n#  \\n#  Copyright (c) 2015, Jan Winkler, Insti...% str(e))\\n\\n    node.destroy_node()\\n    rclpy.shutdown()\\n\\n\\nif __name__ == \"__main__\":\\n    mp3_inventory_client()')\n +    where <function search at 0x7f5a7603df30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "service_client/task_005_gazebo",
+        "status": "FAILED",
+        "score": "5/7",
+        "pass_rate": "71.43%",
+        "tokens": 2110,
+        "failed_cases": [
+            {
+                "test_function": "test_response_used_in_return",
+                "error_message": "AssertionError: Return value must actually use the response object\nassert (None or None)\n +  where None = <function search at 0x7f597a445f30>('return\\\\s+.*response\\\\.success', '#! /usr/bin/env python3\\n# Wrappers around the services provided by rosified gazebo\\n\\nimport sys\\nimport rclpy\\nfrom...rn resp.success\\n    except Exception as e:\\n        print(\"Service call failed: %s\" % e)\\n        node.destroy_node()')\n +    where <function search at 0x7f597a445f30> = re.search\n +  and   None = <function search at 0x7f597a445f30>('success\\\\s*=\\\\s*.*response\\\\.success', '#! /usr/bin/env python3\\n# Wrappers around the services provided by rosified gazebo\\n\\nimport sys\\nimport rclpy\\nfrom...rn resp.success\\n    except Exception as e:\\n        print(\"Service call failed: %s\" % e)\\n        node.destroy_node()')\n +    where <function search at 0x7f597a445f30> = re.search"
+            },
+            {
+                "test_function": "test_multiple_service_calls_use_response",
+                "error_message": "AssertionError: spawn_sdf_model_client must use the response object in return/logic\nassert None\n +  where None = <function search at 0x7f597a445f30>('spawn_sdf_model_client.*response', '#! /usr/bin/env python3\\n# Wrappers around the services provided by rosified gazebo\\n\\nimport sys\\nimport rclpy\\nfrom...rn resp.success\\n    except Exception as e:\\n        print(\"Service call failed: %s\" % e)\\n        node.destroy_node()', re.DOTALL)\n +    where <function search at 0x7f597a445f30> = re.search\n +    and   re.DOTALL = re.DOTALL"
+            }
+        ]
+    },
+    {
+        "task_id": "service_client/task_006_gazebo_set_get_state",
+        "status": "FAILED",
+        "score": "5/8",
+        "pass_rate": "62.50%",
+        "tokens": 2231,
+        "failed_cases": [
+            {
+                "test_function": "test_02_service_client_type_and_name",
+                "error_message": "AssertionError: Must create ROS2 client for gazebo_msgs::srv::SetModelState (create_client<...>).\nMissing pattern: create_client\\s*<\\s*gazebo_msgs::srv::SetModelState\\s*>"
+            },
+            {
+                "test_function": "test_04_request_assigns_all_model_state_fields",
+                "error_message": "AssertionError: Must assign request->model_state.model_name.\nMissing pattern: (request|req)\\s*->\\s*model_state\\s*\\.\\s*model_name\\s*="
+            },
+            {
+                "test_function": "test_05_full_service_call_chain_success_and_failure_handling",
+                "error_message": "AssertionError: Must handle the non-SUCCESS case (timeout/failure) after spin_until_future_complete.\nMissing pattern: (!=\\s*rclcpp::FutureReturnCode::SUCCESS)|(else[\\s\\S]{0,300}RCLCPP_(ERROR|WARN)[\\s\\S]{0,200}(return|throw))"
+            }
+        ]
+    },
+    {
+        "task_id": "service_client/task_007_navigation_make_plan",
+        "status": "FAILED",
+        "score": "3/4",
+        "pass_rate": "75.00%",
+        "tokens": 37956,
+        "failed_cases": [
+            {
+                "test_function": "test_03_requestmap_has_mutex_lock_guard",
+                "error_message": "AssertionError: Must preserve mutex locking semantics from ROS1 (configuration_mutex_).\nMissing pattern: (scoped_lock|lock_guard|unique_lock)[\\s\\S]{0,120}\\bconfiguration_mutex_\\b\nFile: /ros2_ws/src/task_007_navigation_make_plan/amcl_node.cpp"
+            }
+        ]
+    },
+    {
+        "task_id": "service_client/task_008_clear_costmaps",
+        "status": "SUCCESS",
+        "score": "6/6",
+        "pass_rate": "100.00%",
+        "tokens": 3354,
+        "failed_cases": []
+    },
+    {
+        "task_id": "service_client/task_009_moveit_planning_scene",
+        "status": "SUCCESS",
+        "score": "4/4",
+        "pass_rate": "100.00%",
+        "tokens": 5490,
+        "failed_cases": []
+    },
+    {
+        "task_id": "service_client/task_010_controller_manager",
+        "status": "FAILED",
+        "score": "2/5",
+        "pass_rate": "40.00%",
+        "tokens": 2155,
+        "failed_cases": [
+            {
+                "test_function": "test_start_stop_controllers_semantics",
+                "error_message": "AssertionError: start_stop_controllers must send an async service request (call_async/async_send_request)\nassert False\n +  where False = _has_ros2_async_service_call('def start_stop_controllers(start_controllers=[], stop_controllers=[]):\\n    req = SwitchController.Request()\\n    req...  if resp.ok:\\n        return True\\n    else:\\n        print(\"Error when switching controllers\")\\n        return False')"
+            },
+            {
+                "test_function": "test_list_controllers_semantics",
+                "error_message": "AssertionError: list_controllers must send an async service request (call_async/async_send_request)\nassert False\n +  where False = _has_ros2_async_service_call('def list_controllers():\\n    resp = _call_service(\\n        ListControllers,\\n        \\'controller_manager/list_contr...None\\'\\n        print(f\"Controller: {c.name}, state: {c.state}, type: {c.type}, claimed interfaces: [{hw_str}]\")\\n\\n\\n')"
+            },
+            {
+                "test_function": "test_reload_libraries_semantics",
+                "error_message": "AssertionError: reload_libraries should include SwitchController usage (restart controllers that were running)\nassert None\n +  where None = <function search at 0x7f75c4471f30>('(SwitchController)\\\\b', 'def reload_libraries(force_kill, restore=False):\\n    if restore:\\n        # Snapshot current controllers\\n        li...me)\\n        if start_list:\\n            start_stop_controllers(start_controllers=start_list)\\n\\n    return True\\n\\n\\n')\n +    where <function search at 0x7f75c4471f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "service_client/task_011_robot_services",
+        "status": "FAILED",
+        "score": "2/6",
+        "pass_rate": "33.33%",
+        "tokens": 1692,
+        "failed_cases": [
+            {
+                "test_function": "test_target_camera_driver_is_referenced",
+                "error_message": "AssertionError: Must reference the target camera driver namespace 'head_camera/driver' (semantic target preservation)\nassert None\n +  where None = <function search at 0x7f4a19629f30>('head_camera\\\\s*/\\\\s*driver|head_camera/driver', '#!/usr/bin/env python3\\n\\n# Copyright (C) 2015 Fetch Robotics Inc\\n#\\n# Licensed under the Apache License, Version 2....       reconfigure.disable_auto()\\n\\n    import time\\n    time.sleep(1)\\n    node.destroy_node()\\n    rclpy.shutdown()')\n +    where <function search at 0x7f4a19629f30> = re.search"
+            },
+            {
+                "test_function": "test_init_sets_up_configuration_interface",
+                "error_message": "AssertionError: __init__ should initialize a ROS2 node or hold a node reference\nassert None\n +  where None = <function search at 0x7f4a19629f30>('create_node\\\\s*\\\\(|Node\\\\(', \"    def __init__(self, node):\\n        self.node = node\\n        self.client = self.node.create_client(\\n            ..._for_service(timeout_sec=5.0):\\n            self.node.get_logger().info('Waiting for camera parameter service...')\\n\\n\")\n +    where <function search at 0x7f4a19629f30> = re.search"
+            },
+            {
+                "test_function": "test_disable_auto_sets_both_flags_false",
+                "error_message": "AssertionError: disable_auto must set auto_exposure to False\nassert None\n +  where None = <function search at 0x7f4a19629f30>('auto_exposure.*False|False.*auto_exposure', '\\n    def disable_auto(self):\\n        \"\"\"Disable automatic exposure and white balance.\"\"\"\\n        params = []\\n\\n  ...e and white balance\\')\\n        else:\\n            self.node.get_logger().error(\\'Failed to disable auto settings\\')\\n')\n +    where <function search at 0x7f4a19629f30> = re.search"
+            },
+            {
+                "test_function": "test_enable_auto_sets_both_flags_true",
+                "error_message": "AssertionError: enable_auto must set auto_exposure to True\nassert None\n +  where None = <function search at 0x7f4a19629f30>('auto_exposure.*True|True.*auto_exposure', '\\n    def enable_auto(self):\\n        \"\"\"Enable automatic exposure and white balance.\"\"\"\\n        params = []\\n\\n    ...       reconfigure.disable_auto()\\n\\n    import time\\n    time.sleep(1)\\n    node.destroy_node()\\n    rclpy.shutdown()')\n +    where <function search at 0x7f4a19629f30> = re.search"
+            }
+        ]
+    }
+]

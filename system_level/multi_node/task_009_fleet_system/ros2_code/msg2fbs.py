@@ -13,8 +13,7 @@ import os
 import re
 import sys
 
-# from rosbridge_library.internal.ros_loader import get_message_class
-from roslib.message import get_message_class
+from rosidl_runtime_py.utilities import get_message
 
 # Flatbuffers types considered "scalar"
 scalar_types = {
@@ -50,37 +49,24 @@ def gen_metadata_item():
     yield "  __metadata:{}.MsgMetadata;".format(BASE_NS)
 
 def gen_support():
-    """
-    Define ROS 2 core transport structures.
-    Generate FBS definitions for 'MsgMetadata', 'MsgWithMetadata', 'RosTime', and 'RosDuration'.
-    Use ROS 2 naming: 'sec' and 'nanosec' (strictly 32-bit types).
-    Style Constraint: Use 2-space indentation for the generated FBS strings.
-    """
+    yield "namespace {};".format(BASE_NS)
     yield "table MsgMetadata {"
-    yield "  seq: uint32;"
-    yield "  stamp: RosTime;"
-    yield "  frame_id: string;"
+    yield "  topic:string;"
     yield "}"
     yield "table MsgWithMetadata {"
-    yield "  metadata: MsgMetadata;"
-    yield "  data: string;"
+    yield "  __metadata:MsgMetadata;"
     yield "}"
-    yield "table RosTime {"
-    yield "  sec: uint32;"
-    yield "  nanosec: uint32;"
+    yield "struct RosTime {"
+    yield "  sec:uint32;"
+    yield "  nanosec:uint32;"
     yield "}"
-    yield "table RosDuration {"
-    yield "  sec: uint32;"
-    yield "  nanosec: uint32;"
+    yield "struct RosDuration {"
+    yield "  sec:int32;"
+    yield "  nanosec:uint32;"
     yield "}"
 
 def type_remap(ros_type_name):
     """ apply direct translations from ROS type names to flatbuffers type names """
-    type_mapping = {
-        "std_msgs/msg/Header": "std_msgs_Header",
-        "geometry_msgs/msg/Pose": "geometry_msgs_Pose",
-        # Add more type mappings as needed
-    }
     if ros_type_name in type_mapping:
         return type_mapping[ros_type_name]
     return ros_type_name
@@ -95,20 +81,23 @@ class Type:
     ROS definition.
     """
     def __init__(self, ros_type):
-        """
-        Implement ROS 2 type and namespace parsing.
-        Parse fully-qualified ROS 2 types (e.g., 'std_msgs/msg/Header').
-        Extract namespace and name, converting slashes to dots for FlatBuffers.
-        Handle optional array/vector syntax (e.g., 'float32[]')
-        """
         self.ros_type = ros_type
-        self.namespace, self.name = ros_type.split('/', 1)
-        self.name = self.name.replace('/', '.')
         self.is_array = False
-        if self.name.endswith('[]'):
+        
+        # Handle array/vector syntax
+        if '[' in ros_type and ros_type.endswith(']'):
             self.is_array = True
-            self.name = self.name[:-2]
-
+            ros_type = ros_type[:ros_type.find('[')]
+            
+        # Parse namespace and name
+        parts = ros_type.split('/')
+        if len(parts) == 1:
+            self.namespace = None
+            self.name = parts[0]
+        else:
+            self.namespace = '.'.join(parts[:-1])
+            self.name = parts[-1]
+            
     def full_namespace(self):
         """ Namespace including base namespace """
         if self.namespace is None:
@@ -219,14 +208,14 @@ def gen_msg(msg_type, defined_types, args):
         raise RuntimeError("Type already generated: {}".format(msg_type.ros_type))
     msg_type.mark_defined(defined_types)
 
-    msg_class = get_message_class(msg_type.ros_type)
+    msg_class = get_message(msg_type.ros_type)
     if msg_class is None:
         raise RuntimeError("ROS Message type {} not found. Ensure any necessary packages are on your path.".format(msg_type.ros_type))
 
     # this is officially suggested by http://wiki.ros.org/msg#Client_Library_Support
-    name = msg_class._type
-    keys = msg_class.__slots__
-    types = [Type(name) for name in msg_class._slot_types]
+    fields_and_types = msg_class.get_fields_and_field_types()
+    keys = list(fields_and_types.keys())
+    types = [Type(t) for t in fields_and_types.values()]
 
     # generate dependency types
     for t in types:

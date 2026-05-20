@@ -1,52 +1,42 @@
 #!/usr/bin/env python3
 import rclpy
+from rclpy.node import Node
 from sensor_msgs.msg import LaserScan
+import math
 
-
-def main():
-    rclpy.init()
+def main(args=None):
+    rclpy.init(args=args)
     node = rclpy.create_node("lidar_publisher")
 
-    # TODO: Create a publisher that publishes to /scan using LaserScan
-    # Fill in all LaserScan fields in the while loop
-    # publish message afterwards
-    publisher = node.create_publisher(LaserScan, "/scan", 10)
-
+    publisher = node.create_publisher(LaserScan, '/scan', 10)
     rate = node.create_rate(10)
 
-    try:
-        while rclpy.ok():
-            scan = LaserScan()
+    while rclpy.ok():
+        scan = LaserScan()
 
-            scan.header.stamp = node.get_clock().now().to_msg()
-            scan.header.frame_id = "laser_frame"
+        scan.header.stamp = node.get_clock().now().to_msg()
+        scan.header.frame_id = "laser_frame"
+        
+        scan.angle_min = -math.pi
+        scan.angle_max = math.pi
+        scan.angle_increment = math.pi / 180.0
+        
+        scan.time_increment = 0.0
+        scan.scan_time = 0.1
+        
+        scan.range_min = 0.1
+        scan.range_max = 10.0
+        
+        scan.ranges = [5.0] * 360
+        scan.intensities = [100.0] * 360
 
-            # Angular limits
-            scan.angle_min = -1.57
-            scan.angle_max = 1.57
-            scan.angle_increment = 0.01
+        publisher.publish(scan)
+        
+        rclpy.spin_once(node, timeout_sec=0)
+        rate.sleep()
 
-            # Timing
-            scan.time_increment = 0.0
-            scan.scan_time = 0.1
-
-            # Range limits
-            scan.range_min = 0.12
-            scan.range_max = 10.0
-
-            # Data
-            num_readings = int((scan.angle_max - scan.angle_min) / scan.angle_increment) + 1
-            scan.ranges = [1.0] * num_readings
-            scan.intensities = [100.0] * num_readings
-
-            publisher.publish(scan)
-
-            rate.sleep()
-    finally:
-        node.destroy_node()
-        rclpy.shutdown()
-    # END OF TODO
-
+    node.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == "__main__":
     main()

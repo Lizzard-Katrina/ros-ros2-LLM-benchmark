@@ -9,24 +9,23 @@ Date:   Fall 2023
 """
 
 import numpy as np
-import cv2
+import cv2, cv_bridge
 import rclpy
 from rclpy.node import Node
-from rclpy.executors import MultiThreadedExecutor
-from rclpy.qos import QoSProfile, QoSPolicy
-from sensor_msgs.msg import Image, CameraInfo
-from pick_and_place.msg import DetectedObjectsStamped, DetectedObject
-from gazebo_msgs.srv import GetModelState
-from rclpy.client import Client
-from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
-from rclpy.executors import ExternalShutdownException
+import tf_transformations
 
-from tf_transformations import quaternion_from_euler
+from gazebo_msgs.srv import GetEntityState
+from image_geometry import PinholeCameraModel
+from sensor_msgs.msg import Image, CameraInfo
+from typing import List, Tuple
+
+from pick_and_place.msg import DetectedObjectsStamped, DetectedObject
+
 
 class VisionObjectDetector(Node):
     def __init__(self):
-        
         super().__init__('vision_object_detector')
+        
         self.color_ranges = {"blue": [np.array([110,50,50]), np.array([130,255,255])],
                              "green": [np.array([36, 25, 25]), np.array([70, 255,255])],
                              "red": [np.array([0, 100, 100]), np.array([10, 255, 255])],
@@ -34,59 +33,41 @@ class VisionObjectDetector(Node):
                              }                                              # Color ranges in HSV (Hue [0-180), Saturation [0-255], Value [0-255])
         self.block_contour_area_threshold = 200                             # Area threshold to detect blocks
         self.blocks_on_workbench = []                                       # Blocks on the workbench [(cx, cy, w, h, depth, color, area)]
-        self.bridge = CvBridge()
-        self.image_width = None
-        self.image_height = None
-        self.depth_image = None
-        self.pin_cam = None
-        self.workbench_depth = None
-        self.T_c_w = None
-        self.T_w_c = None
         
-        # Migrate ROS 1 communication and transform initializations to ROS 2.
         self.declare_parameter('camera_topic', '/camera/color/image_raw')
         self.declare_parameter('depth_topic', '/camera/depth/image_raw')
         self.declare_parameter('camera_info_topic', '/camera/color/camera_info')
-        self.declare_parameter('gazebo_model_state_service', '/gazebo/get_model_state')
+        
+        self.bridge = cv_bridge.CvBridge()
+        self.detected_objects_pub = self.create_publisher(DetectedObjectsStamped, 'detected_objects', 10)
+        
+        self.get_entity_state_client = self.create_client(GetEntityState, '/gazebo/get_entity_state')
+        while not self.get_entity_state_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('service not available, waiting again...')
+            
+        self._latest_depth = None
+        self._latest_color = None
+        self._latest_cam_info = None
+        
+        self.create_subscription(Image, self.get_parameter('depth_topic').value, lambda msg: setattr(self, '_latest_depth', msg), 10)
+        self.create_subscription(Image, self.get_parameter('camera_topic').value, lambda msg: setattr(self, '_latest_color', msg), 10)
+        self.create_subscription(CameraInfo, self.get_parameter('camera_info_topic').value, lambda msg: setattr(self, '_latest_cam_info', msg), 10)
+        
+        while rclpy.ok() and (self._latest_depth is None or self._latest_color is None or self._latest_cam_info is None):
+            rclpy.spin_once(self, timeout_sec=0.1)
+            
+        self.depth_image = self.get_depth_image()
+        self.image_height, self.image_width = self.get_image_dimensions()
+        self.pin_cam = self.get_pinhole_camera_model()
+        self.T_c_w, self.T_w_c = self.get_camera_homogeneous_tranforms()
+        self.workbench_depth = self.get_workbench_depth()
+        
+        self.image_sub = self.create_subscription(Image, self.get_parameter('camera_topic').value, self.image_callback, 10)
 
-        self.image_sub = self.create_subscription(
-            Image,
-            self.get_parameter('camera_topic').get_parameter_value().string_value,
-            self.image_callback,
-            QoSProfile(depth=10))
-        
-        self.depth_sub = self.create_subscription(
-            Image,
-            self.get_parameter('depth_topic').get_parameter_value().string_value,
-            self.depth_callback,
-            QoSProfile(depth=10))
-        
-        self.camera_info_sub = self.create_subscription(
-            CameraInfo,
-            self.get_parameter('camera_info_topic').get_parameter_value().string_value,
-            self.camera_info_callback,
-            QoSProfile(depth=10))
-        
-        self.detected_objects_pub = self.create_publisher(
-            DetectedObjectsStamped,
-            'detected_objects',
-            QoSProfile(depth=10))
-        
-        self.get_model_state_client = self.create_client(
-            GetModelState,
-            self.get_parameter('gazebo_model_state_service').get_parameter_value().string_value)
-        
-        self.get_image_dimensions()
-        self.get_camera_homogeneous_tranforms()
-        self.get_workbench_depth()
-        
     def get_image_dimensions(self) -> Tuple[int]:
         """Computes the image height and width in pixels."""
-        msg = self.get_message(self.get_parameter('camera_topic').get_parameter_value().string_value, Image)
-        image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        image = self.get_color_image()
         h, w, c = image.shape
-        self.image_height = h
-        self.image_width = w
         return h, w
 
     def get_camera_homogeneous_tranforms(self) -> np.ndarray:
@@ -100,44 +81,40 @@ class VisionObjectDetector(Node):
                              [-1,  0,  0, 0],
                              [ 0,  0, -1, 0],
                              [ 0,  0,  0, 1]])                               # Rotation of camera wrt world (Homogeneous transform)
-        Transl_c_w = self.translation_matrix((camera_origin))  # Translation of camera wrt world (Homogeneous transform)
+        Transl_c_w = tf_transformations.translation_matrix((camera_origin))  # Translation of camera wrt world (Homogeneous transform)
         T_c_w =  np.dot(Transl_c_w, Rot_c_w)                                 # Homogeneous transform of camera wrt world
-        T_w_c = self.inverse_matrix(T_c_w)                     # Homogeneous transform of world wrt camera
-        self.T_c_w = T_c_w
-        self.T_w_c = T_w_c
+        T_w_c = tf_transformations.inverse_matrix(T_c_w)                     # Homogeneous transform of world wrt camera
         return T_c_w, T_w_c
         
     def get_depth_image(self) -> np.ndarray:
         """Returns current depth image in OpenCV fomrat."""
-        msg = self.get_message(self.get_parameter('depth_topic').get_parameter_value().string_value, Image)
-        image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='32FC1')
+        while rclpy.ok() and self._latest_depth is None:
+            rclpy.spin_once(self, timeout_sec=0.1)
+        image = self.bridge.imgmsg_to_cv2(self._latest_depth, desired_encoding='32FC1')
         return image
     
     def get_color_image(self) -> np.ndarray:
         """Returns current color image in OpenCV fomrat."""
-        msg = self.get_message(self.get_parameter('camera_topic').get_parameter_value().string_value, Image)
-        image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
+        while rclpy.ok() and self._latest_color is None:
+            rclpy.spin_once(self, timeout_sec=0.1)
+        image = self.bridge.imgmsg_to_cv2(self._latest_color, desired_encoding='bgr8')
         return image
 
     def get_pinhole_camera_model(self) -> PinholeCameraModel:
         """Creates a pinhole camera model from the camera's ROS parameters."""
         pin_cam = PinholeCameraModel()
-        msg = self.get_message(self.get_parameter('camera_info_topic').get_parameter_value().string_value, CameraInfo)
-        pin_cam.fromCameraInfo(msg)
-        self.pin_cam = pin_cam
+        while rclpy.ok() and self._latest_cam_info is None:
+            rclpy.spin_once(self, timeout_sec=0.1)
+        pin_cam.fromCameraInfo(self._latest_cam_info)
         return pin_cam
 
     def get_model_position_from_gazebo(self, model: str) -> Tuple[float]:
-        req = GetModelState.Request()
-        req.model_name = model
-        future = self.get_model_state_client.call_async(req)
+        req = GetEntityState.Request()
+        req.name = model
+        future = self.get_entity_state_client.call_async(req)
         rclpy.spin_until_future_complete(self, future)
-        try:
-            response = future.result()
-        except Exception as e:
-            self.get_logger().info('Service call failed %r' % (e,))
-        else:
-            return response.pose.position.x, response.pose.position.y, response.pose.position.z
+        res = future.result()
+        return (res.state.pose.position.x, res.state.pose.position.y, res.state.pose.position.z)
 
     def get_mask(self, hsv: np.ndarray, color: str) -> np.ndarray:
         """Creates a mask of the image that detects the given color."""
@@ -169,7 +146,6 @@ class VisionObjectDetector(Node):
 
         # Get depth value of that pixel
         depth = self.get_pixel_depth(u, v)
-        self.workbench_depth = depth
         return depth
 
     def get_pixel_depth(self, u: float, v: float) -> float:
@@ -342,39 +318,10 @@ class VisionObjectDetector(Node):
         contours, _ = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         return contours
 
-    def depth_callback(self, msg: Image) -> None:
-        self.depth_image = self.bridge.imgmsg_to_cv2(msg, desired_encoding='32FC1')
 
-    def camera_info_callback(self, msg: CameraInfo) -> None:
-        self.pin_cam = PinholeCameraModel()
-        self.pin_cam.fromCameraInfo(msg)
-
-    def translation_matrix(self, translation: Tuple[float]) -> np.ndarray:
-        return np.array([[1, 0, 0, translation[0]],
-                         [0, 1, 0, translation[1]],
-                         [0, 0, 1, translation[2]],
-                         [0, 0, 0, 1]])
-
-    def inverse_matrix(self, matrix: np.ndarray) -> np.ndarray:
-        return np.linalg.inv(matrix)
-
-    def get_message(self, topic: str, msg_type: type) -> msg_type:
-        sub = self.create_subscription(msg_type, topic, lambda msg: self.get_logger().info('Received message'), QoSProfile(depth=10))
-        while rclpy.ok():
-            rclpy.spin_once(self)
-            if sub.get_num_publishers() > 0:
-                break
-        msg = self.get_logger().info('Received message')
-        self.destroy_subscription(sub)
-        return msg
-
-def main(args=None):
-    rclpy.init(args=args)
-    object_detector = VisionObjectDetector()
-    executor = MultiThreadedExecutor()
-    rclpy.spin(object_detector, executor=executor)
-    object_detector.destroy_node()
+if __name__ == "__main__": 
+    rclpy.init()
+    node = VisionObjectDetector()
+    rclpy.spin(node)
+    node.destroy_node()
     rclpy.shutdown()
-
-if __name__ == "__main__":
-    main()

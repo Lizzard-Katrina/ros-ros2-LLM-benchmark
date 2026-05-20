@@ -18,10 +18,12 @@
 
 #include <moveit/common_planning_interface_objects/common_objects.h>
 #include <moveit/planning_scene/planning_scene.h>
-#include <moveit_msgs/PlanningScene.h>
+#include <moveit_msgs/msg/planning_scene.hpp>
 #include <reach/plugin_utils.h>
 #include <reach/utils.h>
 #include <yaml-cpp/yaml.h>
+#include <rclcpp/rclcpp.hpp>
+#include <boost/bind/bind.hpp>
 
 namespace
 {
@@ -51,8 +53,8 @@ MoveItIKSolver::MoveItIKSolver(moveit::core::RobotModelConstPtr model, const std
 
   scene_.reset(new planning_scene::PlanningScene(model_));
 
-  rclcpp::Node node("moveit_ik_solver");
-  scene_pub_ = node.create_publisher<moveit_msgs::msg::PlanningScene>("planning_scene", 1);
+  node_ = rclcpp::Node::make_shared("reach_moveit_ik_solver");
+  scene_pub_ = node_->create_publisher<moveit_msgs::msg::PlanningScene>("planning_scene", rclcpp::QoS(1).transient_local());
   moveit_msgs::msg::PlanningScene scene_msg;
   scene_->getPlanningSceneMsg(scene_msg);
   scene_pub_->publish(scene_msg);
@@ -62,13 +64,22 @@ std::vector<std::vector<double>> MoveItIKSolver::solveIK(const Eigen::Isometry3d
                                                          const std::map<std::string, double>& seed) const
 {
   moveit::core::RobotState state(model_);
-  state.setFromIK(jmg_, target, boost::bind(&MoveItIKSolver::isIKSolutionValid, this, _1, jmg_.get(), _2));
+  state.setToDefaultValues();
+  
+  std::vector<double> seed_subset = reach::extractSubset(seed, jmg_->getActiveJointModelNames());
+  state.setJointGroupPositions(jmg_, seed_subset);
+  state.update();
+
+  bool success = state.setFromIK(jmg_, target, 0.0, 
+                                 boost::bind(&MoveItIKSolver::isIKSolutionValid, this, boost::placeholders::_1, boost::placeholders::_2, boost::placeholders::_3));
+  
   state.update();
 
   std::vector<std::vector<double>> solutions;
-  if (state.satisfiesBounds())
+  if (success)
   {
-    std::vector<double> solution = state.getJointGroupPositions(jmg_);
+    std::vector<double> solution;
+    state.copyJointGroupPositions(jmg_, solution);
     solutions.push_back(solution);
   }
 
@@ -122,7 +133,7 @@ reach::IKSolver::ConstPtr MoveItIKSolverFactory::create(const YAML::Node& config
   auto planning_group = reach::get<std::string>(config, "planning_group");
   auto dist_threshold = reach::get<double>(config, "distance_threshold");
 
-  rclcpp::init(0, nullptr);
+  utils::initROS();
   moveit::core::RobotModelConstPtr model = moveit::planning_interface::getSharedRobotModel("robot_description");
   if (!model)
     throw std::runtime_error("Failed to initialize robot model pointer");
@@ -186,7 +197,7 @@ reach::IKSolver::ConstPtr DiscretizedMoveItIKSolverFactory::create(const YAML::N
   auto planning_group = reach::get<std::string>(config, "planning_group");
   auto dist_threshold = reach::get<double>(config, "distance_threshold");
 
-  rclcpp::init(0, nullptr);
+  utils::initROS();
   moveit::core::RobotModelConstPtr model = moveit::planning_interface::getSharedRobotModel("robot_description");
   if (!model)
     throw std::runtime_error("Failed to initialize robot model pointer");

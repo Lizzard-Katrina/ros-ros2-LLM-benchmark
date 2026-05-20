@@ -28,9 +28,6 @@
 
 #include <QApplication>
 
-#include <cstdint>
-#include <vector>
-
 #include <rclcpp/rclcpp.hpp>
 
 #include "turtlesim/turtle_frame.hpp"
@@ -45,11 +42,18 @@ public:
   {
     rclcpp::init(argc, argv);
     nh_ = rclcpp::Node::make_shared("turtlesim");
-    nh_->declare_parameter<std::vector<int64_t>>(
-      "background_color_rgb",
-      std::vector<int64_t>{69, 86, 255});
-    std::vector<int64_t> background_color_rgb =
-      nh_->get_parameter("background_color_rgb").as_integer_array();
+    
+    std::vector<int64_t> background_color_rgb;
+    nh_->declare_parameter("background_color_rgb", std::vector<int64_t>{69, 86, 255});
+    nh_->get_parameter("background_color_rgb", background_color_rgb);
+    
+    turtlesim::TurtleFrame * frame = new turtlesim::TurtleFrame(nh_);
+    frame->show();
+  }
+  
+  ~TurtleApp()
+  {
+    rclcpp::shutdown();
   }
 };
 

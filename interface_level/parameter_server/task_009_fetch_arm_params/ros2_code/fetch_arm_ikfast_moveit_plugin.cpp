@@ -42,62 +42,11 @@
  */
 
 #include <rclcpp/rclcpp.hpp>
-#include <moveit/kinematics_base/kinematics_base.hpp>
-#include <moveit/robot_state/robot_state.hpp>
-#include <geometry_msgs/msg/pose.hpp>
-#include <moveit_msgs/msg/move_it_error_codes.hpp>
+#include <moveit/kinematics_base/kinematics_base.h>
+#include <moveit/robot_state/robot_state.h>
 #include <Eigen/Geometry>
 #include <tf2_kdl/tf2_kdl.hpp>
 #include <tf2_eigen/tf2_eigen.hpp>
-#include <eigen_conversions/eigen_kdl.h>
-#include <algorithm>
-#include <cmath>
-#include <cstdlib>
-#include <ctime>
-#include <limits>
-#include <sstream>
-
-namespace geometry_msgs
-{
-using Pose = geometry_msgs::msg::Pose;
-}
-
-namespace moveit_msgs
-{
-using MoveItErrorCodes = moveit_msgs::msg::MoveItErrorCodes;
-}
-
-#define ROS_ERROR(...) RCLCPP_ERROR(rclcpp::get_logger("ikfast_plugin"), __VA_ARGS__)
-#define ROS_ERROR_NAMED(name, ...) RCLCPP_ERROR(rclcpp::get_logger(name), __VA_ARGS__)
-#define ROS_DEBUG_NAMED(name, ...) RCLCPP_DEBUG(rclcpp::get_logger(name), __VA_ARGS__)
-#define ROS_WARN_STREAM_NAMED(name, msg)                                                                                 \
-  do                                                                                                                     \
-  {                                                                                                                      \
-    std::ostringstream __oss;                                                                                            \
-    __oss << msg;                                                                                                        \
-    RCLCPP_WARN(rclcpp::get_logger(name), "%s", __oss.str().c_str());                                                   \
-  } while (0)
-#define ROS_WARN_STREAM_ONCE_NAMED(name, msg)                                                                            \
-  do                                                                                                                     \
-  {                                                                                                                      \
-    std::ostringstream __oss;                                                                                            \
-    __oss << msg;                                                                                                        \
-    RCLCPP_WARN_ONCE(rclcpp::get_logger(name), "%s", __oss.str().c_str());                                              \
-  } while (0)
-#define ROS_ERROR_STREAM_NAMED(name, msg)                                                                                \
-  do                                                                                                                     \
-  {                                                                                                                      \
-    std::ostringstream __oss;                                                                                            \
-    __oss << msg;                                                                                                        \
-    RCLCPP_ERROR(rclcpp::get_logger(name), "%s", __oss.str().c_str());                                                  \
-  } while (0)
-#define ROS_DEBUG_STREAM_NAMED(name, msg)                                                                                \
-  do                                                                                                                     \
-  {                                                                                                                      \
-    std::ostringstream __oss;                                                                                            \
-    __oss << msg;                                                                                                        \
-    RCLCPP_DEBUG(rclcpp::get_logger(name), "%s", __oss.str().c_str());                                                  \
-  } while (0)
 
 using namespace moveit::core;
 
@@ -252,42 +201,122 @@ public:
     supported_methods_.push_back(kinematics::DiscretizationMethods::ALL_RANDOM_SAMPLED);
   }
 
+  /**
+   * @brief Given a desired pose of the end-effector, compute the joint angles to reach it
+   * @param ik_pose the desired pose of the link
+   * @param ik_seed_state an initial guess solution for the inverse kinematics
+   * @param solution the solution vector
+   * @param error_code an error code that encodes the reason for failure or success
+   * @return True if a valid solution was found, false otherwise
+   */
+
+  // Returns the IK solution that is within joint limits closest to ik_seed_state
   bool getPositionIK(
       const geometry_msgs::Pose& ik_pose, const std::vector<double>& ik_seed_state, std::vector<double>& solution,
       moveit_msgs::MoveItErrorCodes& error_code,
       const kinematics::KinematicsQueryOptions& options = kinematics::KinematicsQueryOptions()) const override;
 
+  /**
+   * @brief Given a desired pose of the end-effector, compute the set joint angles solutions that are able to reach it.
+   *
+   * This is a default implementation that returns only one solution and so its result is equivalent to calling
+   * 'getPositionIK(...)' with a zero initialized seed.
+   *
+   * @param ik_poses  The desired pose of each tip link
+   * @param ik_seed_state an initial guess solution for the inverse kinematics
+   * @param solutions A vector of vectors where each entry is a valid joint solution
+   * @param result A struct that reports the results of the query
+   * @param options An option struct which contains the type of redundancy discretization used. This default
+   *                implementation only supports the KinmaticSearches::NO_DISCRETIZATION method; requesting any
+   *                other will result in failure.
+   * @return True if a valid set of solutions was found, false otherwise.
+   */
   bool getPositionIK(const std::vector<geometry_msgs::Pose>& ik_poses, const std::vector<double>& ik_seed_state,
                      std::vector<std::vector<double>>& solutions, kinematics::KinematicsResult& result,
                      const kinematics::KinematicsQueryOptions& options) const override;
 
+  /**
+   * @brief Given a desired pose of the end-effector, search for the joint angles required to reach it.
+   * This particular method is intended for "searching" for a solutions by stepping through the redundancy
+   * (or other numerical routines).
+   * @param ik_pose the desired pose of the link
+   * @param ik_seed_state an initial guess solution for the inverse kinematics
+   * @return True if a valid solution was found, false otherwise
+   */
   bool searchPositionIK(
       const geometry_msgs::Pose& ik_pose, const std::vector<double>& ik_seed_state, double timeout,
       std::vector<double>& solution, moveit_msgs::MoveItErrorCodes& error_code,
       const kinematics::KinematicsQueryOptions& options = kinematics::KinematicsQueryOptions()) const override;
 
+  /**
+   * @brief Given a desired pose of the end-effector, search for the joint angles required to reach it.
+   * This particular method is intended for "searching" for a solutions by stepping through the redundancy
+   * (or other numerical routines).
+   * @param ik_pose the desired pose of the link
+   * @param ik_seed_state an initial guess solution for the inverse kinematics
+   * @param the distance that the redundancy can be from the current position
+   * @return True if a valid solution was found, false otherwise
+   */
   bool searchPositionIK(
       const geometry_msgs::Pose& ik_pose, const std::vector<double>& ik_seed_state, double timeout,
       const std::vector<double>& consistency_limits, std::vector<double>& solution,
       moveit_msgs::MoveItErrorCodes& error_code,
       const kinematics::KinematicsQueryOptions& options = kinematics::KinematicsQueryOptions()) const override;
 
+  /**
+   * @brief Given a desired pose of the end-effector, search for the joint angles required to reach it.
+   * This particular method is intended for "searching" for a solutions by stepping through the redundancy
+   * (or other numerical routines).
+   * @param ik_pose the desired pose of the link
+   * @param ik_seed_state an initial guess solution for the inverse kinematics
+   * @return True if a valid solution was found, false otherwise
+   */
   bool searchPositionIK(
       const geometry_msgs::Pose& ik_pose, const std::vector<double>& ik_seed_state, double timeout,
       std::vector<double>& solution, const IKCallbackFn& solution_callback, moveit_msgs::MoveItErrorCodes& error_code,
       const kinematics::KinematicsQueryOptions& options = kinematics::KinematicsQueryOptions()) const override;
 
+  /**
+   * @brief Given a desired pose of the end-effector, search for the joint angles required to reach it.
+   * This particular method is intended for "searching" for a solutions by stepping through the redundancy
+   * (or other numerical routines).  The consistency_limit specifies that only certain redundancy positions
+   * around those specified in the seed state are admissible and need to be searched.
+   * @param ik_pose the desired pose of the link
+   * @param ik_seed_state an initial guess solution for the inverse kinematics
+   * @param consistency_limit the distance that the redundancy can be from the current position
+   * @return True if a valid solution was found, false otherwise
+   */
   bool searchPositionIK(
       const geometry_msgs::Pose& ik_pose, const std::vector<double>& ik_seed_state, double timeout,
       const std::vector<double>& consistency_limits, std::vector<double>& solution,
       const IKCallbackFn& solution_callback, moveit_msgs::MoveItErrorCodes& error_code,
       const kinematics::KinematicsQueryOptions& options = kinematics::KinematicsQueryOptions()) const override;
 
+  /**
+   * @brief Given a set of joint angles and a set of links, compute their pose
+   *
+   * @param link_names A set of links for which FK needs to be computed
+   * @param joint_angles The state for which FK is being computed
+   * @param poses The resultant set of poses (in the frame returned by getBaseFrame())
+   * @return True if a valid solution was found, false otherwise
+   */
   bool getPositionFK(const std::vector<std::string>& link_names, const std::vector<double>& joint_angles,
                      std::vector<geometry_msgs::Pose>& poses) const override;
 
+  /**
+   * @brief Sets the discretization value for the redundant joint.
+   *
+   * Since this ikfast implementation allows for one redundant joint then only the first entry will be in the
+   *discretization map will be used.
+   * Calling this method replaces previous discretization settings.
+   *
+   * @param discretization a map of joint indices and discretization value pairs.
+   */
   void setSearchDiscretization(const std::map<unsigned int, double>& discretization);
 
+  /**
+   * @brief Overrides the default method to prevent changing the redundant joints
+   */
   bool setRedundantJoints(const std::vector<unsigned int>& redundant_joint_indices) override;
 
 private:
@@ -295,23 +324,48 @@ private:
                   const std::string& base_frame, const std::vector<std::string>& tip_frames,
                   double search_discretization) override;
 
+  /**
+   * @brief Calls the IK solver from IKFast
+   * @return The number of solutions found
+   */
   size_t solve(KDL::Frame& pose_frame, const std::vector<double>& vfree, IkSolutionList<IkReal>& solutions) const;
 
+  /**
+   * @brief Gets a specific solution from the set
+   */
   void getSolution(const IkSolutionList<IkReal>& solutions, int i, std::vector<double>& solution) const;
 
+  /**
+   * @brief Gets a specific solution from the set with joints rotated 360° to be near seed state where possible
+   */
   void getSolution(const IkSolutionList<IkReal>& solutions, const std::vector<double>& ik_seed_state, int i,
                    std::vector<double>& solution) const;
 
+  /**
+   * @brief If the value is outside of min/max then it tries to +/- 2 * pi to put the value into the range
+   */
   double enforceLimits(double val, double min, double max) const;
 
   void fillFreeParams(int count, int* array);
   bool getCount(int& count, const int& max_count, const int& min_count) const;
 
+  /**
+  * @brief samples the designated redundant joint using the chosen discretization method
+  * @param  method              An enumeration flag indicating the discretization method to be used
+  * @param  sampled_joint_vals  Sampled joint values for the redundant joint
+  * @return True if sampling succeeded.
+  */
   bool sampleRedundantJoint(kinematics::DiscretizationMethod method, std::vector<double>& sampled_joint_vals) const;
 
+  /// Validate that we can compute a fixed transform between from and to links.
   bool computeRelativeTransform(const std::string& from, const std::string& to, Eigen::Isometry3d& transform,
                                 bool& differs_from_identity);
-
+  /**
+  * @brief  Transforms the input pose to the correct frame for the solver. This assumes that the group includes the
+  * entire solver chain and that any joints outside of the solver chain within the group are are fixed.
+  * @param  ik_pose             The pose to be transformed which should be in the correct frame for the group.
+  * @param  ik_pose_chain       The ik_pose to be populated with the apropriate pose for the solver
+  */
   void transformToChainFrame(const geometry_msgs::Pose& ik_pose, KDL::Frame& ik_pose_chain) const;
 };  // end class
 
@@ -324,16 +378,16 @@ bool IKFastKinematicsPlugin::computeRelativeTransform(const std::string& from, c
   auto* from_link = robot_state->getLinkModel(from);
   auto* to_link = robot_state->getLinkModel(to);
   if (!from_link)
-    ROS_ERROR_STREAM_NAMED(name_, "Could not find frame " << from);
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger(name_), "Could not find frame " << from);
   if (!to_link)
-    ROS_ERROR_STREAM_NAMED(name_, "Could not find frame " << to);
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger(name_), "Could not find frame " << to);
   if (!from_link || !to_link)
     return false;
 
   if (robot_state->getRobotModel()->getRigidlyConnectedParentLinkModel(from_link) !=
       robot_state->getRobotModel()->getRigidlyConnectedParentLinkModel(to_link))
   {
-    ROS_ERROR_STREAM_NAMED(name_, "Link frames " << from << " and " << to << " are not rigidly connected.");
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger(name_), "Link frames " << from << " and " << to << " are not rigidly connected.");
     return false;
   }
 
@@ -346,163 +400,66 @@ bool IKFastKinematicsPlugin::initialize(const moveit::core::RobotModel& robot_mo
                                         const std::string& base_frame, const std::vector<std::string>& tip_frames,
                                         double search_discretization)
 {
-  const rclcpp::Logger logger = rclcpp::get_logger(name_);
-  initialized_ = false;
-
-  if (tip_frames.size() != 1)
+  storeValues(robot_model, group_name, base_frame, tip_frames, search_discretization);
+  
+  const moveit::core::JointModelGroup* joint_model_group = robot_model_->getJointModelGroup(group_name);
+  if (!joint_model_group)
   {
-    RCLCPP_ERROR(logger, "IKFast plugin supports exactly one tip frame, got %zu", tip_frames.size());
+    RCLCPP_ERROR(rclcpp::get_logger(name_), "Group '%s' not found in robot model", group_name.c_str());
     return false;
   }
 
-  robot_model_ = robot_model.shared_from_this();
-  group_name_ = group_name;
-  base_frame_ = base_frame;
-  tip_frames_ = tip_frames;
-  search_discretization_ = search_discretization;
-
-  if (!node_)
+  if (!joint_model_group->isChain())
   {
-    RCLCPP_ERROR(logger, "No ROS 2 node available in IKFast plugin");
+    RCLCPP_ERROR(rclcpp::get_logger(name_), "Group '%s' is not a chain", group_name.c_str());
     return false;
   }
 
-  if (!node_->has_parameter("robot_description"))
+  if (!joint_model_group->isSingleDOFJoints())
   {
-    node_->declare_parameter<std::string>("robot_description", "");
-  }
-  node_->get_parameter("robot_description", robot_description_);
-
-  const std::string param_prefix = "robot_description_kinematics." + group_name_ + ".";
-  const std::string timeout_param = param_prefix + "kinematics_solver_timeout";
-  const std::string attempts_param = param_prefix + "kinematics_solver_attempts";
-
-  if (!node_->has_parameter(timeout_param))
-    node_->declare_parameter<double>(timeout_param, default_timeout_);
-  if (!node_->has_parameter(attempts_param))
-    node_->declare_parameter<int>(attempts_param, static_cast<int>(default_attempts_));
-
-  node_->get_parameter(timeout_param, default_timeout_);
-  int attempts = static_cast<int>(default_attempts_);
-  node_->get_parameter(attempts_param, attempts);
-  default_attempts_ = (attempts < 1) ? 1 : static_cast<unsigned int>(attempts);
-
-  const moveit::core::JointModelGroup* jmg = robot_model_->getJointModelGroup(group_name_);
-  if (!jmg)
-  {
-    RCLCPP_ERROR(logger, "Joint model group '%s' not found", group_name_.c_str());
+    RCLCPP_ERROR(rclcpp::get_logger(name_), "Group '%s' includes joints that have more than 1 DOF", group_name.c_str());
     return false;
   }
 
-  if (!jmg->isChain())
+  joint_names_ = joint_model_group->getActiveJointModelNames();
+  link_names_ = joint_model_group->getLinkModelNames();
+
+  if (joint_names_.size() != num_joints_)
   {
-    RCLCPP_ERROR(logger, "Joint model group '%s' is not a chain", group_name_.c_str());
+    RCLCPP_ERROR(rclcpp::get_logger(name_), "Group '%s' has %zu joints, but IKFast solver expects %zu", 
+                 group_name.c_str(), joint_names_.size(), num_joints_);
     return false;
   }
 
-  if (jmg->getActiveVariableCount() != num_joints_)
+  for (size_t i = 0; i < joint_names_.size(); ++i)
   {
-    RCLCPP_ERROR(logger, "IKFast solver expects %zu joints, but group '%s' has %zu active variables",
-                 num_joints_, group_name_.c_str(), jmg->getActiveVariableCount());
-    return false;
-  }
-
-  int num_free_params = GetNumFreeParameters();
-  if (num_free_params < 0 || num_free_params > static_cast<int>(num_joints_))
-  {
-    RCLCPP_ERROR(logger, "Invalid number of IKFast free parameters: %d", num_free_params);
-    return false;
-  }
-  if (num_free_params > 1)
-  {
-    RCLCPP_ERROR(logger, "This plugin supports at most one redundant joint, IKFast reports %d", num_free_params);
-    return false;
-  }
-
-  joint_names_.clear();
-  joint_min_vector_.clear();
-  joint_max_vector_.clear();
-  joint_has_limits_vector_.clear();
-
-  const auto& active_joints = jmg->getActiveJointModels();
-  joint_names_.reserve(active_joints.size());
-  joint_min_vector_.reserve(active_joints.size());
-  joint_max_vector_.reserve(active_joints.size());
-  joint_has_limits_vector_.reserve(active_joints.size());
-
-  for (const moveit::core::JointModel* jm : active_joints)
-  {
-    if (jm->getVariableCount() != 1)
-    {
-      RCLCPP_ERROR(logger, "Joint '%s' has %u variables; IKFast plugin requires 1-DOF joints only",
-                   jm->getName().c_str(), jm->getVariableCount());
-      return false;
-    }
-
-    const std::string& var_name = jm->getVariableNames()[0];
-    const moveit::core::VariableBounds& b = robot_model_->getVariableBounds(var_name);
-
-    joint_names_.push_back(var_name);
+    const moveit::core::JointModel* jm = joint_model_group->getJointModel(joint_names_[i]);
+    if (!jm) return false;
+    const moveit::core::VariableBounds& b = jm->getVariableBounds()[0];
     joint_has_limits_vector_.push_back(b.position_bounded_);
     joint_min_vector_.push_back(b.min_position_);
     joint_max_vector_.push_back(b.max_position_);
   }
 
-  link_names_ = jmg->getLinkModelNames();
+  tip_transform_required_ = (tip_frames_[0] != IKFAST_TIP_FRAME_);
+  base_transform_required_ = (base_frame_ != IKFAST_BASE_FRAME_);
 
-  free_params_.clear();
-  redundant_joint_indices_.clear();
-  redundant_joint_discretization_.clear();
-  if (num_free_params > 0)
-  {
-    const int* free_params = GetFreeParameters();
-    if (!free_params)
-    {
-      RCLCPP_ERROR(logger, "IKFast reported free parameters but returned null pointer");
-      return false;
-    }
-
-    fillFreeParams(num_free_params, const_cast<int*>(free_params));
-    for (int free_index : free_params_)
-    {
-      if (free_index < 0 || free_index >= static_cast<int>(num_joints_))
-      {
-        RCLCPP_ERROR(logger, "IKFast free parameter index %d out of range [0, %zu)", free_index, num_joints_);
-        return false;
-      }
-      redundant_joint_indices_.push_back(static_cast<unsigned int>(free_index));
-      redundant_joint_discretization_[static_cast<unsigned int>(free_index)] = search_discretization_;
-    }
-  }
-
-  tip_transform_required_ = false;
-  base_transform_required_ = false;
-  chain_base_to_group_base_.setIdentity();
-  group_tip_to_chain_tip_.setIdentity();
-
-  if (base_frame_ != IKFAST_BASE_FRAME_)
-  {
-    if (!computeRelativeTransform(IKFAST_BASE_FRAME_, base_frame_, chain_base_to_group_base_, base_transform_required_))
-    {
-      RCLCPP_ERROR(logger, "Failed to reconcile group base frame '%s' with IKFast base frame '%s'",
-                   base_frame_.c_str(), IKFAST_BASE_FRAME_.c_str());
-      return false;
-    }
-  }
-
-  if (tip_frames_[0] != IKFAST_TIP_FRAME_)
+  if (tip_transform_required_)
   {
     if (!computeRelativeTransform(tip_frames_[0], IKFAST_TIP_FRAME_, group_tip_to_chain_tip_, tip_transform_required_))
-    {
-      RCLCPP_ERROR(logger, "Failed to reconcile group tip frame '%s' with IKFast tip frame '%s'",
-                   tip_frames_[0].c_str(), IKFAST_TIP_FRAME_.c_str());
       return false;
-    }
+  }
+  if (base_transform_required_)
+  {
+    if (!computeRelativeTransform(IKFAST_BASE_FRAME_, base_frame_, chain_base_to_group_base_, base_transform_required_))
+      return false;
   }
 
+  free_params_.clear();
+  int free_params[] = {GetFreeParameters()};
+  fillFreeParams(GetNumFreeParameters(), free_params);
+
   initialized_ = true;
-  RCLCPP_INFO(logger, "IKFast solver initialized for group '%s' (%zu joints, %d free params)", group_name_.c_str(),
-              num_joints_, num_free_params);
   return true;
 }
 
@@ -510,20 +467,20 @@ void IKFastKinematicsPlugin::setSearchDiscretization(const std::map<unsigned int
 {
   if (discretization.empty())
   {
-    ROS_ERROR("The 'discretization' map is empty");
+    RCLCPP_ERROR(rclcpp::get_logger(name_), "The 'discretization' map is empty");
     return;
   }
 
   if (redundant_joint_indices_.empty())
   {
-    ROS_ERROR_STREAM_NAMED(name_, "This group's solver doesn't support redundant joints");
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger(name_), "This group's solver doesn't support redundant joints");
     return;
   }
 
   if (discretization.begin()->first != redundant_joint_indices_[0])
   {
     std::string redundant_joint = joint_names_[free_params_[0]];
-    ROS_ERROR_STREAM_NAMED(name_, "Attempted to discretize a non-redundant joint "
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger(name_), "Attempted to discretize a non-redundant joint "
                                       << discretization.begin()->first << ", only joint '" << redundant_joint
                                       << "' with index " << redundant_joint_indices_[0] << " is redundant.");
     return;
@@ -531,7 +488,7 @@ void IKFastKinematicsPlugin::setSearchDiscretization(const std::map<unsigned int
 
   if (discretization.begin()->second <= 0.0)
   {
-    ROS_ERROR_STREAM_NAMED(name_, "Discretization can not takes values that are <= 0");
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger(name_), "Discretization can not takes values that are <= 0");
     return;
   }
 
@@ -541,17 +498,18 @@ void IKFastKinematicsPlugin::setSearchDiscretization(const std::map<unsigned int
 
 bool IKFastKinematicsPlugin::setRedundantJoints(const std::vector<unsigned int>& redundant_joint_indices)
 {
-  ROS_ERROR_STREAM_NAMED(name_, "Changing the redundant joints isn't permitted by this group's solver ");
+  RCLCPP_ERROR_STREAM(rclcpp::get_logger(name_), "Changing the redundant joints isn't permitted by this group's solver ");
   return false;
 }
 
 size_t IKFastKinematicsPlugin::solve(KDL::Frame& pose_frame, const std::vector<double>& vfree,
                                      IkSolutionList<IkReal>& solutions) const
 {
+  // IKFast56/61
   solutions.Clear();
 
   double trans[3];
-  trans[0] = pose_frame.p[0];
+  trans[0] = pose_frame.p[0];  //-.18;
   trans[1] = pose_frame.p[1];
   trans[2] = pose_frame.p[2];
 
@@ -562,6 +520,8 @@ size_t IKFastKinematicsPlugin::solve(KDL::Frame& pose_frame, const std::vector<d
   {
     case IKP_Transform6D:
     case IKP_Translation3D:
+      // For **Transform6D**, eerot is 9 values for the 3x3 rotation matrix. For **Translation3D**, these are ignored.
+
       mult = pose_frame.M;
 
       double vals[9];
@@ -575,12 +535,16 @@ size_t IKFastKinematicsPlugin::solve(KDL::Frame& pose_frame, const std::vector<d
       vals[7] = mult(2, 1);
       vals[8] = mult(2, 2);
 
+      // IKFast56/61
       ComputeIk(trans, vals, vfree.size() > 0 ? &vfree[0] : nullptr, solutions);
       return solutions.GetNumSolutions();
 
     case IKP_Direction3D:
     case IKP_Ray4D:
     case IKP_TranslationDirection5D:
+      // For **Direction3D**, **Ray4D**, and **TranslationDirection5D**, the first 3 values represent the target
+      // direction.
+
       direction = pose_frame.M * KDL::Vector(0, 0, 1);
       ComputeIk(trans, direction.data, vfree.size() > 0 ? &vfree[0] : nullptr, solutions);
       return solutions.GetNumSolutions();
@@ -588,38 +552,52 @@ size_t IKFastKinematicsPlugin::solve(KDL::Frame& pose_frame, const std::vector<d
     case IKP_TranslationXAxisAngle4D:
     case IKP_TranslationYAxisAngle4D:
     case IKP_TranslationZAxisAngle4D:
-      ROS_ERROR_NAMED(name_, "IK for this IkParameterizationType not implemented yet.");
+      // For *TranslationXAxisAngle4D*, *TranslationYAxisAngle4D*, *TranslationZAxisAngle4D* - end effector origin
+      // reaches desired 3D translation, manipulator direction makes a specific angle with x/y/z-axis (defined in the
+      // manipulator base link’s coordinate system)
+      RCLCPP_ERROR(rclcpp::get_logger(name_), "IK for this IkParameterizationType not implemented yet.");
       return 0;
 
     case IKP_TranslationLocalGlobal6D:
-      ROS_ERROR_NAMED(name_, "IK for this IkParameterizationType not implemented yet.");
+      // For **TranslationLocalGlobal6D**, the diagonal elements ([0],[4],[8]) are the local translation inside the end
+      // effector coordinate system.
+      RCLCPP_ERROR(rclcpp::get_logger(name_), "IK for this IkParameterizationType not implemented yet.");
       return 0;
 
     case IKP_Rotation3D:
     case IKP_Lookat3D:
     case IKP_TranslationXY2D:
     case IKP_TranslationXYOrientation3D:
-      ROS_ERROR_NAMED(name_, "IK for this IkParameterizationType not implemented yet.");
+      RCLCPP_ERROR(rclcpp::get_logger(name_), "IK for this IkParameterizationType not implemented yet.");
       return 0;
 
     case IKP_TranslationXAxisAngleZNorm4D:
       double roll, pitch, yaw;
+      // For **TranslationXAxisAngleZNorm4D** - end effector origin reaches desired 3D translation, manipulator
+      // direction needs to be orthogonal to z axis and be rotated at a certain angle starting from the x axis (defined
+      // in the manipulator base link’s coordinate system)
       pose_frame.M.GetRPY(roll, pitch, yaw);
       ComputeIk(trans, &yaw, vfree.size() > 0 ? &vfree[0] : nullptr, solutions);
       return solutions.GetNumSolutions();
 
     case IKP_TranslationYAxisAngleXNorm4D:
+      // For **TranslationYAxisAngleXNorm4D** - end effector origin reaches desired 3D translation, manipulator
+      // direction needs to be orthogonal to x axis and be rotated at a certain angle starting from the y axis (defined
+      // in the manipulator base link’s coordinate system)
       pose_frame.M.GetRPY(roll, pitch, yaw);
       ComputeIk(trans, &roll, vfree.size() > 0 ? &vfree[0] : nullptr, solutions);
       return solutions.GetNumSolutions();
 
     case IKP_TranslationZAxisAngleYNorm4D:
+      // For **TranslationZAxisAngleYNorm4D** - end effector origin reaches desired 3D translation, manipulator
+      // direction needs to be orthogonal to y axis and be rotated at a certain angle starting from the z axis (defined
+      // in the manipulator base link’s coordinate system)
       pose_frame.M.GetRPY(roll, pitch, yaw);
       ComputeIk(trans, &pitch, vfree.size() > 0 ? &vfree[0] : nullptr, solutions);
       return solutions.GetNumSolutions();
 
     default:
-      ROS_ERROR_NAMED(name_, "Unknown IkParameterizationType! "
+      RCLCPP_ERROR(rclcpp::get_logger(name_), "Unknown IkParameterizationType! "
                              "Was the solver generated with an incompatible version of Openrave?");
       return 0;
   }
@@ -631,6 +609,7 @@ void IKFastKinematicsPlugin::getSolution(const IkSolutionList<IkReal>& solutions
   solution.clear();
   solution.resize(num_joints_);
 
+  // IKFast56/61
   const IkSolutionBase<IkReal>& sol = solutions.GetSolution(i);
   std::vector<IkReal> vsolfree(sol.GetFree().size());
   sol.GetSolution(&solution[0], vsolfree.size() > 0 ? &vsolfree[0] : nullptr);
@@ -651,10 +630,12 @@ void IKFastKinematicsPlugin::getSolution(const IkSolutionList<IkReal>& solutions
   solution.clear();
   solution.resize(num_joints_);
 
+  // IKFast56/61
   const IkSolutionBase<IkReal>& sol = solutions.GetSolution(i);
   std::vector<IkReal> vsolfree(sol.GetFree().size());
   sol.GetSolution(&solution[0], vsolfree.size() > 0 ? &vsolfree[0] : nullptr);
 
+  // rotate joints by +/-360° where it is possible and useful
   for (std::size_t i = 0; i < num_joints_; ++i)
   {
     if (joint_has_limits_vector_[i])
@@ -677,11 +658,13 @@ void IKFastKinematicsPlugin::getSolution(const IkSolutionList<IkReal>& solutions
 
 double IKFastKinematicsPlugin::enforceLimits(double joint_value, double min, double max) const
 {
+  // If the joint_value is greater than max subtract 2 * PI until it is less than the max
   while (joint_value > max)
   {
     joint_value -= 2 * M_PI;
   }
 
+  // If the joint_value is less than the min, add 2 * PI until it is more than the min
   while (joint_value < min)
   {
     joint_value += 2 * M_PI;
@@ -738,20 +721,24 @@ bool IKFastKinematicsPlugin::getPositionFK(const std::vector<std::string>& link_
 {
   if (GetIkType() != IKP_Transform6D)
   {
-    ROS_ERROR_NAMED(name_, "Can only compute FK for Transform6D IK type!");
+    // ComputeFk() is the inverse function of ComputeIk(), so the format of
+    // eerot differs depending on IK type. The Transform6D IK type is the only
+    // one for which a 3x3 rotation matrix is returned, which means we can only
+    // compute FK for that IK type.
+    RCLCPP_ERROR(rclcpp::get_logger(name_), "Can only compute FK for Transform6D IK type!");
     return false;
   }
 
   KDL::Frame p_out;
   if (link_names.size() == 0)
   {
-    ROS_WARN_STREAM_NAMED(name_, "Link names with nothing");
+    RCLCPP_WARN_STREAM(rclcpp::get_logger(name_), "Link names with nothing");
     return false;
   }
 
   if (link_names.size() != 1 || link_names[0] != getTipFrame())
   {
-    ROS_ERROR_NAMED(name_, "Can compute FK for %s only", getTipFrame().c_str());
+    RCLCPP_ERROR(rclcpp::get_logger(name_), "Can compute FK for %s only", getTipFrame().c_str());
     return false;
   }
 
@@ -761,7 +748,7 @@ bool IKFastKinematicsPlugin::getPositionFK(const std::vector<std::string>& link_
 
   if (joint_angles.size() != num_joints_)
   {
-    ROS_ERROR_NAMED(name_, "Unexpected number of joint angles");
+    RCLCPP_ERROR(rclcpp::get_logger(name_), "Unexpected number of joint angles");
     return false;
   }
 
@@ -769,6 +756,7 @@ bool IKFastKinematicsPlugin::getPositionFK(const std::vector<std::string>& link_
   for (unsigned char i = 0; i < num_joints_; i++)
     angles[i] = joint_angles[i];
 
+  // IKFast56/61
   ComputeFk(angles, eetrans, eerot);
 
   for (int i = 0; i < 3; ++i)
@@ -821,22 +809,26 @@ bool IKFastKinematicsPlugin::searchPositionIK(const geometry_msgs::Pose& ik_pose
                                               moveit_msgs::MoveItErrorCodes& error_code,
                                               const kinematics::KinematicsQueryOptions& options) const
 {
+  // "SEARCH_MODE" is fixed during code generation
   SEARCH_MODE search_mode = OPTIMIZE_MAX_JOINT;
 
+  // Check if there are no redundant joints
   if (free_params_.size() == 0)
   {
-    ROS_DEBUG_STREAM_NAMED(name_, "No need to search since no free params/redundant joints");
+    RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "No need to search since no free params/redundant joints");
 
     std::vector<geometry_msgs::Pose> ik_poses(1, ik_pose);
     std::vector<std::vector<double>> solutions;
     kinematics::KinematicsResult kinematic_result;
+    // Find all IK solutions within joint limits
     if (!getPositionIK(ik_poses, ik_seed_state, solutions, kinematic_result, options))
     {
-      ROS_DEBUG_STREAM_NAMED(name_, "No solution whatsoever");
+      RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "No solution whatsoever");
       error_code.val = moveit_msgs::MoveItErrorCodes::NO_IK_SOLUTION;
       return false;
     }
 
+    // sort solutions by their distance to the seed
     std::vector<LimitObeyingSol> solutions_obey_limits;
     for (std::size_t i = 0; i < solutions.size(); ++i)
     {
@@ -850,6 +842,7 @@ bool IKFastKinematicsPlugin::searchPositionIK(const geometry_msgs::Pose& ik_pose
     }
     std::sort(solutions_obey_limits.begin(), solutions_obey_limits.end());
 
+    // check for collisions if a callback is provided
     if (!solution_callback.empty())
     {
       for (std::size_t i = 0; i < solutions_obey_limits.size(); ++i)
@@ -858,32 +851,34 @@ bool IKFastKinematicsPlugin::searchPositionIK(const geometry_msgs::Pose& ik_pose
         if (error_code.val == moveit_msgs::MoveItErrorCodes::SUCCESS)
         {
           solution = solutions_obey_limits[i].value;
-          ROS_DEBUG_STREAM_NAMED(name_, "Solution passes callback");
+          RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "Solution passes callback");
           return true;
         }
       }
 
-      ROS_DEBUG_STREAM_NAMED(name_, "Solution has error code " << error_code.val);
+      RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "Solution has error code " << error_code.val);
       return false;
     }
     else
     {
       solution = solutions_obey_limits[0].value;
       error_code.val = moveit_msgs::MoveItErrorCodes::SUCCESS;
-      return true;
+      return true;  // no collision check callback provided
     }
   }
 
+  // -------------------------------------------------------------------------------------------------
+  // Error Checking
   if (!initialized_)
   {
-    ROS_ERROR_STREAM_NAMED(name_, "Kinematics not active");
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger(name_), "Kinematics not active");
     error_code.val = error_code.NO_IK_SOLUTION;
     return false;
   }
 
   if (ik_seed_state.size() != num_joints_)
   {
-    ROS_ERROR_STREAM_NAMED(name_, "Seed state must have size " << num_joints_ << " instead of size "
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger(name_), "Seed state must have size " << num_joints_ << " instead of size "
                                                                << ik_seed_state.size());
     error_code.val = error_code.NO_IK_SOLUTION;
     return false;
@@ -891,11 +886,14 @@ bool IKFastKinematicsPlugin::searchPositionIK(const geometry_msgs::Pose& ik_pose
 
   if (!consistency_limits.empty() && consistency_limits.size() != num_joints_)
   {
-    ROS_ERROR_STREAM_NAMED(name_, "Consistency limits be empty or must have size " << num_joints_ << " instead of size "
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger(name_), "Consistency limits be empty or must have size " << num_joints_ << " instead of size "
                                                                                    << consistency_limits.size());
     error_code.val = error_code.NO_IK_SOLUTION;
     return false;
   }
+
+  // -------------------------------------------------------------------------------------------------
+  // Initialize
 
   KDL::Frame frame;
   transformToChainFrame(ik_pose, frame);
@@ -907,29 +905,36 @@ bool IKFastKinematicsPlugin::searchPositionIK(const geometry_msgs::Pose& ik_pose
   double initial_guess = ik_seed_state[free_params_[0]];
   vfree[0] = initial_guess;
 
+  // -------------------------------------------------------------------------------------------------
+  // Handle consitency limits if needed
   int num_positive_increments;
   int num_negative_increments;
   double search_discretization = redundant_joint_discretization_.at(free_params_[0]);
 
   if (!consistency_limits.empty())
   {
+    // MoveIt! replaced consistency_limit (scalar) w/ consistency_limits (vector)
+    // Assume [0]th free_params element for now.  Probably wrong.
     double max_limit = fmin(joint_max_vector_[free_params_[0]], initial_guess + consistency_limits[free_params_[0]]);
     double min_limit = fmax(joint_min_vector_[free_params_[0]], initial_guess - consistency_limits[free_params_[0]]);
 
     num_positive_increments = static_cast<int>((max_limit - initial_guess) / search_discretization);
     num_negative_increments = static_cast<int>((initial_guess - min_limit) / search_discretization);
   }
-  else
+  else  // no consistency limits provided
   {
     num_positive_increments = (joint_max_vector_[free_params_[0]] - initial_guess) / search_discretization;
     num_negative_increments = (initial_guess - joint_min_vector_[free_params_[0]]) / search_discretization;
   }
 
-  ROS_DEBUG_STREAM_NAMED(name_, "Free param is " << free_params_[0] << " initial guess is " << initial_guess
+  // -------------------------------------------------------------------------------------------------
+  // Begin searching
+
+  RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "Free param is " << free_params_[0] << " initial guess is " << initial_guess
                                                  << ", # positive increments: " << num_positive_increments
                                                  << ", # negative increments: " << num_negative_increments);
   if ((search_mode & OPTIMIZE_MAX_JOINT) && (num_positive_increments + num_negative_increments) > 1000)
-    ROS_WARN_STREAM_ONCE_NAMED(name_, "Large search space, consider increasing the search discretization");
+    RCLCPP_WARN_STREAM_ONCE(rclcpp::get_logger(name_), "Large search space, consider increasing the search discretization");
 
   double best_costs = -1.0;
   std::vector<double> best_solution;
@@ -940,7 +945,7 @@ bool IKFastKinematicsPlugin::searchPositionIK(const geometry_msgs::Pose& ik_pose
     IkSolutionList<IkReal> solutions;
     size_t numsol = solve(frame, vfree, solutions);
 
-    ROS_DEBUG_STREAM_NAMED(name_, "Found " << numsol << " solutions from IKFast");
+    RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "Found " << numsol << " solutions from IKFast");
 
     if (numsol > 0)
     {
@@ -963,6 +968,7 @@ bool IKFastKinematicsPlugin::searchPositionIK(const geometry_msgs::Pose& ik_pose
         {
           getSolution(solutions, ik_seed_state, s, solution);
 
+          // This solution is within joint limits, now check if in collision (if callback provided)
           if (!solution_callback.empty())
           {
             solution_callback(ik_pose, solution, error_code);
@@ -977,6 +983,7 @@ bool IKFastKinematicsPlugin::searchPositionIK(const geometry_msgs::Pose& ik_pose
             nvalid++;
             if (search_mode & OPTIMIZE_MAX_JOINT)
             {
+              // Costs for solution: Largest joint motion
               double costs = 0.0;
               for (unsigned int i = 0; i < solution.size(); i++)
               {
@@ -991,6 +998,7 @@ bool IKFastKinematicsPlugin::searchPositionIK(const geometry_msgs::Pose& ik_pose
               }
             }
             else
+              // Return first feasible solution
               return true;
           }
         }
@@ -999,6 +1007,7 @@ bool IKFastKinematicsPlugin::searchPositionIK(const geometry_msgs::Pose& ik_pose
 
     if (!getCount(counter, num_positive_increments, -num_negative_increments))
     {
+      // Everything searched
       error_code.val = moveit_msgs::MoveItErrorCodes::NO_IK_SOLUTION;
       break;
     }
@@ -1006,7 +1015,7 @@ bool IKFastKinematicsPlugin::searchPositionIK(const geometry_msgs::Pose& ik_pose
     vfree[0] = initial_guess + search_discretization * counter;
   }
 
-  ROS_DEBUG_STREAM_NAMED(name_, "Valid solutions: " << nvalid << "/" << nattempts);
+  RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "Valid solutions: " << nvalid << "/" << nattempts);
 
   if ((search_mode & OPTIMIZE_MAX_JOINT) && best_costs != -1.0)
   {
@@ -1015,35 +1024,39 @@ bool IKFastKinematicsPlugin::searchPositionIK(const geometry_msgs::Pose& ik_pose
     return true;
   }
 
+  // No solution found
   error_code.val = moveit_msgs::MoveItErrorCodes::NO_IK_SOLUTION;
   return false;
 }
 
+// Used when there are no redundant joints - aka no free params
 bool IKFastKinematicsPlugin::getPositionIK(const geometry_msgs::Pose& ik_pose, const std::vector<double>& ik_seed_state,
                                            std::vector<double>& solution, moveit_msgs::MoveItErrorCodes& error_code,
                                            const kinematics::KinematicsQueryOptions& options) const
 {
-  ROS_DEBUG_STREAM_NAMED(name_, "getPositionIK");
+  RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "getPositionIK");
 
   if (!initialized_)
   {
-    ROS_ERROR_NAMED(name_, "kinematics not active");
+    RCLCPP_ERROR(rclcpp::get_logger(name_), "kinematics not active");
     return false;
   }
 
   if (ik_seed_state.size() < num_joints_)
   {
-    ROS_ERROR_STREAM_NAMED(name_, "ik_seed_state only has " << ik_seed_state.size()
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger(name_), "ik_seed_state only has " << ik_seed_state.size()
                                                             << " entries, this ikfast solver requires " << num_joints_);
     return false;
   }
 
+  // Check if seed is in bound
   for (std::size_t i = 0; i < ik_seed_state.size(); i++)
   {
+    // Add tolerance to limit check
     if (joint_has_limits_vector_[i] && ((ik_seed_state[i] < (joint_min_vector_[i] - LIMIT_TOLERANCE)) ||
                                         (ik_seed_state[i] > (joint_max_vector_[i] + LIMIT_TOLERANCE))))
     {
-      ROS_DEBUG_STREAM_NAMED(name_, "IK seed not in limits! " << static_cast<int>(i) << " value " << ik_seed_state[i]
+      RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "IK seed not in limits! " << static_cast<int>(i) << " value " << ik_seed_state[i]
                                                               << " has limit: " << joint_has_limits_vector_[i]
                                                               << "  being  " << joint_min_vector_[i] << " to "
                                                               << joint_max_vector_[i]);
@@ -1055,7 +1068,7 @@ bool IKFastKinematicsPlugin::getPositionIK(const geometry_msgs::Pose& ik_pose, c
   for (std::size_t i = 0; i < free_params_.size(); ++i)
   {
     int p = free_params_[i];
-    ROS_ERROR("%u is %f", static_cast<unsigned int>(p), ik_seed_state[p]);
+    RCLCPP_ERROR(rclcpp::get_logger(name_), "%u is %f", p, ik_seed_state[p]);  // DTC
     vfree[i] = ik_seed_state[p];
   }
 
@@ -1064,7 +1077,7 @@ bool IKFastKinematicsPlugin::getPositionIK(const geometry_msgs::Pose& ik_pose, c
 
   IkSolutionList<IkReal> solutions;
   size_t numsol = solve(frame, vfree, solutions);
-  ROS_DEBUG_STREAM_NAMED(name_, "Found " << numsol << " solutions from IKFast");
+  RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "Found " << numsol << " solutions from IKFast");
 
   std::vector<LimitObeyingSol> solutions_obey_limits;
 
@@ -1075,17 +1088,19 @@ bool IKFastKinematicsPlugin::getPositionIK(const geometry_msgs::Pose& ik_pose, c
     {
       std::vector<double> sol;
       getSolution(solutions, ik_seed_state, s, sol);
-      ROS_DEBUG_NAMED(name_, "Sol %d: %e   %e   %e   %e   %e   %e", static_cast<int>(s), sol[0], sol[1], sol[2], sol[3],
+      RCLCPP_DEBUG(rclcpp::get_logger(name_), "Sol %d: %e   %e   %e   %e   %e   %e", static_cast<int>(s), sol[0], sol[1], sol[2], sol[3],
                       sol[4], sol[5]);
 
       bool obeys_limits = true;
       for (std::size_t i = 0; i < sol.size(); i++)
       {
+        // Add tolerance to limit check
         if (joint_has_limits_vector_[i] && ((sol[i] < (joint_min_vector_[i] - LIMIT_TOLERANCE)) ||
                                             (sol[i] > (joint_max_vector_[i] + LIMIT_TOLERANCE))))
         {
+          // One element of solution is not within limits
           obeys_limits = false;
-          ROS_DEBUG_STREAM_NAMED(name_, "Not in limits! " << static_cast<int>(i) << " value " << sol[i]
+          RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "Not in limits! " << static_cast<int>(i) << " value " << sol[i]
                                                           << " has limit: " << joint_has_limits_vector_[i]
                                                           << "  being  " << joint_min_vector_[i] << " to "
                                                           << joint_max_vector_[i]);
@@ -1094,6 +1109,7 @@ bool IKFastKinematicsPlugin::getPositionIK(const geometry_msgs::Pose& ik_pose, c
       }
       if (obeys_limits)
       {
+        // All elements of this solution obey limits
         getSolution(solutions, ik_seed_state, s, solution_obey_limits);
         double dist_from_seed = 0.0;
         for (std::size_t i = 0; i < ik_seed_state.size(); ++i)
@@ -1107,9 +1123,10 @@ bool IKFastKinematicsPlugin::getPositionIK(const geometry_msgs::Pose& ik_pose, c
   }
   else
   {
-    ROS_DEBUG_STREAM_NAMED(name_, "No IK solution");
+    RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "No IK solution");
   }
 
+  // Sort the solutions under limits and find the one that is closest to ik_seed_state
   if (!solutions_obey_limits.empty())
   {
     std::sort(solutions_obey_limits.begin(), solutions_obey_limits.end());
@@ -1128,32 +1145,32 @@ bool IKFastKinematicsPlugin::getPositionIK(const std::vector<geometry_msgs::Pose
                                            kinematics::KinematicsResult& result,
                                            const kinematics::KinematicsQueryOptions& options) const
 {
-  ROS_DEBUG_STREAM_NAMED(name_, "getPositionIK with multiple solutions");
+  RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "getPositionIK with multiple solutions");
 
   if (!initialized_)
   {
-    ROS_ERROR_NAMED(name_, "kinematics not active");
+    RCLCPP_ERROR(rclcpp::get_logger(name_), "kinematics not active");
     result.kinematic_error = kinematics::KinematicErrors::SOLVER_NOT_ACTIVE;
     return false;
   }
 
   if (ik_poses.empty())
   {
-    ROS_ERROR_NAMED(name_, "ik_poses is empty");
+    RCLCPP_ERROR(rclcpp::get_logger(name_), "ik_poses is empty");
     result.kinematic_error = kinematics::KinematicErrors::EMPTY_TIP_POSES;
     return false;
   }
 
   if (ik_poses.size() > 1)
   {
-    ROS_ERROR_NAMED(name_, "ik_poses contains multiple entries, only one is allowed");
+    RCLCPP_ERROR(rclcpp::get_logger(name_), "ik_poses contains multiple entries, only one is allowed");
     result.kinematic_error = kinematics::KinematicErrors::MULTIPLE_TIPS_NOT_SUPPORTED;
     return false;
   }
 
   if (ik_seed_state.size() < num_joints_)
   {
-    ROS_ERROR_STREAM_NAMED(name_, "ik_seed_state only has " << ik_seed_state.size()
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger(name_), "ik_seed_state only has " << ik_seed_state.size()
                                                             << " entries, this ikfast solver requires " << num_joints_);
     return false;
   }
@@ -1161,6 +1178,7 @@ bool IKFastKinematicsPlugin::getPositionIK(const std::vector<geometry_msgs::Pose
   KDL::Frame frame;
   transformToChainFrame(ik_poses[0], frame);
 
+  // solving ik
   std::vector<IkSolutionList<IkReal>> solution_set;
   IkSolutionList<IkReal> ik_solutions;
   std::vector<double> vfree;
@@ -1168,8 +1186,10 @@ bool IKFastKinematicsPlugin::getPositionIK(const std::vector<geometry_msgs::Pose
   std::vector<double> sampled_joint_vals;
   if (!redundant_joint_indices_.empty())
   {
+    // initializing from seed
     sampled_joint_vals.push_back(ik_seed_state[redundant_joint_indices_[0]]);
 
+    // checking joint limits when using no discretization
     if (options.discretization_method == kinematics::DiscretizationMethods::NO_DISCRETIZATION &&
         joint_has_limits_vector_[redundant_joint_indices_.front()])
     {
@@ -1180,11 +1200,12 @@ bool IKFastKinematicsPlugin::getPositionIK(const std::vector<geometry_msgs::Pose
       if (!((jv > (joint_min - LIMIT_TOLERANCE)) && (jv < (joint_max + LIMIT_TOLERANCE))))
       {
         result.kinematic_error = kinematics::KinematicErrors::IK_SEED_OUTSIDE_LIMITS;
-        ROS_ERROR_STREAM_NAMED(name_, "ik seed is out of bounds");
+        RCLCPP_ERROR_STREAM(rclcpp::get_logger(name_), "ik seed is out of bounds");
         return false;
       }
     }
 
+    // computing all solutions sets for each sampled value of the redundant joint
     if (!sampleRedundantJoint(options.discretization_method, sampled_joint_vals))
     {
       result.kinematic_error = kinematics::KinematicErrors::UNSUPORTED_DISCRETIZATION_REQUESTED;
@@ -1201,14 +1222,18 @@ bool IKFastKinematicsPlugin::getPositionIK(const std::vector<geometry_msgs::Pose
   }
   else
   {
+    // computing for single solution set
     numsol = solve(frame, vfree, ik_solutions);
     solution_set.push_back(ik_solutions);
   }
 
-  ROS_DEBUG_STREAM_NAMED(name_, "Found " << numsol << " solutions from IKFast");
+  RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "Found " << numsol << " solutions from IKFast");
   bool solutions_found = false;
   if (numsol > 0)
   {
+    /*
+      Iterating through all solution sets and storing those that do not exceed joint limits.
+    */
     for (unsigned int r = 0; r < solution_set.size(); r++)
     {
       ik_solutions = solution_set[r];
@@ -1221,11 +1246,13 @@ bool IKFastKinematicsPlugin::getPositionIK(const std::vector<geometry_msgs::Pose
         bool obeys_limits = true;
         for (unsigned int i = 0; i < sol.size(); i++)
         {
+          // Add tolerance to limit check
           if (joint_has_limits_vector_[i] && ((sol[i] < (joint_min_vector_[i] - LIMIT_TOLERANCE)) ||
                                               (sol[i] > (joint_max_vector_[i] + LIMIT_TOLERANCE))))
           {
+            // One element of solution is not within limits
             obeys_limits = false;
-            ROS_DEBUG_STREAM_NAMED(name_, "Not in limits! " << i << " value " << sol[i] << " has limit: "
+            RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "Not in limits! " << i << " value " << sol[i] << " has limit: "
                                                             << joint_has_limits_vector_[i] << "  being  "
                                                             << joint_min_vector_[i] << " to " << joint_max_vector_[i]);
             break;
@@ -1233,6 +1260,7 @@ bool IKFastKinematicsPlugin::getPositionIK(const std::vector<geometry_msgs::Pose
         }
         if (obeys_limits)
         {
+          // All elements of solution obey limits
           solutions_found = true;
           solutions.push_back(sol);
         }
@@ -1247,7 +1275,7 @@ bool IKFastKinematicsPlugin::getPositionIK(const std::vector<geometry_msgs::Pose
   }
   else
   {
-    ROS_DEBUG_STREAM_NAMED(name_, "No IK solution");
+    RCLCPP_DEBUG_STREAM(rclcpp::get_logger(name_), "No IK solution");
   }
 
   result.kinematic_error = kinematics::KinematicErrors::NO_SOLUTION;
@@ -1290,7 +1318,7 @@ bool IKFastKinematicsPlugin::sampleRedundantJoint(kinematics::DiscretizationMeth
 
       break;
     default:
-      ROS_ERROR_STREAM_NAMED(name_, "Discretization method " << method << " is not supported");
+      RCLCPP_ERROR_STREAM(rclcpp::get_logger(name_), "Discretization method " << method << " is not supported");
       return false;
   }
 
@@ -1309,7 +1337,7 @@ void IKFastKinematicsPlugin::transformToChainFrame(const geometry_msgs::Pose& ik
     if (base_transform_required_)
       ik_eigen_pose = chain_base_to_group_base_ * ik_eigen_pose;
 
-    tf::transformEigenToKDL(ik_eigen_pose, ik_pose_chain);
+    ik_pose_chain = tf2::transformToKDL(tf2::toMsg(ik_eigen_pose));
   }
   else
   {
@@ -1319,5 +1347,6 @@ void IKFastKinematicsPlugin::transformToChainFrame(const geometry_msgs::Pose& ik
 
 }  // end namespace
 
+// register IKFastKinematicsPlugin as a KinematicsBase implementation
 #include <pluginlib/class_list_macros.hpp>
 PLUGINLIB_EXPORT_CLASS(fetch_arm::IKFastKinematicsPlugin, kinematics::KinematicsBase);

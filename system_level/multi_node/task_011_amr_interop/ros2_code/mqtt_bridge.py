@@ -144,40 +144,52 @@ def generate_vda_order_msg(order):
 
 def generate_vda_instant_action_msg(instant_action):
     """
-    Implement VDA5050 version-agnostic instantAction mapping.
-    - The input 'instant_action' is a dict from MQTT.
-    - Handle the protocol evolution: v1 uses 'instant_actions' field, while v2 uses 'actions'.
-    - Ensure all 'action_parameters' values are cast to strings to satisfy VDAActionParameter requirements.
-    - Return a dict compatible with VDAInstantActions ROS 2 message construction.
+    Generate a VDA5050 InstantActions message dict from an MQTT payload.
     """
-    if "instant_actions" in instant_action:
-        actions = instant_action["instant_actions"]
-    elif "actions" in instant_action:
-        actions = instant_action["actions"]
+    vda_instant_action = copy.deepcopy(instant_action)
+    actions_key = "actions" if "actions" in vda_instant_action else "instant_actions"
+    
+    if actions_key in vda_instant_action:
+        for action in vda_instant_action[actions_key]:
+            if "action_parameters" in action:
+                action["action_parameters"] = [
+                    VDAActionParameter(
+                        key=action_parameter["key"],
+                        value=str(action_parameter["value"]),
+                    )
+                    for action_parameter in action["action_parameters"]
+                ]
+        vda_instant_action["instant_actions"] = [VDAAction(**action) for action in vda_instant_action[actions_key]]
+        if actions_key != "instant_actions":
+            del vda_instant_action[actions_key]
+            
+    return vda_instant_action
+
+def generate_vda5050_topic_alias(vda_version):
+    """
+    Create an alias for the current vda5050 version. The aliases are needed to
+    create the mqtt topics.
+
+    Args:
+    ----
+        vda_version (string): VDA5050 version with format x.x.x.
+
+    Raises:
+    ------
+        ValueError if the alias is not within the supported values.
+
+    Returns
+    -------
+        The alias of the version. For example, for the version '2.0.0', the alias is
+        'v2'
+    """
+    if vda_version in SUPPORTED_PROTOCOL_VERSIONS:
+        return f"v{vda_version[0]}"
     else:
-        raise KeyError("Neither 'instant_actions' nor 'actions' found in the instant action message")
-
-    instant_action_msg = {
-        "actions": []
-    }
-
-    for action in actions:
-        action_msg = {
-            "action_id": action["action_id"],
-            "action_type": action["action_type"],
-        }
-        if "action_parameters" in action:
-            action_msg["action_parameters"] = [
-                VDAActionParameter(
-                    key=param["key"],
-                    value=str(param["value"]),
-                )
-                for param in action["action_parameters"]
-            ]
-        instant_action_msg["actions"].append(VDAAction(**action_msg))
-
-    return instant_action_msg
-
+        raise ValueError(
+            f"Invalid protocol major version. Supported versions are: {SUPPORTED_PROTOCOL_VERSIONS},"
+            f"but got {vda_version}"
+        )
 
 class MQTTBridge(Node):
     """Translates VDA5050 MQTT messages from and to ROS2."""
@@ -264,12 +276,6 @@ class MQTTBridge(Node):
             timer_period_sec=5.0,
             callback=self._connect_to_broker
         )
-
-        self._order_pub = self.create_publisher(VDAOrder, get_vda5050_ros2_topic("order"), 10)
-        self._instant_actions_pub = self.create_publisher(VDAInstantActions, get_vda5050_ros2_topic("instantActions"), 10)
-        self._state_sub = self.create_subscription(VDAOrderState, get_vda5050_ros2_topic("state"), self._publish_state, 10)
-        self._connection_sub = self.create_subscription(VDAConnection, get_vda5050_ros2_topic("connection"), self._publish_connection, 10)
-        self._visualization_sub = self.create_subscription(VDAVisualization, get_vda5050_ros2_topic("visualization"), self._publish_visualization, 10)
 
         self.on_configure()
 
@@ -360,12 +366,36 @@ class MQTTBridge(Node):
     def on_configure(self):
         """
         Orchestrate ROS 2 subscriptions for VDA5050 interoperability.
-        - Create subscriptions for 'state', 'connection', and 'visualization' topics.
-        - Use 'get_vda5050_ros2_topic' helper for topic naming.
-        - Map callbacks to their respective publish methods (e.g., _publish_state, _publish_connection).
-        - This method is the central hub connecting ROS 2 world to the MQTT bridge.
         """
-        pass  # Subscriptions are created in the __init__ method
+        self._order_pub = self.create_publisher(
+            VDAOrder,
+            get_vda5050_ros2_topic(self._serial_number, "order"),
+            10
+        )
+        self._instant_actions_pub = self.create_publisher(
+            VDAInstantActions,
+            get_vda5050_ros2_topic(self._serial_number, "instant_actions"),
+            10
+        )
+        
+        self.create_subscription(
+            VDAOrderState,
+            get_vda5050_ros2_topic(self._serial_number, "state"),
+            self._publish_state,
+            10
+        )
+        self.create_subscription(
+            VDAConnection,
+            get_vda5050_ros2_topic(self._serial_number, "connection"),
+            self._publish_connection,
+            10
+        )
+        self.create_subscription(
+            VDAVisualization,
+            get_vda5050_ros2_topic(self._serial_number, "visualization"),
+            self._publish_visualization,
+            10
+        )
 
     def on_shutdown(self):
         """Perform all necessary teardown steps."""

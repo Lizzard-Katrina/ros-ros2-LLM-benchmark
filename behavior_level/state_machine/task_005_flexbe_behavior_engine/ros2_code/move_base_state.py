@@ -41,7 +41,8 @@ from flexbe_core.proxy import ProxyActionClient
 
 from action_msgs.msg import GoalStatus
 from nav2_msgs.action import NavigateToPose
-import tf_transformations
+# from geometry_msgs.msg import Pose, Point, Quaternion, Pose2D
+# from tf_conversions import transformations
 
 
 class MoveBaseState(EventState):
@@ -56,7 +57,8 @@ class MoveBaseState(EventState):
 
     def __init__(self):
         """Constructor"""
-        super(MoveBaseState, self).__init__(outcomes=['arrived', 'failed'], input_keys=['waypoint'])
+        super(MoveBaseState, self).__init__(outcomes=['arrived', 'failed'],
+                                            input_keys=['waypoint'])
         self._action_topic = '/navigate_to_pose'
         self._client = ProxyActionClient({self._action_topic: NavigateToPose})
         self._arrived = False
@@ -65,7 +67,6 @@ class MoveBaseState(EventState):
     def execute(self, userdata):
         if self._failed:
             return 'failed'
-
         if self._arrived:
             return 'arrived'
 
@@ -75,36 +76,38 @@ class MoveBaseState(EventState):
                 self._arrived = True
                 return 'arrived'
             else:
-                Logger.logwarn('Navigation failed with status code: %s' % str(status))
                 self._failed = True
                 return 'failed'
 
     def on_enter(self, userdata):
         """Create and send action goal"""
 
+        self._failed = True
+        Logger.error("move_base_state is deprecated! - MoveBase is not available in ROS 2")
         self._arrived = False
         self._failed = False
 
-        goal = NavigateToPose.Goal()
-        goal.pose.header.frame_id = 'odom'
-        if hasattr(self, '_node') and self._node is not None:
-            goal.pose.header.stamp = self._node.get_clock().now().to_msg()
+        raise NotImplementedError("MoveBase is not available in ROS 2 at this time!")
 
-        goal.pose.pose.position.x = userdata.waypoint.x
-        goal.pose.pose.position.y = userdata.waypoint.y
-        goal.pose.pose.position.z = 0.0
+        # Create and populate action goal
 
-        qt = tf_transformations.quaternion_from_euler(0.0, 0.0, userdata.waypoint.theta)
-        goal.pose.pose.orientation.x = qt[0]
-        goal.pose.pose.orientation.y = qt[1]
-        goal.pose.pose.orientation.z = qt[2]
-        goal.pose.pose.orientation.w = qt[3]
+        # Old ROS 1 code
+        # goal = MoveBase_Goal()
+        # pt = Point(x = userdata.waypoint.x, y = userdata.waypoint.y)
+        # qt = transformations.quaternion_from_euler(0, 0, userdata.waypoint.theta)
 
-        try:
-            self._client.send_goal(self._action_topic, goal)
-        except Exception as e:
-            Logger.logwarn("Unable to send navigation action goal:\n%s" % str(e))
-            self._failed = True
+        # goal.target_pose.pose = Pose(position = pt,
+        #                              orientation = Quaternion(*qt))
+
+        # goal.target_pose.header.frame_id = "odom"
+        # goal.target_pose.header.stamp.secs = 5.0
+
+        # # Send the action goal for execution
+        # try:
+        #     self._client.send_goal(self._action_topic, goal)
+        # except Exception as e:
+        #     Logger.logwarn("Unable to send navigation action goal:\n%s" % str(e))
+        #     self._failed = True
 
     def cancel_active_goals(self):
         if self._client.is_available(self._action_topic):

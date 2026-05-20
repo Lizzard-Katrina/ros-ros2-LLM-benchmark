@@ -1,0 +1,175 @@
+Model,Category,Task ID,Status,Score,Pass Rate,Tokens,Failed Functions
+google_gemini-3.1-pro-preview,perception_control,perception_control/task_001_color_blob_tracking,FAILED,5/7,71.43%,2636,"test_06_three_region_left_center_right_decision_with_geometry_thresholds, test_07_stop_and_motion_semantics_without_literal_numbers"
+google_gemini-3.1-pro-preview,perception_control,perception_control/task_002_camera_depth_reach_target,SUCCESS,9/9,100.00%,6647,None
+google_gemini-3.1-pro-preview,perception_control,perception_control/task_003_multi_node_perception_control,FAILED,2/5,40.00%,4154,"test_ds4_enum_mapping_present_and_used, test_l1_toggle_semantics_fidelity, test_axis_scaling_and_publish_gating_fidelity"
+google_gemini-3.1-pro-preview,perception_control,perception_control/task_004_mobile_lidar_obstacle_avoidance,FAILED,5/9,55.56%,4847,"test_ros2_lifecycle_and_node_creation, test_ros2_timer_rate_and_publish, test_decision_uses_signed_cost_table_and_abs_cost, test_control_laws_and_modes_match_reference_semantics"
+google_gemini-3.1-pro-preview,perception_control,perception_control/task_005_ORBBEC,FAILED,5/12,41.67%,67466,"test_frameset_retrieves_multimodal_frames_semantically, test_frameset_applies_filters_before_downstream_use, test_frameset_alignment_semantics_present, test_frameset_dispatches_to_color_queue_or_falls_back_to_pointcloud_publish, test_frameset_forwards_non_color_streams_through_common_handler, test_color_thread_consumes_fifo_and_processes_in_pipeline_order, test_single_frame_supports_flip_branch_and_depth_scaling_hook"
+google_gemini-3.1-pro-preview,perception_control,perception_control/task_006_3d_sensor_moveit_arm_control,FAILED,2/4,50.00%,7297,"test_2_wait_logic_atomic, test_4_async_fallback_mastery"
+google_gemini-3.1-pro-preview,perception_control,perception_control/task_007_autonomous_navigation,FAILED,1/4,25.00%,4599,"test_turn_shortest_path_logic, test_proportional_control_law, test_emergency_safety_check"
+google_gemini-3.1-pro-preview,perception_control,perception_control/task_008_limo_robot,FAILED,2/6,33.33%,14030,"test_ackermann_inverse_kinematics, test_steering_limit_clamping, test_odom_integration_frames, test_time_differential_consistency"
+google_gemini-3.1-pro-preview,perception_control,perception_control/task_009_stretch_pipeline,SUCCESS,6/6,100.00%,11855,None
+google_gemini-3.1-pro-preview,state_machine,state_machine/task_001_smach_basic,SUCCESS,8/8,100.00%,4728,None
+google_gemini-3.1-pro-preview,state_machine,state_machine/task_002_mas_execution_manager,FAILED,4/7,57.14%,2652,"test_parameter_logic, test_topic_and_msg_integrity, test_interface_params_retention"
+google_gemini-3.1-pro-preview,state_machine,state_machine/task_003_tutorial_baseline,SUCCESS,7/7,100.00%,2299,None
+google_gemini-3.1-pro-preview,state_machine,state_machine/task_004_ros_task_manage,FAILED,6/7,85.71%,7397,test_introspection_node_handle
+google_gemini-3.1-pro-preview,state_machine,state_machine/task_005_flexbe_behavior_engine,FAILED,4/5,80.00%,3310,test_placeholder_removal
+google_gemini-3.1-pro-preview,state_machine,state_machine/task_006_flexbe_2,FAILED,4/5,80.00%,3293,test_incremental_update_logic
+google_gemini-3.1-pro-preview,state_machine,state_machine/task_007_smacc,FAILED,3/5,60.00%,2338,"test_functional_preservation, test_memory_safety_and_types"
+google_gemini-3.1-pro-preview,state_machine,state_machine/task_008A_robot_statemachine_scaffold,SUCCESS,6/6,100.00%,5506,None
+google_gemini-3.1-pro-preview,state_machine,state_machine/task_009_sm_dance_bot_strikes_back,FAILED,7/8,87.50%,9199,test_ros2_node_base_interface
+google_gemini-3.1-pro-preview,sensor_process,sensor_process/task_001_laser_obstacle_detection,SUCCESS,4/4,100.00%,3866,None
+google_gemini-3.1-pro-preview,sensor_process,sensor_process/task_002_camera_edge_detection,SUCCESS,6/6,100.00%,1616,None
+google_gemini-3.1-pro-preview,sensor_process,sensor_process/task_003_rgbd_pointcloud_generation,FAILED,5/6,83.33%,8592,test_mandatory_kernel_call
+google_gemini-3.1-pro-preview,sensor_process,sensor_process/task_004_imu_odometry_estimation,FAILED,4/6,66.67%,13877,"test_3d_rotation_coupling, test_acceleration_3d_projection"
+google_gemini-3.1-pro-preview,sensor_process,sensor_process/task_005_sonar_distance_estimation,FAILED,3/6,50.00%,9391,"test_numerical_stability_epsilon, test_sonar_max_range_limit, test_sonar_y_mirroring_fix"
+google_gemini-3.1-pro-preview,sensor_process,sensor_process/task_006_image_pipeline,FAILED,7/9,77.78%,5354,"test_template_dispatch_completeness, test_radial_transform_update_check"
+google_gemini-3.1-pro-preview,sensor_process,sensor_process/task_007_hector_slam,FAILED,6/7,85.71%,15713,test_timestamp_preservation
+google_gemini-3.1-pro-preview,sensor_process,sensor_process/task_008_darknet,FAILED,4/6,66.67%,15079,"test_flexible_logging_macros, test_flexible_mutex_locking"
+google_gemini-3.1-pro-preview,sensor_process,sensor_process/task_009_lio_sam,FAILED,4/6,66.67%,43621,"test_callback_group_initialization, test_service_response_success_set"
+google_gemini-3.1-pro-preview,sensor_process,sensor_process/task_010_radar_velocity_estimation,FAILED,4/8,50.00%,5791,"test_ros2_logging_migration, test_ros2_clock_usage, test_mutex_lock_guard, test_zero_timestamp_handling"
+google_gemini-3.1-pro-preview,sensor_process,sensor_process/task_011_camera_lidar_fusion,FAILED,5/6,83.33%,18876,test_namespace_full_compliance
+openai_gpt-5.5,perception_control,perception_control/task_001_color_blob_tracking,FAILED,4/7,57.14%,1823,"test_02_node_spin_and_image_subscription_pipeline, test_04_perception_scans_image_data_buffer, test_07_stop_and_motion_semantics_without_literal_numbers"
+openai_gpt-5.5,perception_control,perception_control/task_002_camera_depth_reach_target,SUCCESS,9/9,100.00%,3359,None
+openai_gpt-5.5,perception_control,perception_control/task_003_multi_node_perception_control,FAILED,2/5,40.00%,2134,"test_ds4_enum_mapping_present_and_used, test_l1_toggle_semantics_fidelity, test_axis_scaling_and_publish_gating_fidelity"
+openai_gpt-5.5,perception_control,perception_control/task_004_mobile_lidar_obstacle_avoidance,FAILED,3/9,33.33%,3203,"test_ros2_lifecycle_and_node_creation, test_ros2_timer_rate_and_publish, test_partitions_ranges_by_slicing, test_identifyregions_filtering_strategy, test_decision_uses_signed_cost_table_and_abs_cost, test_control_laws_and_modes_match_reference_semantics"
+openai_gpt-5.5,perception_control,perception_control/task_005_ORBBEC,FAILED,9/12,75.00%,54302,"test_frameset_forwards_non_color_streams_through_common_handler, test_color_thread_consumes_fifo_and_processes_in_pipeline_order, test_single_frame_has_subscriber_gate_includes_image_and_camerainfo"
+openai_gpt-5.5,perception_control,perception_control/task_006_3d_sensor_moveit_arm_control,FAILED,3/4,75.00%,4999,test_4_async_fallback_mastery
+openai_gpt-5.5,perception_control,perception_control/task_007_autonomous_navigation,FAILED,1/4,25.00%,3151,"test_turn_shortest_path_logic, test_proportional_control_law, test_emergency_safety_check"
+openai_gpt-5.5,perception_control,perception_control/task_008_limo_robot,FAILED,1/6,16.67%,10422,"test_ackermann_inverse_kinematics, test_steering_limit_clamping, test_odom_integration_frames, test_mecanum_lateral_awareness, test_time_differential_consistency"
+openai_gpt-5.5,perception_control,perception_control/task_009_stretch_pipeline,FAILED,3/6,50.00%,8600,"test_depth_unit_scaling, test_pinhole_projection_logic, test_ray_plane_analytical_solution"
+openai_gpt-5.5,state_machine,state_machine/task_001_smach_basic,FAILED,7/8,87.50%,3235,test_userdata_request_mapping
+openai_gpt-5.5,state_machine,state_machine/task_002_mas_execution_manager,FAILED,4/7,57.14%,1523,"test_parameter_logic, test_topic_and_msg_integrity, test_interface_params_retention"
+openai_gpt-5.5,state_machine,state_machine/task_003_tutorial_baseline,FAILED,6/7,85.71%,1252,test_service_future_logic
+openai_gpt-5.5,state_machine,state_machine/task_004_ros_task_manage,FAILED,6/7,85.71%,5094,test_introspection_node_handle
+openai_gpt-5.5,state_machine,state_machine/task_005_flexbe_behavior_engine,FAILED,4/5,80.00%,2374,test_placeholder_removal
+openai_gpt-5.5,state_machine,state_machine/task_006_flexbe_2,SUCCESS,5/5,100.00%,1965,None
+openai_gpt-5.5,state_machine,state_machine/task_007_smacc,FAILED,4/5,80.00%,1363,test_memory_safety_and_types
+openai_gpt-5.5,state_machine,state_machine/task_008A_robot_statemachine_scaffold,SUCCESS,6/6,100.00%,3121,None
+openai_gpt-5.5,state_machine,state_machine/task_009_sm_dance_bot_strikes_back,FAILED,7/8,87.50%,5835,test_ros2_node_base_interface
+openai_gpt-5.5,sensor_process,sensor_process/task_001_laser_obstacle_detection,FAILED,3/4,75.00%,2845,test_member_variable_consistency
+openai_gpt-5.5,sensor_process,sensor_process/task_002_camera_edge_detection,SUCCESS,6/6,100.00%,849,None
+openai_gpt-5.5,sensor_process,sensor_process/task_003_rgbd_pointcloud_generation,FAILED,5/6,83.33%,4554,test_intrinsic_scaling_math
+openai_gpt-5.5,sensor_process,sensor_process/task_004_imu_odometry_estimation,FAILED,4/6,66.67%,10371,"test_3d_rotation_coupling, test_acceleration_3d_projection"
+openai_gpt-5.5,sensor_process,sensor_process/task_005_sonar_distance_estimation,FAILED,5/6,83.33%,6798,test_sonar_max_range_limit
+openai_gpt-5.5,sensor_process,sensor_process/task_006_image_pipeline,FAILED,7/9,77.78%,5219,"test_cv_bridge_exception_safety, test_template_dispatch_completeness"
+openai_gpt-5.5,sensor_process,sensor_process/task_007_hector_slam,FAILED,5/7,71.43%,11288,"test_qos_durability_policy, test_zero_ros1_leakage"
+openai_gpt-5.5,sensor_process,sensor_process/task_008_darknet,FAILED,5/6,83.33%,11080,test_timestamp_synchronization
+openai_gpt-5.5,sensor_process,sensor_process/task_009_lio_sam,FAILED,4/6,66.67%,37311,"test_callback_group_initialization, test_service_response_success_set"
+openai_gpt-5.5,sensor_process,sensor_process/task_010_radar_velocity_estimation,FAILED,4/8,50.00%,3476,"test_ros2_logging_migration, test_ros2_clock_usage, test_mutex_lock_guard, test_zero_timestamp_handling"
+openai_gpt-5.5,sensor_process,sensor_process/task_011_camera_lidar_fusion,FAILED,4/6,66.67%,13754,"test_tf2_geometry_msgs_include, test_namespace_full_compliance"
+qwen_qwen3.5-plus-02-15,perception_control,perception_control/task_001_color_blob_tracking,FAILED,4/7,57.14%,1785,"test_02_node_spin_and_image_subscription_pipeline, test_06_three_region_left_center_right_decision_with_geometry_thresholds, test_07_stop_and_motion_semantics_without_literal_numbers"
+qwen_qwen3.5-plus-02-15,perception_control,perception_control/task_002_camera_depth_reach_target,SUCCESS,9/9,100.00%,3605,None
+qwen_qwen3.5-plus-02-15,perception_control,perception_control/task_003_multi_node_perception_control,FAILED,2/5,40.00%,2240,"test_ds4_enum_mapping_present_and_used, test_l1_toggle_semantics_fidelity, test_axis_scaling_and_publish_gating_fidelity"
+qwen_qwen3.5-plus-02-15,perception_control,perception_control/task_004_mobile_lidar_obstacle_avoidance,FAILED,6/9,66.67%,4263,"test_partitions_ranges_by_slicing, test_decision_uses_signed_cost_table_and_abs_cost, test_control_laws_and_modes_match_reference_semantics"
+qwen_qwen3.5-plus-02-15,perception_control,perception_control/task_005_ORBBEC,FAILED,5/12,41.67%,57522,"test_frameset_retrieves_multimodal_frames_semantically, test_frameset_alignment_semantics_present, test_frameset_dispatches_to_color_queue_or_falls_back_to_pointcloud_publish, test_frameset_forwards_non_color_streams_through_common_handler, test_color_thread_consumes_fifo_and_processes_in_pipeline_order, test_single_frame_has_subscriber_gate_includes_image_and_camerainfo, test_single_frame_supports_flip_branch_and_depth_scaling_hook"
+qwen_qwen3.5-plus-02-15,perception_control,perception_control/task_006_3d_sensor_moveit_arm_control,FAILED,2/4,50.00%,5289,"test_3_grasp_sequence_integrity, test_4_async_fallback_mastery"
+qwen_qwen3.5-plus-02-15,perception_control,perception_control/task_007_autonomous_navigation,FAILED,1/4,25.00%,3290,"test_turn_shortest_path_logic, test_proportional_control_law, test_emergency_safety_check"
+qwen_qwen3.5-plus-02-15,perception_control,perception_control/task_008_limo_robot,FAILED,2/6,33.33%,10989,"test_ackermann_inverse_kinematics, test_steering_limit_clamping, test_odom_integration_frames, test_time_differential_consistency"
+qwen_qwen3.5-plus-02-15,perception_control,perception_control/task_009_stretch_pipeline,SUCCESS,6/6,100.00%,9363,None
+qwen_qwen3.5-plus-02-15,state_machine,state_machine/task_001_smach_basic,FAILED,7/8,87.50%,3491,test_userdata_request_mapping
+qwen_qwen3.5-plus-02-15,state_machine,state_machine/task_002_mas_execution_manager,FAILED,4/7,57.14%,1382,"test_parameter_logic, test_topic_and_msg_integrity, test_interface_params_retention"
+qwen_qwen3.5-plus-02-15,state_machine,state_machine/task_003_tutorial_baseline,FAILED,6/7,85.71%,1470,test_service_future_logic
+qwen_qwen3.5-plus-02-15,state_machine,state_machine/task_004_ros_task_manage,FAILED,5/7,71.43%,5289,"test_introspection_node_handle, test_rclpy_init_protection"
+qwen_qwen3.5-plus-02-15,state_machine,state_machine/task_005_flexbe_behavior_engine,FAILED,4/5,80.00%,2387,test_placeholder_removal
+qwen_qwen3.5-plus-02-15,state_machine,state_machine/task_006_flexbe_2,FAILED,3/5,60.00%,2098,"test_true_buffer_drain_logic, test_incremental_update_logic"
+qwen_qwen3.5-plus-02-15,state_machine,state_machine/task_007_smacc,FAILED,3/5,60.00%,1389,"test_functional_preservation, test_memory_safety_and_types"
+qwen_qwen3.5-plus-02-15,state_machine,state_machine/task_008A_robot_statemachine_scaffold,FAILED,5/6,83.33%,3139,test_parameter_lifecycle_strict
+qwen_qwen3.5-plus-02-15,state_machine,state_machine/task_009_sm_dance_bot_strikes_back,FAILED,7/8,87.50%,6808,test_ros2_node_base_interface
+qwen_qwen3.5-plus-02-15,sensor_process,sensor_process/task_001_laser_obstacle_detection,FAILED,3/4,75.00%,3076,test_member_variable_consistency
+qwen_qwen3.5-plus-02-15,sensor_process,sensor_process/task_002_camera_edge_detection,SUCCESS,6/6,100.00%,935,None
+qwen_qwen3.5-plus-02-15,sensor_process,sensor_process/task_003_rgbd_pointcloud_generation,FAILED,4/6,66.67%,4964,"test_intrinsic_scaling_math, test_mandatory_kernel_call"
+qwen_qwen3.5-plus-02-15,sensor_process,sensor_process/task_004_imu_odometry_estimation,FAILED,4/6,66.67%,10542,"test_3d_rotation_coupling, test_acceleration_3d_projection"
+qwen_qwen3.5-plus-02-15,sensor_process,sensor_process/task_005_sonar_distance_estimation,FAILED,2/6,33.33%,8578,"test_sonar_geometry_robust_v4, test_numerical_stability_epsilon, test_sonar_max_range_limit, test_sonar_y_mirroring_fix"
+qwen_qwen3.5-plus-02-15,sensor_process,sensor_process/task_006_image_pipeline,FAILED,7/9,77.78%,5007,"test_cv_bridge_exception_safety, test_template_dispatch_completeness"
+qwen_qwen3.5-plus-02-15,sensor_process,sensor_process/task_007_hector_slam,FAILED,6/7,85.71%,12696,test_zero_ros1_leakage
+qwen_qwen3.5-plus-02-15,sensor_process,sensor_process/task_008_darknet,FAILED,4/6,66.67%,14019,"test_flexible_logging_macros, test_flexible_mutex_locking"
+qwen_qwen3.5-plus-02-15,sensor_process,sensor_process/task_009_lio_sam,FAILED,4/6,66.67%,40383,"test_callback_group_initialization, test_service_response_success_set"
+qwen_qwen3.5-plus-02-15,sensor_process,sensor_process/task_010_radar_velocity_estimation,FAILED,4/8,50.00%,4528,"test_ros2_logging_migration, test_ros2_clock_usage, test_mutex_lock_guard, test_zero_timestamp_handling"
+qwen_qwen3.5-plus-02-15,sensor_process,sensor_process/task_011_camera_lidar_fusion,FAILED,5/6,83.33%,15145,test_tf2_geometry_msgs_include
+z-ai_glm-5-turbo,perception_control,perception_control/task_001_color_blob_tracking,FAILED,6/7,85.71%,1369,test_07_stop_and_motion_semantics_without_literal_numbers
+z-ai_glm-5-turbo,perception_control,perception_control/task_002_camera_depth_reach_target,SUCCESS,9/9,100.00%,3217,None
+z-ai_glm-5-turbo,perception_control,perception_control/task_003_multi_node_perception_control,FAILED,2/5,40.00%,1932,"test_ds4_enum_mapping_present_and_used, test_l1_toggle_semantics_fidelity, test_axis_scaling_and_publish_gating_fidelity"
+z-ai_glm-5-turbo,perception_control,perception_control/task_004_mobile_lidar_obstacle_avoidance,FAILED,4/9,44.44%,2473,"test_ros2_lifecycle_and_node_creation, test_ros2_timer_rate_and_publish, test_partitions_ranges_by_slicing, test_decision_uses_signed_cost_table_and_abs_cost, test_control_laws_and_modes_match_reference_semantics"
+z-ai_glm-5-turbo,perception_control,perception_control/task_005_ORBBEC,FAILED,6/12,50.00%,52583,"test_frameset_applies_filters_before_downstream_use, test_frameset_alignment_semantics_present, test_frameset_forwards_non_color_streams_through_common_handler, test_color_thread_consumes_fifo_and_processes_in_pipeline_order, test_single_frame_has_subscriber_gate_includes_image_and_camerainfo, test_single_frame_supports_flip_branch_and_depth_scaling_hook"
+z-ai_glm-5-turbo,perception_control,perception_control/task_006_3d_sensor_moveit_arm_control,FAILED,3/4,75.00%,4541,test_4_async_fallback_mastery
+z-ai_glm-5-turbo,perception_control,perception_control/task_007_autonomous_navigation,FAILED,2/4,50.00%,2989,"test_turn_shortest_path_logic, test_proportional_control_law"
+z-ai_glm-5-turbo,perception_control,perception_control/task_008_limo_robot,FAILED,1/6,16.67%,9987,"test_ackermann_inverse_kinematics, test_steering_limit_clamping, test_odom_integration_frames, test_mecanum_lateral_awareness, test_time_differential_consistency"
+z-ai_glm-5-turbo,perception_control,perception_control/task_009_stretch_pipeline,SUCCESS,6/6,100.00%,8459,None
+z-ai_glm-5-turbo,state_machine,state_machine/task_001_smach_basic,SUCCESS,8/8,100.00%,2926,None
+z-ai_glm-5-turbo,state_machine,state_machine/task_002_mas_execution_manager,FAILED,4/7,57.14%,1167,"test_parameter_logic, test_topic_and_msg_integrity, test_interface_params_retention"
+z-ai_glm-5-turbo,state_machine,state_machine/task_003_tutorial_baseline,FAILED,6/7,85.71%,1060,test_service_future_logic
+z-ai_glm-5-turbo,state_machine,state_machine/task_004_ros_task_manage,FAILED,4/7,57.14%,4669,"test_concurrency_architecture, test_introspection_node_handle, test_rclpy_init_protection"
+z-ai_glm-5-turbo,state_machine,state_machine/task_005_flexbe_behavior_engine,FAILED,3/5,60.00%,2253,"test_no_ros1_remnants, test_placeholder_removal"
+z-ai_glm-5-turbo,state_machine,state_machine/task_006_flexbe_2,FAILED,4/5,80.00%,1934,test_true_buffer_drain_logic
+z-ai_glm-5-turbo,state_machine,state_machine/task_007_smacc,FAILED,3/5,60.00%,1063,"test_functional_preservation, test_memory_safety_and_types"
+z-ai_glm-5-turbo,state_machine,state_machine/task_008A_robot_statemachine_scaffold,FAILED,5/6,83.33%,2846,test_parameter_lifecycle_strict
+z-ai_glm-5-turbo,state_machine,state_machine/task_009_sm_dance_bot_strikes_back,FAILED,5/8,62.50%,5927,"test_ros2_node_base_interface, test_parameter_declaration_lifecycle, test_safe_logging_and_node_usage"
+z-ai_glm-5-turbo,sensor_process,sensor_process/task_001_laser_obstacle_detection,FAILED,3/4,75.00%,2477,test_member_variable_consistency
+z-ai_glm-5-turbo,sensor_process,sensor_process/task_002_camera_edge_detection,SUCCESS,6/6,100.00%,857,None
+z-ai_glm-5-turbo,sensor_process,sensor_process/task_003_rgbd_pointcloud_generation,FAILED,4/6,66.67%,4497,"test_intrinsic_scaling_math, test_dispatch_logic_16uc1_32fc1"
+z-ai_glm-5-turbo,sensor_process,sensor_process/task_004_imu_odometry_estimation,FAILED,3/6,50.00%,9185,"test_3d_rotation_coupling, test_acceleration_3d_projection, test_angular_singularity_mapping"
+z-ai_glm-5-turbo,sensor_process,sensor_process/task_005_sonar_distance_estimation,FAILED,1/6,16.67%,6818,"test_holonomic_kinematics, test_sonar_geometry_robust_v4, test_numerical_stability_epsilon, test_sonar_max_range_limit, test_sonar_y_mirroring_fix"
+z-ai_glm-5-turbo,sensor_process,sensor_process/task_006_image_pipeline,FAILED,7/9,77.78%,4901,"test_cv_bridge_exception_safety, test_template_dispatch_completeness"
+z-ai_glm-5-turbo,sensor_process,sensor_process/task_007_hector_slam,SUCCESS,7/7,100.00%,10762,None
+z-ai_glm-5-turbo,sensor_process,sensor_process/task_008_darknet,FAILED,5/6,83.33%,11316,test_timestamp_synchronization
+z-ai_glm-5-turbo,sensor_process,sensor_process/task_009_lio_sam,FAILED,5/6,83.33%,36753,test_callback_group_initialization
+z-ai_glm-5-turbo,sensor_process,sensor_process/task_010_radar_velocity_estimation,FAILED,6/8,75.00%,3442,"test_ros2_clock_usage, test_zero_timestamp_handling"
+z-ai_glm-5-turbo,sensor_process,sensor_process/task_011_camera_lidar_fusion,FAILED,4/6,66.67%,13630,"test_tf2_geometry_msgs_include, test_namespace_full_compliance"
+anthropic_claude-opus-4.6,perception_control,perception_control/task_001_color_blob_tracking,FAILED,5/7,71.43%,1915,"test_05_rgb_triplet_check_present, test_07_stop_and_motion_semantics_without_literal_numbers"
+anthropic_claude-opus-4.6,perception_control,perception_control/task_002_camera_depth_reach_target,SUCCESS,9/9,100.00%,4197,None
+anthropic_claude-opus-4.6,perception_control,perception_control/task_003_multi_node_perception_control,FAILED,3/5,60.00%,2684,"test_l1_toggle_semantics_fidelity, test_axis_scaling_and_publish_gating_fidelity"
+anthropic_claude-opus-4.6,perception_control,perception_control/task_004_mobile_lidar_obstacle_avoidance,FAILED,6/9,66.67%,3520,"test_partitions_ranges_by_slicing, test_decision_uses_signed_cost_table_and_abs_cost, test_control_laws_and_modes_match_reference_semantics"
+anthropic_claude-opus-4.6,perception_control,perception_control/task_005_ORBBEC,FAILED,9/12,75.00%,74014,"test_frameset_alignment_semantics_present, test_frameset_forwards_non_color_streams_through_common_handler, test_color_thread_consumes_fifo_and_processes_in_pipeline_order"
+anthropic_claude-opus-4.6,perception_control,perception_control/task_006_3d_sensor_moveit_arm_control,FAILED,3/4,75.00%,6611,test_4_async_fallback_mastery
+anthropic_claude-opus-4.6,perception_control,perception_control/task_007_autonomous_navigation,FAILED,1/4,25.00%,3924,"test_turn_shortest_path_logic, test_proportional_control_law, test_emergency_safety_check"
+anthropic_claude-opus-4.6,perception_control,perception_control/task_008_limo_robot,FAILED,1/6,16.67%,13456,"test_ackermann_inverse_kinematics, test_steering_limit_clamping, test_odom_integration_frames, test_mecanum_lateral_awareness, test_time_differential_consistency"
+anthropic_claude-opus-4.6,perception_control,perception_control/task_009_stretch_pipeline,FAILED,5/6,83.33%,11088,test_depth_unit_scaling
+anthropic_claude-opus-4.6,state_machine,state_machine/task_001_smach_basic,SUCCESS,8/8,100.00%,4092,None
+anthropic_claude-opus-4.6,state_machine,state_machine/task_002_mas_execution_manager,FAILED,6/7,85.71%,1815,test_topic_and_msg_integrity
+anthropic_claude-opus-4.6,state_machine,state_machine/task_003_tutorial_baseline,FAILED,5/7,71.43%,1499,"test_clock_and_manual_math, test_service_future_logic"
+anthropic_claude-opus-4.6,state_machine,state_machine/task_004_ros_task_manage,FAILED,6/7,85.71%,6114,test_introspection_node_handle
+anthropic_claude-opus-4.6,state_machine,state_machine/task_005_flexbe_behavior_engine,FAILED,4/5,80.00%,2916,test_placeholder_removal
+anthropic_claude-opus-4.6,state_machine,state_machine/task_006_flexbe_2,FAILED,4/5,80.00%,2404,test_incremental_update_logic
+anthropic_claude-opus-4.6,state_machine,state_machine/task_007_smacc,FAILED,4/5,80.00%,1569,test_memory_safety_and_types
+anthropic_claude-opus-4.6,state_machine,state_machine/task_008A_robot_statemachine_scaffold,FAILED,5/6,83.33%,3619,test_parameter_lifecycle_strict
+anthropic_claude-opus-4.6,state_machine,state_machine/task_009_sm_dance_bot_strikes_back,FAILED,7/8,87.50%,7676,test_ros2_node_base_interface
+anthropic_claude-opus-4.6,sensor_process,sensor_process/task_001_laser_obstacle_detection,SUCCESS,4/4,100.00%,3477,None
+anthropic_claude-opus-4.6,sensor_process,sensor_process/task_002_camera_edge_detection,SUCCESS,6/6,100.00%,1140,None
+anthropic_claude-opus-4.6,sensor_process,sensor_process/task_003_rgbd_pointcloud_generation,SUCCESS,6/6,100.00%,5897,None
+anthropic_claude-opus-4.6,sensor_process,sensor_process/task_004_imu_odometry_estimation,FAILED,4/6,66.67%,12402,"test_3d_rotation_coupling, test_acceleration_3d_projection"
+anthropic_claude-opus-4.6,sensor_process,sensor_process/task_005_sonar_distance_estimation,FAILED,4/6,66.67%,9105,"test_numerical_stability_epsilon, test_sonar_max_range_limit"
+anthropic_claude-opus-4.6,sensor_process,sensor_process/task_006_image_pipeline,FAILED,8/9,88.89%,5920,test_template_dispatch_completeness
+anthropic_claude-opus-4.6,sensor_process,sensor_process/task_007_hector_slam,SUCCESS,7/7,100.00%,16436,None
+anthropic_claude-opus-4.6,sensor_process,sensor_process/task_008_darknet,FAILED,4/6,66.67%,14982,"test_flexible_logging_macros, test_flexible_mutex_locking"
+anthropic_claude-opus-4.6,sensor_process,sensor_process/task_009_lio_sam,FAILED,4/6,66.67%,49840,"test_callback_group_initialization, test_service_response_success_set"
+anthropic_claude-opus-4.6,sensor_process,sensor_process/task_010_radar_velocity_estimation,FAILED,4/8,50.00%,5229,"test_ros2_logging_migration, test_ros2_clock_usage, test_mutex_lock_guard, test_zero_timestamp_handling"
+anthropic_claude-opus-4.6,sensor_process,sensor_process/task_011_camera_lidar_fusion,FAILED,5/6,83.33%,19254,test_tf2_geometry_msgs_include
+deepseek_deepseek-v4-pro,perception_control,perception_control/task_001_color_blob_tracking,FAILED,5/7,71.43%,1575,"test_02_node_spin_and_image_subscription_pipeline, test_07_stop_and_motion_semantics_without_literal_numbers"
+deepseek_deepseek-v4-pro,perception_control,perception_control/task_002_camera_depth_reach_target,SUCCESS,9/9,100.00%,3507,None
+deepseek_deepseek-v4-pro,perception_control,perception_control/task_003_multi_node_perception_control,FAILED,2/5,40.00%,2175,"test_ds4_enum_mapping_present_and_used, test_l1_toggle_semantics_fidelity, test_axis_scaling_and_publish_gating_fidelity"
+deepseek_deepseek-v4-pro,perception_control,perception_control/task_004_mobile_lidar_obstacle_avoidance,FAILED,6/9,66.67%,2951,"test_partitions_ranges_by_slicing, test_decision_uses_signed_cost_table_and_abs_cost, test_control_laws_and_modes_match_reference_semantics"
+deepseek_deepseek-v4-pro,perception_control,perception_control/task_005_ORBBEC,FAILED,9/12,75.00%,59120,"test_frameset_forwards_non_color_streams_through_common_handler, test_color_thread_consumes_fifo_and_processes_in_pipeline_order, test_single_frame_supports_flip_branch_and_depth_scaling_hook"
+deepseek_deepseek-v4-pro,perception_control,perception_control/task_006_3d_sensor_moveit_arm_control,FAILED,2/4,50.00%,5132,"test_3_grasp_sequence_integrity, test_4_async_fallback_mastery"
+deepseek_deepseek-v4-pro,perception_control,perception_control/task_007_autonomous_navigation,FAILED,3/4,75.00%,3190,test_proportional_control_law
+deepseek_deepseek-v4-pro,perception_control,perception_control/task_008_limo_robot,FAILED,1/6,16.67%,10990,"test_ackermann_inverse_kinematics, test_steering_limit_clamping, test_odom_integration_frames, test_mecanum_lateral_awareness, test_time_differential_consistency"
+deepseek_deepseek-v4-pro,perception_control,perception_control/task_009_stretch_pipeline,SUCCESS,6/6,100.00%,9379,None
+deepseek_deepseek-v4-pro,state_machine,state_machine/task_001_smach_basic,SUCCESS,8/8,100.00%,3351,None
+deepseek_deepseek-v4-pro,state_machine,state_machine/task_002_mas_execution_manager,FAILED,4/7,57.14%,1454,"test_parameter_logic, test_topic_and_msg_integrity, test_interface_params_retention"
+deepseek_deepseek-v4-pro,state_machine,state_machine/task_003_tutorial_baseline,FAILED,5/7,71.43%,1209,"test_clock_and_manual_math, test_service_future_logic"
+deepseek_deepseek-v4-pro,state_machine,state_machine/task_004_ros_task_manage,FAILED,5/7,71.43%,5091,"test_concurrency_architecture, test_introspection_node_handle"
+deepseek_deepseek-v4-pro,state_machine,state_machine/task_005_flexbe_behavior_engine,FAILED,3/5,60.00%,2587,"test_no_ros1_remnants, test_ros2_goal_status_constants"
+deepseek_deepseek-v4-pro,state_machine,state_machine/task_006_flexbe_2,FAILED,3/5,60.00%,2211,"test_true_buffer_drain_logic, test_incremental_update_logic"
+deepseek_deepseek-v4-pro,state_machine,state_machine/task_007_smacc,FAILED,3/5,60.00%,1233,"test_functional_preservation, test_memory_safety_and_types"
+deepseek_deepseek-v4-pro,state_machine,state_machine/task_008A_robot_statemachine_scaffold,FAILED,5/6,83.33%,3303,test_parameter_lifecycle_strict
+deepseek_deepseek-v4-pro,state_machine,state_machine/task_009_sm_dance_bot_strikes_back,FAILED,7/8,87.50%,6708,test_ros2_node_base_interface
+deepseek_deepseek-v4-pro,sensor_process,sensor_process/task_001_laser_obstacle_detection,FAILED,3/4,75.00%,3252,test_member_variable_consistency
+deepseek_deepseek-v4-pro,sensor_process,sensor_process/task_002_camera_edge_detection,SUCCESS,6/6,100.00%,968,None
+deepseek_deepseek-v4-pro,sensor_process,sensor_process/task_003_rgbd_pointcloud_generation,FAILED,5/6,83.33%,4791,test_intrinsic_scaling_math
+deepseek_deepseek-v4-pro,sensor_process,sensor_process/task_004_imu_odometry_estimation,FAILED,4/6,66.67%,10116,"test_3d_rotation_coupling, test_acceleration_3d_projection"
+deepseek_deepseek-v4-pro,sensor_process,sensor_process/task_005_sonar_distance_estimation,FAILED,1/6,16.67%,7955,"test_holonomic_kinematics, test_sonar_geometry_robust_v4, test_numerical_stability_epsilon, test_sonar_max_range_limit, test_sonar_y_mirroring_fix"
+deepseek_deepseek-v4-pro,sensor_process,sensor_process/task_006_image_pipeline,FAILED,6/9,66.67%,5354,"test_pointcloud2_field_setup, test_template_dispatch_completeness, test_radial_transform_update_check"
+deepseek_deepseek-v4-pro,sensor_process,sensor_process/task_007_hector_slam,FAILED,6/7,85.71%,12878,test_timestamp_preservation
+deepseek_deepseek-v4-pro,sensor_process,sensor_process/task_008_darknet,FAILED,3/6,50.00%,11405,"test_flexible_logging_macros, test_flexible_mutex_locking, test_timestamp_synchronization"
+deepseek_deepseek-v4-pro,sensor_process,sensor_process/task_009_lio_sam,FAILED,5/6,83.33%,27978,test_callback_group_initialization
+deepseek_deepseek-v4-pro,sensor_process,sensor_process/task_010_radar_velocity_estimation,FAILED,2/8,25.00%,2933,"test_ros2_logging_migration, test_shared_ptr_dereferencing, test_ros2_clock_usage, test_mutex_lock_guard, test_trigger_reset_logic_strict, test_zero_timestamp_handling"
+deepseek_deepseek-v4-pro,sensor_process,sensor_process/task_011_camera_lidar_fusion,FAILED,4/6,66.67%,14957,"test_tf2_geometry_msgs_include, test_namespace_full_compliance"

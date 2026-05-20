@@ -35,7 +35,7 @@ __author__ = "mferguson@willowgarage.com (Michael Ferguson)"
 
 import array
 import errno
-import imp
+import importlib
 import io
 import multiprocessing
 import queue
@@ -49,10 +49,9 @@ from serial import Serial, SerialException, SerialTimeoutException
 
 import rclpy
 from rclpy.node import Node
-from rclpy.executors import ExternalShutdownException
-from std_msgs.msg import Time
+from builtin_interfaces.msg import Time
 from rosserial_msgs.msg import TopicInfo, Log
-from rosserial_msgs.srv import RequestParamRequest, RequestParamResponse
+from rosserial_msgs.srv import RequestParam
 
 import diagnostic_msgs.msg
 
@@ -61,50 +60,36 @@ ERROR_NO_SYNC = "no sync with device"
 ERROR_PACKET_FAILED = "Packet Failed : Failed to read msg data"
 
 def load_pkg_module(package, directory):
-    #check if its in the python path
-    path = sys.path
     try:
-        imp.find_module(package)
+        m = importlib.import_module(package + '.' + directory)
     except ImportError:
-        import importlib
-        importlib.import_module(package)
-    try:
-        m = __import__( package + '.' + directory )
-    except ImportError:
-        print( "Cannot import package : %s"% package )
-        print( "sys.path was " + str(path) )
         return None
     return m
 
 def load_message(package, message):
     m = load_pkg_module(package, 'msg')
-    m2 = getattr(m, 'msg')
-    return getattr(m2, message)
+    return getattr(m, message)
 
-def load_service(package,service):
+def load_service(package, service):
     s = load_pkg_module(package, 'srv')
-    s = getattr(s, 'srv')
     srv = getattr(s, service)
-    mreq = getattr(s, service+"Request")
-    mres = getattr(s, service+"Response")
-    return srv,mreq,mres
+    mreq = getattr(s, service + "_Request")
+    mres = getattr(s, service + "_Response")
+    return srv, mreq, mres
 
 class Publisher:
     """
         Publisher forwards messages from the serial device to ROS.
     """
-    def __init__(self, topic_info, node):
+    def __init__(self, topic_info, parent):
         """ Create a new publisher. """
         self.topic = topic_info.topic_name
-        self.node = node
+        self.parent = parent
 
         # find message type
         package, message = topic_info.message_type.split('/')
         self.message = load_message(package, message)
-        if self.message._md5sum == topic_info.md5sum:
-            self.publisher = self.node.create_publisher(self.message, self.topic, 10)
-        else:
-            raise Exception('Checksum does not match: ' + self.message._md5sum + ',' + topic_info.md5sum)
+        self.publisher = self.parent.node.create_publisher(self.message, self.topic, 10)
 
     def handlePacket(self, data):
         """ Forward message to ROS network. """
@@ -118,19 +103,15 @@ class Subscriber:
         Subscriber forwards messages from ROS to the serial device.
     """
 
-    def __init__(self, topic_info, parent, node):
+    def __init__(self, topic_info, parent):
         self.topic = topic_info.topic_name
         self.id = topic_info.topic_id
         self.parent = parent
-        self.node = node
 
         # find message type
         package, message = topic_info.message_type.split('/')
         self.message = load_message(package, message)
-        if self.message._md5sum == topic_info.md5sum:
-            self.subscriber = self.node.create_subscription(self.message, self.topic, self.callback, 10)
-        else:
-            raise Exception('Checksum does not match: ' + self.message._md5sum + ',' + topic_info.md5sum)
+        self.subscriber = self.parent.node.create_subscription(self.message, self.topic, self.callback, 10)
 
     def callback(self, msg):
         """ Forward message to serial device. """
@@ -139,44 +120,38 @@ class Subscriber:
         self.parent.send(self.id, data_buffer.getvalue())
 
     def unregister(self):
-        self.node.get_logger().info("Removing subscriber: %s", self.topic)
-        self.subscriber.destroy()
-
+        self.parent.node.get_logger().info("Removing subscriber: %s" % self.topic)
+        self.parent.node.destroy_subscription(self.subscriber)
 
 class ServiceServer:
     """
         ServiceServer responds to requests from ROS.
     """
 
-    def __init__(self, topic_info, parent, node):
+    def __init__(self, topic_info, parent):
         self.topic = topic_info.topic_name
         self.parent = parent
-        self.node = node
 
         # find message type
         package, service = topic_info.message_type.split('/')
-        s = load_pkg_module(package, 'srv')
-        s = getattr(s, 'srv')
-        self.mreq = getattr(s, service+"Request")
-        self.mres = getattr(s, service+"Response")
-        srv = getattr(s, service)
-        self.service = self.node.create_service(srv, self.topic, self.callback)
+        srv, self.mreq, self.mres = load_service(package, service)
+        self.service = self.parent.node.create_service(srv, self.topic, self.callback)
 
         # response message
         self.data = None
 
     def unregister(self):
-        self.node.get_logger().info("Removing service: %s", self.topic)
-        self.service.destroy()
+        self.parent.node.get_logger().info("Removing service: %s" % self.topic)
+        self.parent.node.destroy_service(self.service)
 
-    def callback(self, req):
+    def callback(self, req, res):
         """ Forward request to serial device. """
         data_buffer = io.BytesIO()
         req.serialize(data_buffer)
         self.response = None
         self.parent.send(self.id, data_buffer.getvalue())
         while self.response is None:
-            pass
+            time.sleep(0.001)
         return self.response
 
     def handlePacket(self, data):
@@ -188,30 +163,28 @@ class ServiceServer:
 
 class ServiceClient:
     """
-        ServiceServer responds to requests from ROS.
+        ServiceClient responds to requests from ROS.
     """
 
-    def __init__(self, topic_info, parent, node):
+    def __init__(self, topic_info, parent):
         self.topic = topic_info.topic_name
         self.parent = parent
-        self.node = node
 
         # find message type
         package, service = topic_info.message_type.split('/')
-        s = load_pkg_module(package, 'srv')
-        s = getattr(s, 'srv')
-        self.mreq = getattr(s, service+"Request")
-        self.mres = getattr(s, service+"Response")
-        srv = getattr(s, service)
-        self.node.get_logger().info("Starting service client, waiting for service '" + self.topic + "'")
-        self.proxy = self.node.create_client(srv, self.topic)
+        srv, self.mreq, self.mres = load_service(package, service)
+        self.parent.node.get_logger().info("Starting service client, waiting for service '" + self.topic + "'")
+        self.proxy = self.parent.node.create_client(srv, self.topic)
+        self.proxy.wait_for_service()
 
     def handlePacket(self, data):
         """ Forward request to ROS network. """
         req = self.mreq()
         req.deserialize(data)
         # call service proxy
-        resp = self.proxy.call(req)
+        future = self.proxy.call_async(req)
+        rclpy.spin_until_future_complete(self.parent.node, future)
+        resp = future.result()
         # serialize and publish
         data_buffer = io.BytesIO()
         resp.serialize(data_buffer)
@@ -224,8 +197,8 @@ class RosSerialServer:
         for additional connections. Each forked process is a new ros node, and proxies ros
         operations (e.g. publish/subscribe) from its connection to the rest of ros.
     """
-    def __init__(self, tcp_portnum, fork_server=False):
-        self.node = rclpy.create_node('ros_serial_server')
+    def __init__(self, node, tcp_portnum, fork_server=False):
+        self.node = node
         self.node.get_logger().info("Fork_server is: %s" % fork_server)
         self.tcp_portnum = tcp_portnum
         self.fork_server = fork_server
@@ -263,7 +236,7 @@ class RosSerialServer:
                 self.node.get_logger().info("startSerialClient() exited")
 
     def startSerialClient(self):
-        client = SerialClient(self)
+        client = SerialClient(self.node, self)
         try:
             client.run()
         except KeyboardInterrupt:
@@ -283,7 +256,10 @@ class RosSerialServer:
                 srv.unregister()
 
     def startSocketServer(self, port, address):
-        self.node = rclpy.create_node("serial_node_%r" % address)
+        rclpy.init()
+        node = rclpy.create_node("serial_node_%r" % address)
+        self.node = node
+        self.node.get_logger().info("starting ROS Serial Python Node serial_node-%r" % address)
         self.startSerialClient()
 
     def flushInput(self):
@@ -334,49 +310,20 @@ class SerialClient(object):
     protocol_ver2 = b'\xfe'
     protocol_ver = protocol_ver2
 
-    def __init__(self, port=None, baud=57600, timeout=5.0, fix_pyserial_for_test=False, node=None):
+    def __init__(self, node, port=None, baud=57600, timeout=5.0, fix_pyserial_for_test=False):
         """ Initialize node, connect to bus, attempt to negotiate topics. """
-
         self.node = node
-        self.node.get_logger().info("SerialClient initialized")
-
-        self.port = port
-        self.baud = baud
         self.timeout = timeout
         self.fix_pyserial_for_test = fix_pyserial_for_test
-
-        self.buffer_out = -1
-        self.buffer_in = -1
-
-        self.callbacks = dict()
-        # endpoints for creating new pubs/subs
-        self.callbacks[TopicInfo.ID_PUBLISHER] = self.setupPublisher
-        self.callbacks[TopicInfo.ID_SUBSCRIBER] = self.setupSubscriber
-        # service client/servers have 2 creation endpoints (a publisher and a subscriber)
-        self.callbacks[TopicInfo.ID_SERVICE_SERVER+TopicInfo.ID_PUBLISHER] = self.setupServiceServerPublisher
-        self.callbacks[TopicInfo.ID_SERVICE_SERVER+TopicInfo.ID_SUBSCRIBER] = self.setupServiceServerSubscriber
-        self.callbacks[TopicInfo.ID_SERVICE_CLIENT+TopicInfo.ID_PUBLISHER] = self.setupServiceClientPublisher
-        self.callbacks[TopicInfo.ID_SERVICE_CLIENT+TopicInfo.ID_SUBSCRIBER] = self.setupServiceClientSubscriber
-        # custom endpoints
-        self.callbacks[TopicInfo.ID_PARAMETER_REQUEST] = self.handleParameterRequest
-        self.callbacks[TopicInfo.ID_LOG] = self.handleLoggingRequest
-        self.callbacks[TopicInfo.ID_TIME] = self.handleTimeRequest
-
+        self.write_queue = queue.Queue()
+        self.write_lock = threading.Lock()
+        self.read_lock = threading.Lock()
+        self.write_thread = None
+        self.synced = False
         self.publishers = dict()
         self.subscribers = dict()
         self.services = dict()
-
-        self.write_queue = queue.Queue()
-        self.write_thread = None
-        self.write_lock = threading.Lock()
-        self.read_lock = threading.Lock()
-
-        self.synced = False
-        self.lastsync = self.node.get_clock().now()
-        self.lastsync_lost = self.node.get_clock().now()
-        self.last_read = self.node.get_clock().now()
-        self.last_write = self.node.get_clock().now()
-
+        
         self.pub_diagnostics = self.node.create_publisher(diagnostic_msgs.msg.DiagnosticArray, '/diagnostics', 10)
 
         if port is None:
@@ -396,13 +343,35 @@ class SerialClient(object):
                         self.port = Serial(port, baud, timeout=self.timeout, write_timeout=10)
                     break
                 except SerialException as e:
-                    self.node.get_logger().error("Error opening serial: %s", e)
+                    self.node.get_logger().error("Error opening serial: %s" % e)
                     time.sleep(3)
 
         if not rclpy.ok():
             return
 
         time.sleep(0.1)           # Wait for ready (patch for Uno)
+
+        self.buffer_out = -1
+        self.buffer_in = -1
+
+        self.callbacks = dict()
+        # endpoints for creating new pubs/subs
+        self.callbacks[TopicInfo.ID_PUBLISHER] = self.setupPublisher
+        self.callbacks[TopicInfo.ID_SUBSCRIBER] = self.setupSubscriber
+        # service client/servers have 2 creation endpoints (a publisher and a subscriber)
+        self.callbacks[TopicInfo.ID_SERVICE_SERVER+TopicInfo.ID_PUBLISHER] = self.setupServiceServerPublisher
+        self.callbacks[TopicInfo.ID_SERVICE_SERVER+TopicInfo.ID_SUBSCRIBER] = self.setupServiceServerSubscriber
+        self.callbacks[TopicInfo.ID_SERVICE_CLIENT+TopicInfo.ID_PUBLISHER] = self.setupServiceClientPublisher
+        self.callbacks[TopicInfo.ID_SERVICE_CLIENT+TopicInfo.ID_SUBSCRIBER] = self.setupServiceClientSubscriber
+        # custom endpoints
+        self.callbacks[TopicInfo.ID_PARAMETER_REQUEST] = self.handleParameterRequest
+        self.callbacks[TopicInfo.ID_LOG] = self.handleLoggingRequest
+        self.callbacks[TopicInfo.ID_TIME] = self.handleTimeRequest
+
+        time.sleep(2.0)
+        self.requestTopics()
+        self.lastsync = self.node.get_clock().now()
+        self.lastsync_lost = self.node.get_clock().now()
 
     def requestTopics(self):
         """ Determine topics to subscribe/publish. """
@@ -523,7 +492,7 @@ class SerialClient(object):
                 except IOError:
                     self.sendDiagnostics(diagnostic_msgs.msg.DiagnosticStatus.ERROR, ERROR_PACKET_FAILED)
                     self.node.get_logger().info("Packet Failed :  Failed to read msg data")
-                    self.node.get_logger().info("expected msg length is %d", msg_length)
+                    self.node.get_logger().info("expected msg length is %d" % msg_length)
                     raise
 
                 # Reada checksum for topic id and msg
@@ -571,13 +540,13 @@ class SerialClient(object):
         try:
             msg = TopicInfo()
             msg.deserialize(data)
-            pub = Publisher(msg, self.node)
+            pub = Publisher(msg, self)
             self.publishers[msg.topic_id] = pub
             self.callbacks[msg.topic_id] = pub.handlePacket
             self.setPublishSize(msg.buffer_size)
             self.node.get_logger().info("Setup publisher on %s [%s]" % (msg.topic_name, msg.message_type) )
         except Exception as e:
-            self.node.get_logger().error("Creation of publisher failed: %s", e)
+            self.node.get_logger().error("Creation of publisher failed: %s" % e)
 
     def setupSubscriber(self, data):
         """ Register a new subscriber. """
@@ -585,19 +554,19 @@ class SerialClient(object):
             msg = TopicInfo()
             msg.deserialize(data)
             if not msg.topic_name in list(self.subscribers.keys()):
-                sub = Subscriber(msg, self, self.node)
+                sub = Subscriber(msg, self)
                 self.subscribers[msg.topic_name] = sub
                 self.setSubscribeSize(msg.buffer_size)
                 self.node.get_logger().info("Setup subscriber on %s [%s]" % (msg.topic_name, msg.message_type) )
             elif msg.message_type != self.subscribers[msg.topic_name].message._type:
                 old_message_type = self.subscribers[msg.topic_name].message._type
                 self.subscribers[msg.topic_name].unregister()
-                sub = Subscriber(msg, self, self.node)
+                sub = Subscriber(msg, self)
                 self.subscribers[msg.topic_name] = sub
                 self.setSubscribeSize(msg.buffer_size)
                 self.node.get_logger().info("Change the message type of subscriber on %s from [%s] to [%s]" % (msg.topic_name, old_message_type, msg.message_type) )
         except Exception as e:
-            self.node.get_logger().error("Creation of subscriber failed: %s", e)
+            self.node.get_logger().error("Creation of subscriber failed: %s" % e)
 
     def setupServiceServerPublisher(self, data):
         """ Register a new service server. """
@@ -608,15 +577,12 @@ class SerialClient(object):
             try:
                 srv = self.services[msg.topic_name]
             except KeyError:
-                srv = ServiceServer(msg, self, self.node)
+                srv = ServiceServer(msg, self)
                 self.node.get_logger().info("Setup service server on %s [%s]" % (msg.topic_name, msg.message_type) )
                 self.services[msg.topic_name] = srv
-            if srv.mres._md5sum == msg.md5sum:
-                self.callbacks[msg.topic_id] = srv.handlePacket
-            else:
-                raise Exception('Checksum does not match: ' + srv.mres._md5sum + ',' + msg.md5sum)
+            self.callbacks[msg.topic_id] = srv.handlePacket
         except Exception as e:
-            self.node.get_logger().error("Creation of service server failed: %s", e)
+            self.node.get_logger().error("Creation of service server failed: %s" % e)
 
     def setupServiceServerSubscriber(self, data):
         """ Register a new service server. """
@@ -627,15 +593,12 @@ class SerialClient(object):
             try:
                 srv = self.services[msg.topic_name]
             except KeyError:
-                srv = ServiceServer(msg, self, self.node)
+                srv = ServiceServer(msg, self)
                 self.node.get_logger().info("Setup service server on %s [%s]" % (msg.topic_name, msg.message_type) )
                 self.services[msg.topic_name] = srv
-            if srv.mreq._md5sum == msg.md5sum:
-                srv.id = msg.topic_id
-            else:
-                raise Exception('Checksum does not match: ' + srv.mreq._md5sum + ',' + msg.md5sum)
+            srv.id = msg.topic_id
         except Exception as e:
-            self.node.get_logger().error("Creation of service server failed: %s", e)
+            self.node.get_logger().error("Creation of service server failed: %s" % e)
 
     def setupServiceClientPublisher(self, data):
         """ Register a new service client. """
@@ -646,15 +609,12 @@ class SerialClient(object):
             try:
                 srv = self.services[msg.topic_name]
             except KeyError:
-                srv = ServiceClient(msg, self, self.node)
+                srv = ServiceClient(msg, self)
                 self.node.get_logger().info("Setup service client on %s [%s]" % (msg.topic_name, msg.message_type) )
                 self.services[msg.topic_name] = srv
-            if srv.mreq._md5sum == msg.md5sum:
-                self.callbacks[msg.topic_id] = srv.handlePacket
-            else:
-                raise Exception('Checksum does not match: ' + srv.mreq._md5sum + ',' + msg.md5sum)
+            self.callbacks[msg.topic_id] = srv.handlePacket
         except Exception as e:
-            self.node.get_logger().error("Creation of service client failed: %s", e)
+            self.node.get_logger().error("Creation of service client failed: %s" % e)
 
     def setupServiceClientSubscriber(self, data):
         """ Register a new service client. """
@@ -665,20 +625,19 @@ class SerialClient(object):
             try:
                 srv = self.services[msg.topic_name]
             except KeyError:
-                srv = ServiceClient(msg, self, self.node)
+                srv = ServiceClient(msg, self)
                 self.node.get_logger().info("Setup service client on %s [%s]" % (msg.topic_name, msg.message_type) )
                 self.services[msg.topic_name] = srv
-            if srv.mres._md5sum == msg.md5sum:
-                srv.id = msg.topic_id
-            else:
-                raise Exception('Checksum does not match: ' + srv.mres._md5sum + ',' + msg.md5sum)
+            srv.id = msg.topic_id
         except Exception as e:
-            self.node.get_logger().error("Creation of service client failed: %s", e)
+            self.node.get_logger().error("Creation of service client failed: %s" % e)
 
     def handleTimeRequest(self, data):
         """ Respond to device with system time. """
         t = Time()
-        t.data = self.node.get_clock().now()
+        now = self.node.get_clock().now().to_msg()
+        t.sec = now.sec
+        t.nanosec = now.nanosec
         data_buffer = io.BytesIO()
         t.serialize(data_buffer)
         self.send( TopicInfo.ID_TIME, data_buffer.getvalue() )
@@ -686,21 +645,21 @@ class SerialClient(object):
 
     def handleParameterRequest(self, data):
         """ Send parameters to device. Supports only simple datatypes and arrays of such. """
-        req = RequestParamRequest()
+        req = RequestParam.Request()
         req.deserialize(data)
-        resp = RequestParamResponse()
+        resp = RequestParam.Response()
         try:
             param = self.node.get_parameter(req.name).value
-        except KeyError:
-            self.node.get_logger().error("Parameter %s does not exist"%req.name)
+        except Exception:
+            self.node.get_logger().error("Parameter %s does not exist" % req.name)
             return
 
         if param is None:
-            self.node.get_logger().error("Parameter %s does not exist"%req.name)
+            self.node.get_logger().error("Parameter %s does not exist" % req.name)
             return
 
         if isinstance(param, dict):
-            self.node.get_logger().error("Cannot send param %s because it is a dictionary"%req.name)
+            self.node.get_logger().error("Cannot send param %s because it is a dictionary" % req.name)
             return
         if not isinstance(param, list):
             param = [param]
@@ -708,12 +667,12 @@ class SerialClient(object):
         t = type(param[0])
         for p in param:
             if t!= type(p):
-                self.node.get_logger().error('All Paramers in the list %s must be of the same type'%req.name)
+                self.node.get_logger().error('All Paramers in the list %s must be of the same type' % req.name)
                 return
         if t == int or t == bool:
             resp.ints = param
         if t == float:
-            resp.floats =param
+            resp.floats = param
         if t == str:
             resp.strings = param
         data_buffer = io.BytesIO()
@@ -755,12 +714,12 @@ class SerialClient(object):
         """
         length = len(msg_bytes)
         if self.buffer_in > 0 and length > self.buffer_in:
-            self.node.get_logger().error("Message from ROS network dropped: message larger than buffer.\n%s" % msg)
+            self.node.get_logger().error("Message from ROS network dropped: message larger than buffer.\n%s" % msg_bytes)
             return -1
         else:
             # frame : header (1b) + version (1b) + msg_len(2b) + msg_len_chk(1b) + topic_id(2b) + msg(nb) + msg_topic_id_chk(1b)
             length_bytes = struct.pack('<h', length)
-            length_checksum = 255 - (sum(array.array("B", length_bytes)) % 256)
+            length_checksum = 255 - (sum(array.array('B', length_bytes)) % 256)
             length_checksum_bytes = struct.pack('B', length_checksum)
 
             topic_bytes = struct.pack('<h', topic)
@@ -801,7 +760,7 @@ class SerialClient(object):
         msg = diagnostic_msgs.msg.DiagnosticArray()
         status = diagnostic_msgs.msg.DiagnosticStatus()
         status.name = "rosserial_python"
-        msg.header.stamp = self.node.get_clock().now()
+        msg.header.stamp = self.node.get_clock().now().to_msg()
         msg.status.append(status)
 
         status.message = msg_text
@@ -809,13 +768,13 @@ class SerialClient(object):
 
         status.values.append(diagnostic_msgs.msg.KeyValue())
         status.values[0].key="last sync"
-        if self.lastsync.to_sec()>0:
-            status.values[0].value=time.ctime(self.lastsync.to_sec())
+        if self.lastsync.nanoseconds > 0:
+            status.values[0].value=time.ctime(self.lastsync.nanoseconds / 1e9)
         else:
             status.values[0].value="never"
 
         status.values.append(diagnostic_msgs.msg.KeyValue())
         status.values[1].key="last sync lost"
-        status.values[1].value=time.ctime(self.lastsync_lost.to_sec())
+        status.values[1].value=time.ctime(self.lastsync_lost.nanoseconds / 1e9)
 
         self.pub_diagnostics.publish(msg)

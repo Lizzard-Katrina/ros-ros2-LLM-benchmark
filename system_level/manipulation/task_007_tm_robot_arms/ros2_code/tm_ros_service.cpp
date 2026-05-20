@@ -4,7 +4,7 @@
 // Service
 ////////////////////////////////
 
-bool TmRosNode::connect_tm(tm_msgs::srv::ConnectTM::Request::SharedPtr req, tm_msgs::srv::ConnectTM::Response::SharedPtr res)
+bool TmRosNode::connect_tm(const std::shared_ptr<tm_msgs::srv::ConnectTM::Request> req, std::shared_ptr<tm_msgs::srv::ConnectTM::Response> res)
 {
     bool rb = true;
     int t_o = (int)(1000.0 * req->timeout);
@@ -28,7 +28,7 @@ bool TmRosNode::connect_tm(tm_msgs::srv::ConnectTM::Request::SharedPtr req, tm_m
     return rb;
 }
 
-bool TmRosNode::write_item(tm_msgs::srv::WriteItem::Request::SharedPtr req, tm_msgs::srv::WriteItem::Response::SharedPtr res)
+bool TmRosNode::write_item(const std::shared_ptr<tm_msgs::srv::WriteItem::Request> req, std::shared_ptr<tm_msgs::srv::WriteItem::Response> res)
 {
     bool rb = false;
     std::string content = req->item + "=" + req->value;
@@ -37,37 +37,33 @@ bool TmRosNode::write_item(tm_msgs::srv::WriteItem::Request::SharedPtr req, tm_m
     return rb;
 }
 
-bool TmRosNode::ask_item(tm_msgs::srv::AskItem::Request::SharedPtr req, tm_msgs::srv::AskItem::Response::SharedPtr res)
+bool TmRosNode::ask_item(const std::shared_ptr<tm_msgs::srv::AskItem::Request> req, std::shared_ptr<tm_msgs::srv::AskItem::Response> res)
 {
-    std::lock_guard<std::mutex> lock(svr_mutex_);
-    svr_response_map_[req->id] = "";
-    svr_updated_ = false;
-    std::string content = req->item;
-    iface_.svr.send_content_str(req->id, content);
+    bool rb = false;
+    std::unique_lock<std::mutex> lck(svr_mtx_);
+    iface_.svr.send_content_str(req->id, req->item);
+    
     if (req->wait_time > 0) {
-        auto start_time = std::chrono::high_resolution_clock::now();
-        while (!svr_updated_) {
-            svr_cond_.wait_for(std::chrono::seconds(req->wait_time));
-            if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::high_resolution_clock::now() - start_time).count() > req->wait_time) {
-                break;
-            }
+        if (svr_cond_.wait_for(lck, std::chrono::duration<double>(req->wait_time), [this]() { return svr_updated_; })) {
+            res->id = req->id;
+            res->value = svr_response_map_[req->id];
+            rb = true;
         }
     }
-    res->id = req->id;
-    res->content = svr_response_map_[req->id];
-    svr_response_map_.erase(req->id);
-    svr_updated_ = false;
-    return true;
+    svr_updated_ = true;
+    svr_cond_.notify_all();
+    res->ok = rb;
+    return rb;
 }
 
-bool TmRosNode::send_script(tm_msgs::srv::SendScript::Request::SharedPtr req, tm_msgs::srv::SendScript::Response::SharedPtr res)
+bool TmRosNode::send_script(const std::shared_ptr<tm_msgs::srv::SendScript::Request> req, std::shared_ptr<tm_msgs::srv::SendScript::Response> res)
 {   
     bool rb = listenNodeConnection->send_listen_node_script(req->id, req->script);
     res->ok = rb;
     return rb;
 }
 
-bool TmRosNode::set_event(tm_msgs::srv::SetEvent::Request::SharedPtr req, tm_msgs::srv::SetEvent::Response::SharedPtr res)
+bool TmRosNode::set_event(const std::shared_ptr<tm_msgs::srv::SetEvent::Request> req, std::shared_ptr<tm_msgs::srv::SetEvent::Response> res)
 {
     bool rb = false;
     switch (req->func) {
@@ -94,14 +90,14 @@ bool TmRosNode::set_event(tm_msgs::srv::SetEvent::Request::SharedPtr req, tm_msg
     return rb;
 }
 
-bool TmRosNode::set_io(tm_msgs::srv::SetIO::Request::SharedPtr req, tm_msgs::srv::SetIO::Response::SharedPtr res)
+bool TmRosNode::set_io(const std::shared_ptr<tm_msgs::srv::SetIO::Request> req, std::shared_ptr<tm_msgs::srv::SetIO::Response> res)
 {
     bool rb = iface_.set_io(TmIOModule(req->module), TmIOType(req->type), int(req->pin), req->state);
     res->ok = rb;
     return rb;
 }
 
-bool TmRosNode::set_positions(tm_msgs::srv::SetPositions::Request::SharedPtr req, tm_msgs::srv::SetPositions::Response::SharedPtr res)
+bool TmRosNode::set_positions(const std::shared_ptr<tm_msgs::srv::SetPositions::Request> req, std::shared_ptr<tm_msgs::srv::SetPositions::Response> res)
 {
     bool rb = false;
     switch(req->motion_type) {
@@ -118,7 +114,8 @@ bool TmRosNode::set_positions(tm_msgs::srv::SetPositions::Request::SharedPtr req
     res->ok = rb;
     return rb;
 }
-bool TmRosNode::ask_sta(tm_msgs::srv::AskSta::Request::SharedPtr req, tm_msgs::srv::AskSta::Response::SharedPtr res)
+
+bool TmRosNode::ask_sta(const std::shared_ptr<tm_msgs::srv::AskSta::Request> req, std::shared_ptr<tm_msgs::srv::AskSta::Response> res)
 {
     res->ok = listenNodeConnection->ask_sta_struct(req->subcmd, req->subdata, req->wait_time, res->subcmd, res->subdata);
     return res->ok;

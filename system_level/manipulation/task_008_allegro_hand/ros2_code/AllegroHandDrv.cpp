@@ -46,6 +46,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <string>
+#include <algorithm>
+#include <cctype>
 #include "rclcpp/rclcpp.hpp"
 #include "candrv/candrv.h"
 #include "allegro_hand_driver/AllegroHandDrv.h"
@@ -78,16 +80,16 @@ AllegroHandDrv::AllegroHandDrv()
      _curr_position_get(0)
     , _emergency_stop(false)
 {
-    RCLCPP_INFO(rclcpp::get_logger("AllegroHandDrv"), "AllegroHandDrv instance is constructed.");
+    RCLCPP_INFO(rclcpp::get_logger("allegro_hand_drv"), "AllegroHandDrv instance is constructed.");
 }
 
 AllegroHandDrv::~AllegroHandDrv()
 {
     if (_can_handle != 0) {
-        RCLCPP_INFO(rclcpp::get_logger("AllegroHandDrv"), "CAN: System Off");
+        RCLCPP_INFO(rclcpp::get_logger("allegro_hand_drv"), "CAN: System Off");
         CANAPI::command_set_period(_can_handle, 0);
         usleep(10000);
-        RCLCPP_INFO(rclcpp::get_logger("AllegroHandDrv"), "CAN: Close CAN channel");
+        RCLCPP_INFO(rclcpp::get_logger("allegro_hand_drv"), "CAN: Close CAN channel");
         CANAPI::command_can_close(_can_handle);
     }
 }
@@ -97,21 +99,20 @@ static inline std::string &rtrim(std::string &s)
 {
     s.erase(std::find_if(
         s.rbegin(), s.rend(),
-        std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+        [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end());
     return s;
 }
 
 bool AllegroHandDrv::init(int mode)
 {
     string CAN_CH;
-    rclcpp::Parameter param;
-    auto node = rclcpp::Node::make_shared("allegro_hand_driver");
-    node->get_parameter("~comm/CAN_CH", param);
-    CAN_CH = param.as_string();
+    auto node = rclcpp::Node::make_shared("allegro_hand_drv_param_loader");
+    node->declare_parameter("comm.CAN_CH", "can0");
+    node->get_parameter("comm.CAN_CH", CAN_CH);
     rtrim(CAN_CH);  // Ensure the ROS parameter has no trailing whitespace.
 
     if (CAN_CH.empty()) {
-        RCLCPP_ERROR(rclcpp::get_logger("AllegroHandDrv"), "Invalid (empty) CAN channel, cannot proceed. Check PCAN comms.");
+        RCLCPP_ERROR(rclcpp::get_logger("allegro_hand_drv"), "Invalid (empty) CAN channel, cannot proceed. Check PCAN comms.");
         return false;
     }
 
@@ -120,32 +121,31 @@ bool AllegroHandDrv::init(int mode)
         return false;
     }
 
-    RCLCPP_INFO(rclcpp::get_logger("AllegroHandDrv"), "CAN: Flush CAN receive buffer");
+    RCLCPP_INFO(rclcpp::get_logger("allegro_hand_drv"), "CAN: Flush CAN receive buffer");
     CANAPI::command_can_flush(_can_handle);
     usleep(100);
 
-    //RCLCPP_INFO(rclcpp::get_logger("AllegroHandDrv"), "CAN: System Off");
     CANAPI::command_servo_off(_can_handle);
     usleep(100);
 
-    RCLCPP_INFO(rclcpp::get_logger("AllegroHandDrv"), "CAN: Request Hand Information");
+    RCLCPP_INFO(rclcpp::get_logger("allegro_hand_drv"), "CAN: Request Hand Information");
     CANAPI::request_hand_information(_can_handle);
     usleep(100);
 
-    RCLCPP_INFO(rclcpp::get_logger("AllegroHandDrv"), "CAN: Request Hand Serial");
+    RCLCPP_INFO(rclcpp::get_logger("allegro_hand_drv"), "CAN: Request Hand Serial");
     CANAPI::request_hand_serial(_can_handle);
     usleep(100);
 
-    RCLCPP_INFO(rclcpp::get_logger("AllegroHandDrv"), "CAN: Setting loop period(:= 2ms) and initialize system");
+    RCLCPP_INFO(rclcpp::get_logger("allegro_hand_drv"), "CAN: Setting loop period(:= 2ms) and initialize system");
     short comm_period[3] = {2, 0, 0}; // millisecond {position, imu, temperature}
     CANAPI::command_set_period(_can_handle, comm_period);
 
-    RCLCPP_INFO(rclcpp::get_logger("AllegroHandDrv"), "CAN: System ON");
+    RCLCPP_INFO(rclcpp::get_logger("allegro_hand_drv"), "CAN: System ON");
     CANAPI::command_servo_on(_can_handle);
     usleep(100);
 
 
-    RCLCPP_INFO(rclcpp::get_logger("AllegroHandDrv"), "CAN: Communicating");
+    RCLCPP_INFO(rclcpp::get_logger("allegro_hand_drv"), "CAN: Communicating");
 
     return true;
 }
@@ -166,7 +166,7 @@ int AllegroHandDrv::writeJointTorque()
     _writeDevices();
 
     if (_emergency_stop) {
-        RCLCPP_ERROR(rclcpp::get_logger("AllegroHandDrv"), "Emergency stop in writeJointTorque()");
+        RCLCPP_ERROR(rclcpp::get_logger("allegro_hand_drv"), "Emergency stop in writeJointTorque()");
         return -1;
     }
 
@@ -215,7 +215,7 @@ void AllegroHandDrv::setTorque(double *torque)
 #endif
     }
     else {
-        RCLCPP_ERROR(rclcpp::get_logger("AllegroHandDrv"), "CAN: Can not determine proper finger CAN channels. Check the Allegro Hand version number in 'zero.yaml'");
+        RCLCPP_ERROR(rclcpp::get_logger("allegro_hand_drv"), "CAN: Can not determine proper finger CAN channels. Check the Allegro Hand version number in 'zero.yaml'");
         return;
     }
 }
@@ -240,36 +240,41 @@ void AllegroHandDrv::_readDevices()
         _parseMessage(id, len, data);
         err = CANAPI::can_read_message(_can_handle, &id, &len, data, FALSE, 0);
     }
-    //RCLCPP_ERROR(rclcpp::get_logger("AllegroHandDrv"), "can_read_message returns %d.", err); // PCAN_ERROR_QRCVEMPTY(32) from Peak CAN means "Receive queue is empty". It is not an error.
 }
 
 void AllegroHandDrv::_writeDevices()
 {
+    short pwm[4];
     for (int findex = 0; findex < 4; findex++) {
-        double pwmDouble = _desired_torque[4*findex];
-        if (pwmDouble > 240.0) {
-            pwmDouble = 240.0;
-        } else if (pwmDouble < -240.0) {
-            pwmDouble = -240.0;
+        for (int i = 0; i < 4; i++) {
+            int joint_idx = findex * 4 + i;
+            double pwmDouble = _desired_torque[joint_idx];
+            
+            if (!allegro_V4) {
+                if (pwmDouble > 240.0) pwmDouble = 240.0;
+                else if (pwmDouble < -240.0) pwmDouble = -240.0;
+            }
+            
+            if (joint_idx == 1 || joint_idx == 5 || joint_idx == 9) {
+                pwmDouble *= 0.5;
+            }
+            
+            pwm[i] = (short)pwmDouble;
         }
-        if (findex == 1 || findex == 5 || findex == 9) {
-            pwmDouble *= 0.5;
-        }
-        short pwm = static_cast<short>(pwmDouble);
         CANAPI::command_set_torque(_can_handle, findex, pwm);
     }
 }
 
 void AllegroHandDrv::_parseMessage(int id, int len, unsigned char* data)
 {
-    int tmppos[4];
-    int lIndexBase;
-    int i;
-
     int findex = (id & 0x00000007);
-    for (i = 0; i < 4; i++) {
-        tmppos[i] = (data[2*i] | (data[2*i+1] << 8));
-        _curr_position[4*findex+i] = (tmppos[i] * (M_PI / 180.0) * 0.088);
+    for (int i = 0; i < 4; i++) {
+        int raw = (data[i*2] | (data[i*2+1] << 8));
+        if (!allegro_V4) {
+            _curr_position[findex * 4 + i] = raw * (M_PI / 180.0) * 0.088;
+        } else {
+            _curr_position[findex * 4 + i] = raw; 
+        }
     }
     _curr_position_get |= (0x01 << findex);
 }

@@ -83,45 +83,45 @@ class Turtlebot3PatrolServer(Node):
     def go_front(self, position, length):
         start_x = self.odom.pose.pose.position.x
         start_y = self.odom.pose.pose.position.y
-
-        distance = 0.0
-        while rclpy.ok() and distance < length:
-            self.twist.linear.x = self.linear_x
-            self.twist.angular.z = 0.0
-            self.cmd_vel_pub.publish(self.twist)
-
+        
+        self.twist.linear.x = self.linear_x
+        self.twist.angular.z = 0.0
+        
+        while True:
             current_x = self.odom.pose.pose.position.x
             current_y = self.odom.pose.pose.position.y
-            distance = math.sqrt((current_x - start_x) ** 2 + (current_y - start_y) ** 2)
-
-            time.sleep(0.01)
-
+            distance = math.sqrt((current_x - start_x)**2 + (current_y - start_y)**2)
+            
+            if distance >= length:
+                break
+                
+            self.cmd_vel_pub.publish(self.twist)
+            time.sleep(0.05)
+            
         self.init_twist()
 
     def turn(self, target_angle):
-        def normalize_angle(angle):
-            while angle > math.pi:
-                angle -= 2.0 * math.pi
-            while angle < -math.pi:
-                angle += 2.0 * math.pi
-            return angle
-
+        target_angle_rad = target_angle * math.pi / 180.0
         start_yaw = self.get_yaw()
-        target_yaw = normalize_angle(start_yaw + math.radians(target_angle))
-
-        while rclpy.ok():
+        
+        self.twist.linear.x = 0.0
+        self.twist.angular.z = self.angular_z
+        
+        while True:
             current_yaw = self.get_yaw()
-            angle_error = normalize_angle(target_yaw - current_yaw)
-
-            if abs(angle_error) < math.radians(2.0):
+            diff = current_yaw - start_yaw
+            
+            while diff > math.pi:
+                diff -= 2.0 * math.pi
+            while diff < -math.pi:
+                diff += 2.0 * math.pi
+                
+            if abs(diff) >= target_angle_rad:
                 break
-
-            self.twist.linear.x = 0.0
-            self.twist.angular.z = self.angular_z if angle_error > 0.0 else -self.angular_z
+                
             self.cmd_vel_pub.publish(self.twist)
-
-            time.sleep(0.01)
-
+            time.sleep(0.05)
+            
         self.init_twist()
 
     def goal_callback(self, goal_request):
@@ -197,8 +197,17 @@ def main(args=None):
     rclpy.init(args=args)
 
     turtlebot3_patrol_server = Turtlebot3PatrolServer()
+    
+    executor = rclpy.executors.MultiThreadedExecutor()
+    executor.add_node(turtlebot3_patrol_server)
 
-    rclpy.spin(turtlebot3_patrol_server)
+    try:
+        executor.spin()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        turtlebot3_patrol_server.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == '__main__':

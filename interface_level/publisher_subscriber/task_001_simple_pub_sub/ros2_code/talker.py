@@ -1,25 +1,23 @@
 #!/usr/bin/env python3
 import rclpy
-from rclpy.node import Node
-from rclpy.executors import ExternalShutdownException
 from std_msgs.msg import String
 
 def talker():
-    # TODO: create a ROS publisher for topic 'chatter'
-    # initialize node 'talker'
     rclpy.init()
-    node = Node('talker')
-    publisher = node.create_publisher(String, 'chatter', 10)
-    # END OF TODO
+    node = rclpy.create_node('talker')
+    pub = node.create_publisher(String, 'chatter', 10)
+    
     rate = node.create_rate(1)  # Keep this line
 
     while rclpy.ok():
-        msg = "Hello world %s" % (node.get_clock().now().nanoseconds / 1e9)   # Keep message logic
-        node.get_logger().info(msg)
+        msg_str = "Hello world %s" % (node.get_clock().now().nanoseconds / 1e9)   # Keep message logic
+        node.get_logger().info(msg_str)
 
-        # TODO: publish the message
-        publisher.publish(String(data=msg))
-        #END OF TODO
+        msg = String()
+        msg.data = msg_str
+        pub.publish(msg)
+        
+        rclpy.spin_once(node)
         rate.sleep()
 
     node.destroy_node()
@@ -28,5 +26,5 @@ def talker():
 if __name__ == '__main__':
     try:
         talker()
-    except (KeyboardInterrupt, ExternalShutdownException):
+    except KeyboardInterrupt:
         pass

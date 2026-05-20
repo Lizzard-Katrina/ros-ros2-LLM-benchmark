@@ -29,27 +29,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <rclcpp/rclcpp.hpp>
 #include "industrial_robot_client/robot_state_interface.h"
+#include "rclcpp/rclcpp.hpp"
 
 using industrial_robot_client::robot_state_interface::RobotStateInterface;
-namespace StandardSocketPorts = industrial::simple_socket::StandardSocketPorts;
 
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
-
-  RobotStateInterface robot_state;
-  if (!robot_state.init("127.0.0.1", StandardSocketPorts::STATE))
+  
+  RobotStateInterface rsi;
+  if (!rsi.init())
   {
-    RCLCPP_ERROR(rclcpp::get_logger("generic_robot_state_node"),
-                 "Failed to initialize Robot State Interface");
-    rclcpp::shutdown();
+    RCLCPP_ERROR(rclcpp::get_logger("robot_state_node"), "Failed to initialize Robot State Interface");
     return -1;
   }
-
-  robot_state.run();
-
+  
+  rsi.run();
+  
   rclcpp::shutdown();
   return 0;
 }

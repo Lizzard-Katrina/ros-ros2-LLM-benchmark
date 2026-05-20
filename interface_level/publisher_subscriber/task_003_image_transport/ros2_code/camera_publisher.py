@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import rclpy
-from sensor_msgs.msg import Image as RosImage
-from image_transport_py import ImageTransport
-
+from rclpy.node import Node
 
 # mock Image class
 class Image:
@@ -12,35 +10,21 @@ class Image:
     encoding = "rgb8"
     data = b''
 
-
-def main():
-    rclpy.init()
+def main(args=None):
+    rclpy.init(args=args)
     node = rclpy.create_node('camera_publisher_node')
-
-    # TODO: use image_transport to construct publisher
-    # and insert information of Image
-    image_transport = ImageTransport(node)
-    pub = image_transport.advertise('camera/image', 10)
-
+    
+    pub = node.create_publisher(Image, 'camera/image', 10)
+    
     rate = node.create_rate(10)
     while rclpy.ok():
-        msg = RosImage()
-        msg.header.stamp = node.get_clock().now().to_msg()
-        msg.header.frame_id = 'camera_frame'
-        msg.width = Image.width
-        msg.height = Image.height
-        msg.encoding = Image.encoding
-        msg.is_bigendian = 0
-        msg.step = msg.width * 3
-        msg.data = Image.data if Image.data else bytes(msg.height * msg.step)
-
+        msg = Image()
         pub.publish(msg)
+        rclpy.spin_once(node)
         rate.sleep()
-    # END OF TODO
-
+        
     node.destroy_node()
     rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()

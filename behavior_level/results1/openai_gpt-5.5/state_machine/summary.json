@@ -1,0 +1,122 @@
+[
+    {
+        "task_id": "state_machine/task_001_smach_basic",
+        "status": "FAILED",
+        "score": "7/8",
+        "pass_rate": "87.50%",
+        "tokens": 3297,
+        "failed_cases": [
+            {
+                "test_function": "test_userdata_request_mapping",
+                "error_message": "AssertionError: Request slot mapping from userdata is missing.\nassert None\n +  where None = <function search at 0x7fe363141f30>('setattr\\\\s*\\\\(\\\\s*self\\\\._request\\\\s*,\\\\s*key\\\\s*,\\\\s*ud\\\\[key\\\\]\\\\s*\\\\)', \"#!/usr/bin/env python3\\nimport rclpy\\n\\nimport threading\\nimport traceback\\nimport time\\n\\nimport smach\\nfrom .ros_st...)\\n\\n        if response_cb_outcome is not None:\\n            return response_cb_outcome\\n\\n        return 'succeeded'\")\n +    where <function search at 0x7fe363141f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_002_mas_execution_manager",
+        "status": "FAILED",
+        "score": "5/7",
+        "pass_rate": "71.43%",
+        "tokens": 1426,
+        "failed_cases": [
+            {
+                "test_function": "test_topic_and_msg_integrity",
+                "error_message": "AssertionError: Topic mismatch: Subscription must use ActionFeedback on the feedback topic.\nassert None\n +  where None = <function search at 0x7f3592635f30>('create_subscription\\\\s*\\\\(.*ActionFeedback.*[\\'\\\\\"]/kcl_rosplan/action_feedback[\\'\\\\\"]', 'import rclpy\\nimport smach\\nfrom std_msgs.msg import String\\nfrom rosplan_dispatch_msgs.msg import ActionDispatch, Ac...y(self, sentence):\\n        say_msg = String()\\n        say_msg.data = sentence\\n        self.say_pub.publish(say_msg)')\n +    where <function search at 0x7f3592635f30> = re.search"
+            },
+            {
+                "test_function": "test_interface_params_retention",
+                "error_message": "AssertionError: Data Flow Error: Ontology interface must receive the url and prefix parameters.\nassert None\n +  where None = <function search at 0x7f3592635f30>('DomesticOntologyInterface\\\\s*\\\\(\\\\s*[^,]+url[^,]*,\\\\s*[^,]+prefix', 'import rclpy\\nimport smach\\nfrom std_msgs.msg import String\\nfrom rosplan_dispatch_msgs.msg import ActionDispatch, Ac...y(self, sentence):\\n        say_msg = String()\\n        say_msg.data = sentence\\n        self.say_pub.publish(say_msg)')\n +    where <function search at 0x7f3592635f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_003_tutorial_baseline",
+        "status": "FAILED",
+        "score": "6/7",
+        "pass_rate": "85.71%",
+        "tokens": 1430,
+        "failed_cases": [
+            {
+                "test_function": "test_service_future_logic",
+                "error_message": "AssertionError: Missing future completion handling.\nassert 'spin_until_future_complete' in '#!/usr/bin/env python\\nimport rclpy\\nimport smach\\nfrom gazebo_msgs.srv import SetModelState\\nfrom gazebo_msgs.msg im...for model: %s: %s\" % (self._model_name, status_message))\\n            return \\'aborted\\'\\n\\n        return \\'aborted\\''"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_004_ros_task_manage",
+        "status": "FAILED",
+        "score": "6/7",
+        "pass_rate": "85.71%",
+        "tokens": 5057,
+        "failed_cases": [
+            {
+                "test_function": "test_introspection_node_handle",
+                "error_message": "AssertionError: API Error: IntrospectionServer must be passed the 'self.node' handle.\nassert None\n +  where None = <function search at 0x7f45691adf30>('IntrospectionServer\\\\(.*self\\\\.node', 'import rclpy\\nfrom rclpy.executors import MultiThreadedExecutor\\nfrom task_manager_lib.TaskClient import *\\nimport sm...Epsilon(),transitions)\\n        else:\\n            smach.Sequence.add(label, self.TaskEpsilon())\\n        return label')\n +    where <function search at 0x7f45691adf30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_005_flexbe_behavior_engine",
+        "status": "FAILED",
+        "score": "4/5",
+        "pass_rate": "80.00%",
+        "tokens": 2374,
+        "failed_cases": [
+            {
+                "test_function": "test_placeholder_removal",
+                "error_message": "AssertionError: Logic Error: NotImplementedError was not removed.\nassert 'NotImplementedError' not in '#!/usr/bin/...tive_goals()'\n  'NotImplementedError' is contained here:\n        raise NotImplementedError(\"MoveBase is not available in ROS 2 at this time!\")\n  ?           +++++++++++++++++++\n    \n            # Create and populate action goal\n    \n            # Old ROS 1 code...\n  \n  ...Full output truncated (30 lines hidden), use '-vv' to show"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_006_flexbe_2",
+        "status": "FAILED",
+        "score": "4/5",
+        "pass_rate": "80.00%",
+        "tokens": 1953,
+        "failed_cases": [
+            {
+                "test_function": "test_incremental_update_logic",
+                "error_message": "AssertionError: Logic Error: Must check if a joint value is None before assigning to avoid overwriting with stale data.\nassert ('is None' in '#!/usr/bin/env python3\\n\\n# Copyright 2023 Philipp Schillinger,  Christopher Newport University\\n#\\n# Redistribution ...start_time = self.get_clock().now()\\n\\n    def on_exit(self, userdata):\\n        self._sub.disable_buffer(self._topic)' or '== None' in '#!/usr/bin/env python3\\n\\n# Copyright 2023 Philipp Schillinger,  Christopher Newport University\\n#\\n# Redistribution ...start_time = self.get_clock().now()\\n\\n    def on_exit(self, userdata):\\n        self._sub.disable_buffer(self._topic)')"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_007_smacc",
+        "status": "FAILED",
+        "score": "4/5",
+        "pass_rate": "80.00%",
+        "tokens": 1316,
+        "failed_cases": [
+            {
+                "test_function": "test_memory_safety_and_types",
+                "error_message": "AssertionError: Safety Warning: Risky [=] capture of 'this' without lifetime protection.\nassert False\n +  where False = any(<generator object test_memory_safety_and_types.<locals>.<genexpr> at 0x7fb59f19f5a0>)"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_008A_robot_statemachine_scaffold",
+        "status": "SUCCESS",
+        "score": "6/6",
+        "pass_rate": "100.00%",
+        "tokens": 3061,
+        "failed_cases": []
+    },
+    {
+        "task_id": "state_machine/task_009_sm_dance_bot_strikes_back",
+        "status": "FAILED",
+        "score": "6/8",
+        "pass_rate": "75.00%",
+        "tokens": 5887,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_node_base_interface",
+                "error_message": "AssertionError: Architecture Error: RealtimePublisher must be initialized with 'get_node_base_interface()' in ROS 2.\nassert None\n +  where None = <function search at 0x7f26bdd7df30>('RealtimePublisher<[\\\\w:]+>\\\\s*\\\\(\\\\s*\\\\w+->get_node_base_interface\\\\(\\\\)', '/*****************************************************************************************************************\\n ...es)\\n  {\\n    rtPublishPaths(odom.header.stamp);\\n  }\\n}\\n}  // namespace odom_tracker\\n}  // namespace cl_move_base_z')\n +    where <function search at 0x7f26bdd7df30> = re.search"
+            },
+            {
+                "test_function": "test_modern_cpp_binding",
+                "error_message": "AssertionError: Style Error: ROS 2 callbacks should use 'std::bind' with 'std::placeholders'.\nassert 'std::bind' in '/*****************************************************************************************************************\\n ...es)\\n  {\\n    rtPublishPaths(odom.header.stamp);\\n  }\\n}\\n}  // namespace odom_tracker\\n}  // namespace cl_move_base_z'"
+            }
+        ]
+    }
+]

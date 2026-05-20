@@ -16,6 +16,8 @@
 
 
 #include <imm_ukf_pda/imm_ukf_pda.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+#include <tf2/utils.h>
 
 ImmUkfPda::ImmUkfPda()
   : target_id_(0)
@@ -77,7 +79,7 @@ void ImmUkfPda::callback(const autoware_msgs::DetectedObjectArray& input)
   bool success = updateNecessaryTransform();
   if (!success)
   {
-    ROS_INFO("Could not find coordiante transformation");
+    RCLCPP_INFO(rclcpp::get_logger("imm_ukf_pda"), "Could not find coordiante transformation");
     return;
   }
 
@@ -102,7 +104,7 @@ void ImmUkfPda::checkVectormapSubscription()
     lanes_ = vmap_.findByFilter([](const vector_map_msgs::Lane& lane) { return true; });
     if (lanes_.empty())
     {
-      ROS_INFO("Has not subscribed vectormap");
+      RCLCPP_INFO(rclcpp::get_logger("imm_ukf_pda"), "Has not subscribed vectormap");
     }
     else
     {
@@ -113,27 +115,29 @@ void ImmUkfPda::checkVectormapSubscription()
 
 bool ImmUkfPda::updateNecessaryTransform()
 {
+  bool success = true;
   try
   {
-    const auto local2global_msg = tf_buffer_->lookupTransform(
-      tracking_frame_, input_header_.frame_id, tf2::TimePointZero);
-    tf2::fromMsg(local2global_msg.transform, local2global_);
+    geometry_msgs::msg::TransformStamped transform_stamped;
+    
+    transform_stamped = tf_buffer_->lookupTransform(tracking_frame_, input_header_.frame_id, tf2::TimePointZero);
+    tf2::fromMsg(transform_stamped.transform, local2global_);
 
-    const auto tracking2lane_msg = tf_buffer_->lookupTransform(
-      vectormap_frame_, tracking_frame_, tf2::TimePointZero);
-    tf2::fromMsg(tracking2lane_msg.transform, tracking_frame2lane_frame_);
+    if (use_vectormap_)
+    {
+      transform_stamped = tf_buffer_->lookupTransform(vectormap_frame_, tracking_frame_, tf2::TimePointZero);
+      tf2::fromMsg(transform_stamped.transform, tracking_frame2lane_frame_);
 
-    const auto lane2tracking_msg = tf_buffer_->lookupTransform(
-      tracking_frame_, vectormap_frame_, tf2::TimePointZero);
-    tf2::fromMsg(lane2tracking_msg.transform, lane_frame2tracking_frame_);
+      transform_stamped = tf_buffer_->lookupTransform(tracking_frame_, vectormap_frame_, tf2::TimePointZero);
+      tf2::fromMsg(transform_stamped.transform, lane_frame2tracking_frame_);
+    }
   }
-  catch (const tf2::TransformException & ex)
+  catch (const tf2::TransformException& ex)
   {
-    RCLCPP_WARN(rclcpp::get_logger("imm_ukf_pda"), "%s", ex.what());
-    return false;
+    RCLCPP_WARN(rclcpp::get_logger("imm_ukf_pda"), "Transform error: %s", ex.what());
+    success = false;
   }
-
-  return true;
+  return success;
 }
 
 void ImmUkfPda::transformPoseToGlobal(const autoware_msgs::DetectedObjectArray& input,
@@ -157,28 +161,25 @@ void ImmUkfPda::transformPoseToLocal(autoware_msgs::DetectedObjectArray& detecte
 {
   detected_objects_output.header = input_header_;
 
-  tf::Transform inv_local2global = local2global_.inverse();
-  tf::StampedTransform global2local;
-  global2local.setData(inv_local2global);
+  tf2::Transform inv_local2global = local2global_.inverse();
   for (auto& object : detected_objects_output.objects)
   {
-    geometry_msgs::Pose out_pose = getTransformedPose(object.pose, global2local);
+    geometry_msgs::Pose out_pose = getTransformedPose(object.pose, inv_local2global);
     object.header = input_header_;
     object.pose = out_pose;
   }
 }
 
 geometry_msgs::Pose ImmUkfPda::getTransformedPose(const geometry_msgs::Pose& in_pose,
-                                                  const tf::StampedTransform& tf_stamp)
+                                                  const tf2::Transform& tf_stamp)
 {
-  tf::Transform transform;
-  geometry_msgs::PoseStamped out_pose;
-  transform.setOrigin(tf::Vector3(in_pose.position.x, in_pose.position.y, in_pose.position.z));
+  tf2::Transform transform;
+  geometry_msgs::Pose out_pose;
+  transform.setOrigin(tf2::Vector3(in_pose.position.x, in_pose.position.y, in_pose.position.z));
   transform.setRotation(
-      tf::Quaternion(in_pose.orientation.x, in_pose.orientation.y, in_pose.orientation.z, in_pose.orientation.w));
-  geometry_msgs::PoseStamped pose_out;
-  tf::poseTFToMsg(tf_stamp * transform, out_pose.pose);
-  return out_pose.pose;
+      tf2::Quaternion(in_pose.orientation.x, in_pose.orientation.y, in_pose.orientation.z, in_pose.orientation.w));
+  tf2::toMsg(tf_stamp * transform, out_pose);
+  return out_pose;
 }
 
 void ImmUkfPda::measurementValidation(const autoware_msgs::DetectedObjectArray& input, UKF& target,
@@ -290,15 +291,16 @@ bool ImmUkfPda::storeObjectWithNearestLaneDirection(const autoware_msgs::Detecte
   }
 
   // map yaw in rotation matrix representation
-  tf::Quaternion map_quat = tf::createQuaternionFromYaw(min_yaw);
-  tf::Matrix3x3 map_matrix(map_quat);
+  tf2::Quaternion map_quat;
+  map_quat.setRPY(0, 0, min_yaw);
+  tf2::Matrix3x3 map_matrix(map_quat);
 
   // vectormap_frame to tracking_frame rotation matrix
-  tf::Quaternion rotation_quat = lane_frame2tracking_frame_.getRotation();
-  tf::Matrix3x3 rotation_matrix(rotation_quat);
+  tf2::Quaternion rotation_quat = lane_frame2tracking_frame_.getRotation();
+  tf2::Matrix3x3 rotation_matrix(rotation_quat);
 
   // rotated yaw in matrix representation
-  tf::Matrix3x3 rotated_matrix = rotation_matrix * map_matrix;
+  tf2::Matrix3x3 rotated_matrix = rotation_matrix * map_matrix;
   double roll, pitch, yaw;
   rotated_matrix.getRPY(roll, pitch, yaw);
 
@@ -670,7 +672,8 @@ void ImmUkfPda::makeOutput(const autoware_msgs::DetectedObjectArray& input,
     while (tyaw < -M_PI)
       tyaw += 2. * M_PI;
 
-    tf::Quaternion q = tf::createQuaternionFromYaw(tyaw);
+    tf2::Quaternion q;
+    q.setRPY(0, 0, tyaw);
 
     autoware_msgs::DetectedObject dd;
     dd = targets_[i].object_;
@@ -733,7 +736,7 @@ void ImmUkfPda::dumpResultText(autoware_msgs::DetectedObjectArray& detected_obje
   std::ofstream outputfile(result_file_path_, std::ofstream::out | std::ofstream::app);
   for (size_t i = 0; i < detected_objects.objects.size(); i++)
   {
-    double yaw = tf::getYaw(detected_objects.objects[i].pose.orientation);
+    double yaw = tf2::getYaw(detected_objects.objects[i].pose.orientation);
 
     // KITTI tracking benchmark data format:
     // (frame_number,tracked_id, object type, truncation, occlusion, observation angle, x1,y1,x2,y2, h, w, l, cx, cy,
@@ -768,36 +771,38 @@ void ImmUkfPda::dumpResultText(autoware_msgs::DetectedObjectArray& detected_obje
 void ImmUkfPda::tracker(const autoware_msgs::DetectedObjectArray& input,
                         autoware_msgs::DetectedObjectArray& detected_objects_output)
 {
-  const double timestamp = rclcpp::Time(input.header.stamp).seconds();
+  double timestamp = rclcpp::Time(input.header.stamp).seconds();
 
   if (!init_)
   {
     initTracker(input, timestamp);
+    makeOutput(input, std::vector<bool>(input.objects.size(), false), detected_objects_output);
     return;
   }
 
-  const double dt = timestamp - timestamp_;
+  double dt = timestamp - timestamp_;
   timestamp_ = timestamp;
 
   std::vector<bool> matching_vec(input.objects.size(), false);
 
-  for (size_t i = 0; i < targets_.size(); ++i)
+  for (size_t i = 0; i < targets_.size(); i++)
   {
     if (targets_[i].tracking_num_ == TrackingState::Die)
     {
       continue;
     }
 
-    targets_[i].prediction(use_sukf_, dt);
+    targets_[i].prediction(use_sukf_, has_subscribed_vectormap_, dt);
 
     std::vector<autoware_msgs::DetectedObject> object_vec;
-    const bool success = probabilisticDataAssociation(input, dt, matching_vec, object_vec, targets_[i]);
+    bool success = probabilisticDataAssociation(input, dt, matching_vec, object_vec, targets_[i]);
+
     if (!success)
     {
       continue;
     }
 
-    targets_[i].update(object_vec, dt, use_sukf_);
+    targets_[i].update(use_sukf_, detection_probability_, gate_probability_, gating_threshold_, object_vec);
   }
 
   makeNewTargets(timestamp, input, matching_vec);

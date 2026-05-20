@@ -38,34 +38,20 @@
  * C++ Libraries / header
  */
 #include "vda5050_connector/handler.hpp"
+#include "vda5050_msgs/msg/state.hpp"
 
 namespace adapter
 {
-/**
- * Define the StateHandler abstract interface.
- * - The class must inherit from 'Handler'.
- * - Define two pure virtual methods: 'configure()' and 'execute()'.
- * - Add a protected member variable to hold the state, which subclasses will use.
- * - Style Constraint: Use 'vda5050_msgs::msg::State' as the state message type.
- * - Style Constraint: The member variable MUST be named 'current_state_msg_'.
- */
+
 class StateHandler : public Handler
 {
 public:
-    virtual ~StateHandler() = default;
-
-    /**
-     * Configure the state handler.
-     */
-    virtual void configure() = 0;
-
-    /**
-     * Execute the state handler.
-     */
-    virtual void execute() = 0;
+  virtual ~StateHandler() = default;
+  virtual void configure() = 0;
+  virtual void execute() = 0;
 
 protected:
-    vda5050_msgs::msg::State current_state_msg_;
+  vda5050_msgs::msg::State current_state_msg_;
 };
 
 }  // namespace adapter

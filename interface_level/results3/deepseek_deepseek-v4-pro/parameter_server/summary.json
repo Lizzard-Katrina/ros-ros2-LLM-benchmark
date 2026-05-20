@@ -1,0 +1,238 @@
+[
+    {
+        "task_id": "parameter_server/task_001_basic_param",
+        "status": "FAILED",
+        "score": "5/7",
+        "pass_rate": "71.43%",
+        "tokens": 12798,
+        "failed_cases": [
+            {
+                "test_function": "test_parameter_event_subscription_is_real",
+                "error_message": "AssertionError: Must use ROS2 parameter event mechanism\nassert None\n +  where None = <function search at 0x7f1d716ddf30>('rcl_interfaces::msg::ParameterEvent|ParameterEventHandler', '/*\\n * Copyright (C) 2009, Willow Garage, Inc.\\n *\\n * Redistribution and use in source and binary forms, with or wit...nge_callback(std::bind(&paramUpdateCallback, std::placeholders::_1));\\n}\\n\\n} // namespace param\\n\\n} // namespace ros')\n +    where <function search at 0x7f1d716ddf30> = re.search"
+            },
+            {
+                "test_function": "test_update_is_gated_by_subscribed_set_and_mutates_cache",
+                "error_message": "AssertionError: update must consult subscribed set (find/count) before cache update\nassert None\n +  where None = <function search at 0x7f1d716ddf30>('(subscrib\\\\w*).*(find|count)\\\\s*\\\\(', 'update(const std::string& key, const rclcpp::ParameterValue& v)\\n{\\n  std::lock_guard<std::recursive_mutex> lock(g_pa...de->get_namespace()) + \"/\" + mapped_key;\\n  }\\n\\n  g_params[mapped_key] = v;\\n  invalidateParentParams(mapped_key);\\n}', re.IGNORECASE)\n +    where <function search at 0x7f1d716ddf30> = re.search\n +    and   re.IGNORECASE = re.IGNORECASE"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_002_dynamic_robot_configuration",
+        "status": "FAILED",
+        "score": "4/6",
+        "pass_rate": "66.67%",
+        "tokens": 1484,
+        "failed_cases": [
+            {
+                "test_function": "test_default_value_integrity",
+                "error_message": "AssertionError: Logic Error: Default fallback values {69, 86, 255} (Deep Sky Blue) not found.\nassert None\n +  where None = <function search at 0x7fecb739df30>('\\\\{\\\\s*69\\\\s*,\\\\s*86\\\\s*,\\\\s*255\\\\s*\\\\}', '// Copyright (c) 2009, Willow Garage, Inc.\\n//\\n// Redistribution and use in source and binary forms, with or without...nteger_array();\\n  }\\n};\\n\\nint main(int argc, char ** argv)\\n{\\n  TurtleApp app(argc, argv);\\n  return app.exec();\\n}')\n +    where <function search at 0x7fecb739df30> = re.search"
+            },
+            {
+                "test_function": "test_type_strictness_casting",
+                "error_message": "AssertionError: Interface Error: Should assign the result of declare_parameter to a variable for immediate use.\nassert None\n +  where None = <function search at 0x7fecb739df30>('(?:auto|vector).*?=\\\\s*nh_->declare_parameter', '// Copyright (c) 2009, Willow Garage, Inc.\\n//\\n// Redistribution and use in source and binary forms, with or without...nteger_array();\\n  }\\n};\\n\\nint main(int argc, char ** argv)\\n{\\n  TurtleApp app(argc, argv);\\n  return app.exec();\\n}')\n +    where <function search at 0x7fecb739df30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_003_Mobile_robot_control",
+        "status": "FAILED",
+        "score": "4/7",
+        "pass_rate": "57.14%",
+        "tokens": 12912,
+        "failed_cases": [
+            {
+                "test_function": "test_exception_message_exact_match",
+                "error_message": "AssertionError: LLM failed to use the EXACT exception message specified in TODO.\nassert None\n +  where None = <function search at 0x7fc7e325df30>('throw\\\\s+std::invalid_argument\\\\s*\\\\(\\\\s*\\\\\"diagonal size must be 6\\\\\"\\\\s*\\\\)', '/*********************************************************************\\n * Software License Agreement (BSD License)\\n...ation_limits);\\n    limiter_ang_.has_acceleration_limits = node->get_parameter(\"angular.z.has_acceleration_limits\").as')\n +    where <function search at 0x7fc7e325df30> = re.search"
+            },
+            {
+                "test_function": "test_covariance_vector_type",
+                "error_message": "AssertionError: LLM failed to use std::vector<double> for covariance diagonals.\nassert None\n +  where None = <function search at 0x7fc7e325df30>('declare_parameter\\\\s*<\\\\s*std::vector\\\\s*<\\\\s*double\\\\s*>\\\\s*>', '/*********************************************************************\\n * Software License Agreement (BSD License)\\n...ation_limits);\\n    limiter_ang_.has_acceleration_limits = node->get_parameter(\"angular.z.has_acceleration_limits\").as')\n +    where <function search at 0x7fc7e325df30> = re.search"
+            },
+            {
+                "test_function": "test_size_logic_check",
+                "error_message": "AssertionError: Missing size != 6 validation logic.\nassert None\n +  where None = <function search at 0x7fc7e325df30>('\\\\.size\\\\(\\\\s*\\\\)\\\\s*!=\\\\s*6', '/*********************************************************************\\n * Software License Agreement (BSD License)\\n...ation_limits);\\n    limiter_ang_.has_acceleration_limits = node->get_parameter(\"angular.z.has_acceleration_limits\").as')\n +    where <function search at 0x7fc7e325df30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_004_turtlrbot3_params",
+        "status": "FAILED",
+        "score": "7/9",
+        "pass_rate": "77.78%",
+        "tokens": 6843,
+        "failed_cases": [
+            {
+                "test_function": "test_physics_logic_preservation",
+                "error_message": "AssertionError: Physics Error: Acceleration should be DIVIDED by the constant for unit conversion.\nassert None\n +  where None = <function search at 0x7f4b8346df30>('profile_acceleration\\\\s*=\\\\s*.*?\\\\s*/\\\\s*motors_\\\\.profile_acceleration_constant', '// Copyright 2019 ROBOTIS CO., LTD.\\n//\\n// Licensed under the Apache License, Version 2.0 (the \"License\");\\n// you m...n          msg->twist.linear.x,\\n          msg->twist.angular.z,\\n          sdk_msg.c_str());\\n      }\\n    )\\n  );\\n}')\n +    where <function search at 0x7f4b8346df30> = re.search"
+            },
+            {
+                "test_function": "test_value_extraction_style",
+                "error_message": "AssertionError: Must use standard ROS2 methods to extract parameter values.\nassert None\n +  where None = <function search at 0x7f4b8346df30>('\\\\.as_double\\\\(|from_parameter_msg', '// Copyright 2019 ROBOTIS CO., LTD.\\n//\\n// Licensed under the Apache License, Version 2.0 (the \"License\");\\n// you m...n          msg->twist.linear.x,\\n          msg->twist.angular.z,\\n          sdk_msg.c_str());\\n      }\\n    )\\n  );\\n}')\n +    where <function search at 0x7f4b8346df30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_005_laser_scan_filter_params",
+        "status": "FAILED",
+        "score": "5/6",
+        "pass_rate": "83.33%",
+        "tokens": 2732,
+        "failed_cases": [
+            {
+                "test_function": "test_tf_filter_binding",
+                "error_message": "AssertionError: TF Filter tolerance must be set to 30ms using std::chrono.\nassert None\n +  where None = <function search at 0x7fd44a219f30>('setTolerance\\\\s*\\\\(\\\\s*(?:\\\\w+::)?(?:milliseconds\\\\s*\\\\(\\\\s*30\\\\s*\\\\)|30ms|0\\\\.03s)\\\\s*\\\\)', '----------------------------\\n/*\\n * Copyright (c) 2008, Willow Garage, Inc.\\n * All rights reserved.\\n *\\n * Redistr...or.add_node(nh);\\n  while (rclcpp::ok()) {\\n\\n    executor.spin_some();\\n    loop_rate.sleep();\\n  }\\n\\n  return 0;\\n}')\n +    where <function search at 0x7fd44a219f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_006_dynamic_param_rqt_reconfigure",
+        "status": "SUCCESS",
+        "score": "6/6",
+        "pass_rate": "100.00%",
+        "tokens": 3517,
+        "failed_cases": []
+    },
+    {
+        "task_id": "parameter_server/task_007_navigation_stack_config",
+        "status": "FAILED",
+        "score": "1/7",
+        "pass_rate": "14.29%",
+        "tokens": 26088,
+        "failed_cases": [
+            {
+                "test_function": "test_parameter_declaration_logic",
+                "error_message": "AssertionError: \u8bed\u4e49\u7f3a\u5931\uff1a\u672a\u6b63\u786e\u58f0\u660e\u53c2\u6570\u6216\u9ed8\u8ba4\u503c\u4e0d\u7b26\u5408\u8981\u6c42 (Pattern: declare_parameter<\\s*int\\s*>\\(\\s*[\"\\']min_particles[\"\\']\\s*,\\s*100\\s*\\))\nassert None\n +  where None = <function search at 0x7f3cceff9f30>('declare_parameter<\\\\s*int\\\\s*>\\\\(\\\\s*[\"\\\\\\']min_particles[\"\\\\\\']\\\\s*,\\\\s*100\\\\s*\\\\)', '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...\"Too large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::DiagnosticStatus::OK, \"OK\");\\n  }\\n}\\n')\n +    where <function search at 0x7f3cceff9f30> = re.search"
+            },
+            {
+                "test_function": "test_callback_binding_logic",
+                "error_message": "AssertionError: \u8bed\u4e49\u5931\u8d25\uff1a\u672a\u6ce8\u518c ROS 2 \u52a8\u6001\u53c2\u6570\u56de\u8c03 (add_on_set_parameters_callback)\nassert None\n +  where None = <function search at 0x7f3cceff9f30>('add_on_set_parameters_callback\\\\(\\\\s*(?:std::bind|\\\\[|this)', '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...\"Too large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::DiagnosticStatus::OK, \"OK\");\\n  }\\n}\\n')\n +    where <function search at 0x7f3cceff9f30> = re.search"
+            },
+            {
+                "test_function": "test_min_max_constraint_logic",
+                "error_message": "AssertionError: \u903b\u8f91\u7f3a\u5931\uff1a\u56de\u8c03\u51fd\u6570\u4e2d\u672a\u5bf9\u6bd4 min/max particles \u7684\u5408\u6cd5\u6027\nassert None\n +  where None = <function search at 0x7f3cceff9f30>('min_particles\\\\s*[><=]+\\\\s*max_particles', '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...\"Too large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::DiagnosticStatus::OK, \"OK\");\\n  }\\n}\\n')\n +    where <function search at 0x7f3cceff9f30> = re.search"
+            },
+            {
+                "test_function": "test_internal_state_sync",
+                "error_message": "AssertionError: \u8bed\u4e49\u5931\u8d25\uff1a\u53c2\u6570\u6821\u9a8c\u6210\u529f\u540e\u672a\u540c\u6b65\u66f4\u65b0\u5185\u90e8\u6210\u5458\u53d8\u91cf (min_particles_)\nassert None\n +  where None = <function search at 0x7f3cceff9f30>('min_particles_\\\\s*=\\\\s*\\\\w+\\\\.as_int\\\\(\\\\)', '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...\"Too large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::DiagnosticStatus::OK, \"OK\");\\n  }\\n}\\n')\n +    where <function search at 0x7f3cceff9f30> = re.search"
+            },
+            {
+                "test_function": "test_no_legacy_artifacts",
+                "error_message": "AssertionError: \u8fc1\u79fb\u4e0d\u5f7b\u5e95\uff1a\u4ee3\u7801\u4e2d\u68c0\u6d4b\u5230 ROS 1 \u9057\u7559\u7b26\u53f7 'private_nh_'\nassert not <re.Match object; span=(7013, 7024), match='private_nh_'>\n +  where <re.Match object; span=(7013, 7024), match='private_nh_'> = <function search at 0x7f3cceff9f30>('private_nh_', '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...\"Too large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::DiagnosticStatus::OK, \"OK\");\\n  }\\n}\\n')\n +    where <function search at 0x7f3cceff9f30> = re.search"
+            },
+            {
+                "test_function": "test_callback_return_type",
+                "error_message": "AssertionError: \u8bed\u4e49\u7f3a\u5931\uff1a\u62d2\u7edd\u66f4\u65b0\u65f6\u672a\u901a\u8fc7 .reason \u5b57\u6bb5\u63d0\u4f9b\u53cd\u9988\u4fe1\u606f\nassert '.reason' in '/*\\n *  Copyright (c) 2008, Willow Garage, Inc.\\n *  All rights reserved.\\n *\\n *  This library is free software; you...\"Too large\");\\n  }\\n  else\\n  {\\n    diagnostic_status.summary(diagnostic_msgs::DiagnosticStatus::OK, \"OK\");\\n  }\\n}\\n'"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_008_gazebo_sim_param",
+        "status": "FAILED",
+        "score": "5/8",
+        "pass_rate": "62.50%",
+        "tokens": 12718,
+        "failed_cases": [
+            {
+                "test_function": "test_multicamera_suffix_preservation",
+                "error_message": "AssertionError: The model likely lost the '_camera_name_suffix' logic which is critical for Multicamera plugins.\nassert (None or None)\n +  where None = <function search at 0x7f50369c5f30>('camera_name_.*?\\\\+=.*?_camera_name_suffix', '\\n\\n#include <string>\\n#include <algorithm>\\n#include <assert.h>\\n#include <thread>\\n#include <functional>\\n#include ...1;\\n\\n  while (rclcpp::ok())\\n  {\\n    \\n    this->camera_queue_.callAvailable(ros::WallDuration(timeout));\\n  }\\n}\\n}')\n +    where <function search at 0x7f50369c5f30> = re.search\n +  and   None = <function search at 0x7f50369c5f30>('camera_name_.*?_camera_name_suffix', '\\n\\n#include <string>\\n#include <algorithm>\\n#include <assert.h>\\n#include <thread>\\n#include <functional>\\n#include ...1;\\n\\n  while (rclcpp::ok())\\n  {\\n    \\n    this->camera_queue_.callAvailable(ros::WallDuration(timeout));\\n  }\\n}\\n}')\n +    where <function search at 0x7f50369c5f30> = re.search"
+            },
+            {
+                "test_function": "test_standard_library_pointer_migration",
+                "error_message": "AssertionError: assert ('std::shared_ptr' in '\\n\\n#include <string>\\n#include <algorithm>\\n#include <assert.h>\\n#include <thread>\\n#include <functional>\\n#include ...1;\\n\\n  while (rclcpp::ok())\\n  {\\n    \\n    this->camera_queue_.callAvailable(ros::WallDuration(timeout));\\n  }\\n}\\n}' or 'std::unique_ptr' in '\\n\\n#include <string>\\n#include <algorithm>\\n#include <assert.h>\\n#include <thread>\\n#include <functional>\\n#include ...1;\\n\\n  while (rclcpp::ok())\\n  {\\n    \\n    this->camera_queue_.callAvailable(ros::WallDuration(timeout));\\n  }\\n}\\n}')"
+            },
+            {
+                "test_function": "test_time_source_logic",
+                "error_message": "AssertionError: assert 'now()' in '\\n\\n#include <string>\\n#include <algorithm>\\n#include <assert.h>\\n#include <thread>\\n#include <functional>\\n#include ...1;\\n\\n  while (rclcpp::ok())\\n  {\\n    \\n    this->camera_queue_.callAvailable(ros::WallDuration(timeout));\\n  }\\n}\\n}'"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_009_fetch_arm_params",
+        "status": "FAILED",
+        "score": "4/6",
+        "pass_rate": "66.67%",
+        "tokens": 29535,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_param_declaration",
+                "error_message": "AssertionError: Missing mandatory ROS 2 parameter declarations via node_->declare_parameter.\nassert None\n +  where None = <function search at 0x7f41538a1f30>('node_->declare_parameter\\\\s*<\\\\s*(?:std::string|double|int)\\\\s*>\\\\s*\\\\(\\\\s*\\\\\"[\\\\w_]+\\\\\"', '/*********************************************************************\\n *\\n * Software License Agreement (BSD Licens...uginlib/class_list_macros.hpp>\\nPLUGINLIB_EXPORT_CLASS(fetch_arm::IKFastKinematicsPlugin, kinematics::KinematicsBase);')\n +    where <function search at 0x7f41538a1f30> = re.search"
+            },
+            {
+                "test_function": "test_logging_migration",
+                "error_message": "AssertionError: RCLCPP macros must use node_->get_logger().\nassert 'get_logger()' in '/*********************************************************************\\n *\\n * Software License Agreement (BSD Licens...uginlib/class_list_macros.hpp>\\nPLUGINLIB_EXPORT_CLASS(fetch_arm::IKFastKinematicsPlugin, kinematics::KinematicsBase);'"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_010_sensor_fusion_params",
+        "status": "FAILED",
+        "score": "5/6",
+        "pass_rate": "83.33%",
+        "tokens": 22884,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_parameter_declaration",
+                "error_message": "AssertionError: Failure: Missing mandatory ROS 2 'declare_parameter<std::vector<bool>>' call.\nassert None\n +  where None = <function search at 0x7fb1c8055f30>('this->declare_parameter\\\\s*<\\\\s*std::vector<bool>\\\\s*>', '/*\\n * Copyright (c) 2014, 2015, 2016 Charles River Analytics, Inc.\\n * All rights reserved.\\n *\\n * Redistribution a...nfig.size());\\n      }\\n\\n      sensor_index++;\\n    } while (sensor_found);\\n  }\\n}\\n\\n\\n----------------------------')\n +    where <function search at 0x7fb1c8055f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_011_moveit_motion_params",
+        "status": "FAILED",
+        "score": "4/6",
+        "pass_rate": "66.67%",
+        "tokens": 5386,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_node_lifecycle_setup",
+                "error_message": "AssertionError: Failure: NodeOptions must allow undeclared parameters for dynamic plugin loading.\nassert 'allow_undeclared_parameters' in '----------------------------\\n#include <rclcpp/rclcpp.hpp>\\n#include <memory>\\n\\n#include <moveit/moveit_cpp/moveit_c...CLCPP_INFO_STREAM(rclcpp::get_logger(\"moveit_cpp_tutorial\"), \"Shutting down.\");\\n  rclcpp::shutdown();\\n  return 0;\\n}'"
+            },
+            {
+                "test_function": "test_async_execution_paradigm",
+                "error_message": "AssertionError: Failure: MoveItCpp requires a background thread or MultiThreadedExecutor.\nassert False"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_012_px4_flight_params",
+        "status": "FAILED",
+        "score": "5/8",
+        "pass_rate": "62.50%",
+        "tokens": 3160,
+        "failed_cases": [
+            {
+                "test_function": "test_parameter_declaration_logic",
+                "error_message": "AssertionError: Failure: 'target_yaw' parameter was not declared using self.declare_parameter().\nassert None\n +  where None = <function search at 0x7fb4038c5f30>('self\\\\.declare_parameter\\\\s*\\\\(\\\\s*[\\'\\\\\"]target_yaw[\\'\\\\\"]', \"----------------------------\\n\\n\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.qos import QoSProfile, Reliab..._ == '__main__':\\n    try:\\n        main()\\n    except Exception as e:\\n        print(e)\\n----------------------------\")\n +    where <function search at 0x7fb4038c5f30> = re.search"
+            },
+            {
+                "test_function": "test_dynamic_message_population_yaw",
+                "error_message": "AssertionError: Failure: TrajectorySetpoint.yaw is still using a hardcoded value or not assigned from a class attribute.\nassert None\n +  where None = <function search at 0x7fb4038c5f30>('msg\\\\.yaw\\\\s*=\\\\s*self\\\\.', \"----------------------------\\n\\n\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.qos import QoSProfile, Reliab..._ == '__main__':\\n    try:\\n        main()\\n    except Exception as e:\\n        print(e)\\n----------------------------\")\n +    where <function search at 0x7fb4038c5f30> = re.search"
+            },
+            {
+                "test_function": "test_dynamic_message_population_position",
+                "error_message": "AssertionError: Failure: TrajectorySetpoint.position[2] (Z-axis) must use the dynamic height attribute.\nassert None\n +  where None = <function search at 0x7fb4038c5f30>('msg\\\\.position\\\\s*=\\\\s*\\\\[.*,.*,.*self\\\\..*\\\\]', \"----------------------------\\n\\n\\nimport rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.qos import QoSProfile, Reliab..._ == '__main__':\\n    try:\\n        main()\\n    except Exception as e:\\n        print(e)\\n----------------------------\")\n +    where <function search at 0x7fb4038c5f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "parameter_server/task_013_slam_mapping_params",
+        "status": "FAILED",
+        "score": "4/7",
+        "pass_rate": "57.14%",
+        "tokens": 17948,
+        "failed_cases": [
+            {
+                "test_function": "test_scanner_physical_validation_logic",
+                "error_message": "AssertionError: Failure: Missing physical consistency check. maxUrange must be capped by maxRange.\nassert None\n +  where None = <function search at 0x7fa8e2c75f30>('if\\\\s*\\\\(\\\\s*\\\\w*maxUrange\\\\w*\\\\s*>\\\\s*\\\\w*maxRange\\\\w*\\\\s*\\\\)', '\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n#include \"slam_gmapping.h\"\\n\\n#include <iostream>\\n\\n#include <time.h>\\n\\n#include \"rclcpp/rclcpp...g(map_to_odom_.getRotation());\\n  tf_broadcaster_->sendTransform(transformStamped);\\n  map_to_odom_mutex_.unlock();\\n}')\n +    where <function search at 0x7fa8e2c75f30> = re.search"
+            },
+            {
+                "test_function": "test_no_fake_nodehandle",
+                "error_message": "AssertionError: Failure: 'private_nh_' detected. In ROS 2, use 'this->declare_parameter' directly.\nassert 'private_nh_' not in '\\n\\n\\n\\n\\n\\...unlock();\\n}'\n  'private_nh_' is contained here:\n    ount_(0), private_nh_(nullptr), scan_filter_sub_(nullptr), scan_filter_(nullptr), transform_thread_(nullptr)\n  ?           +++++++++++\n    {\n      seed_ = time(NULL);\n      init();\n    }...\n  \n  ...Full output truncated (684 lines hidden), use '-vv' to show"
+            },
+            {
+                "test_function": "test_member_variable_assignment",
+                "error_message": "AssertionError: Failure: Parameters must be explicitly assigned to class members using .as_type() syntax.\nassert None\n +  where None = <function search at 0x7fa8e2c75f30>('\\\\w+_\\\\s*=\\\\s*(?:this->)?get_parameter\\\\(.*?\\\\)\\\\.as_', '\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n#include \"slam_gmapping.h\"\\n\\n#include <iostream>\\n\\n#include <time.h>\\n\\n#include \"rclcpp/rclcpp...g(map_to_odom_.getRotation());\\n  tf_broadcaster_->sendTransform(transformStamped);\\n  map_to_odom_mutex_.unlock();\\n}')\n +    where <function search at 0x7fa8e2c75f30> = re.search"
+            }
+        ]
+    }
+]

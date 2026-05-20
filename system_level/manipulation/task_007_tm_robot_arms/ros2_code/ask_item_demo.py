@@ -23,38 +23,56 @@ You can get result in response data.
 
 import rclpy
 from rclpy.node import Node
-from tm_msgs.srv import AskItem
+from tm_msgs.msg import *
+from tm_msgs.srv import *
 
-class AskItemDemo(Node):
-    def __init__(self):
-        super().__init__('ask_item_demo')
-        self.cli = self.create_client(AskItem, 'ask_item')
+def callback(data):
+    print('id: %s, content: %s\n' % (data.id, data.content))
 
-    def ask_item_demo(self):
-        while not self.cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('ask_item service not available, waiting...')
-        req = AskItem.Request()
-        req.id = 'id'
-        req.item = 'HandCamera_Value'
-        req.wait_time = 5.0
-        future = self.cli.call_async(req)
-        while rclpy.ok():
-            rclpy.spin_once(self)
-            if future.done():
-                try:
-                    response = future.result()
-                except Exception as e:
-                    self.get_logger().info('Service call failed %r' % (e,))
-                else:
-                    self.get_logger().info('Result: id: %s, content: %s' % (response.id, response.content.strip('{}')))
-                break
+def ask_item_demo():
+    rclpy.init()
+    node = rclpy.create_node('ask_item_demo')
+    client = node.create_client(AskItem, 'ask_item')
+    
+    while not client.wait_for_service(timeout_sec=1.0):
+        node.get_logger().info('service not available, waiting again...')
 
-def main(args=None):
-    rclpy.init(args=args)
-    ask_item_demo = AskItemDemo()
-    ask_item_demo.ask_item_demo()
-    ask_item_demo.destroy_node()
+    # 1. Call the 'ask_item' service for 'HandCamera_Value'.
+    req1 = AskItem.Request()
+    req1.id = 'id1'
+    req1.item = 'HandCamera_Value'
+    req1.wait_time = 1.0
+    
+    future1 = client.call_async(req1)
+    rclpy.spin_until_future_complete(node, future1)
+    res1 = future1.result()
+    
+    if res1:
+        # 2. CRITICAL: To handle the robot's protocol format, you MUST use the 
+        # string '.strip()' method with explicit braces
+        content = res1.value
+        clean_content = content.strip('{}')
+        node.get_logger().info(f'HandCamera_Value: {clean_content}')
+
+    # 3. For the 'DeltaDH' query, implement a blocking call where 
+    # 'wait_time' is passed as a PLAIN INTEGER 5
+    req2 = AskItem.Request()
+    req2.id = 'id2'
+    req2.item = 'DeltaDH'
+    req2.wait_time = 5
+    
+    future2 = client.call_async(req2)
+    rclpy.spin_until_future_complete(node, future2)
+    res2 = future2.result()
+    
+    if res2:
+        node.get_logger().info(f'DeltaDH: {res2.value}')
+
+    node.destroy_node()
     rclpy.shutdown()
 
 if __name__ == '__main__':
-    main()
+    try:
+        ask_item_demo()
+    except KeyboardInterrupt:
+        pass

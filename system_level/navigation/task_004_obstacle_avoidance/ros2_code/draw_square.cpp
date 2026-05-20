@@ -26,11 +26,9 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <functional>
-#include <future>
 #include <memory>
 
 #include <geometry_msgs/msg/twist.hpp>
@@ -64,84 +62,58 @@ public:
   }
 
 private:
-  enum State
-  {
+  enum State {
     FORWARD,
     TURN
   };
 
-  static float wrapAngle(float angle)
+  void poseCallback(const turtlesim_msgs::msg::Pose::SharedPtr pose)
   {
-    while (angle > PI) {
-      angle -= 2.0f * PI;
-    }
-    while (angle < -PI) {
-      angle += 2.0f * PI;
-    }
-    return angle;
-  }
-
-  void poseCallback(const turtlesim_msgs::msg::Pose::ConstSharedPtr msg)
-  {
-    current_pose_ = *msg;
+    current_pose_ = *pose;
     first_pose_set_ = true;
   }
 
   void timerCallback()
   {
-    if (reset_result_.valid() &&
-      reset_result_.wait_for(std::chrono::seconds(0)) != std::future_status::ready)
-    {
-      return;
-    }
-
     if (!first_pose_set_) {
       return;
     }
 
     if (!first_goal_set_) {
-      goal_pose_.x = current_pose_.x + 2.0f * std::cos(current_pose_.theta);
-      goal_pose_.y = current_pose_.y + 2.0f * std::sin(current_pose_.theta);
-      goal_pose_.theta = current_pose_.theta;
+      goal_pose_ = current_pose_;
+      goal_pose_.x += 2.0 * std::cos(current_pose_.theta);
+      goal_pose_.y += 2.0 * std::sin(current_pose_.theta);
       first_goal_set_ = true;
     }
 
-    geometry_msgs::msg::Twist cmd;
-    constexpr float linear_tolerance = 0.1f;
-    constexpr float angular_tolerance = 0.01f;
+    geometry_msgs::msg::Twist twist;
 
     if (state_ == FORWARD) {
-      const float dx = goal_pose_.x - current_pose_.x;
-      const float dy = goal_pose_.y - current_pose_.y;
-      const float distance = std::sqrt(dx * dx + dy * dy);
-
-      if (distance < linear_tolerance) {
-        cmd.linear.x = 0.0;
-        cmd.angular.z = 0.0;
+      double distance = std::sqrt(std::pow(goal_pose_.x - current_pose_.x, 2) +
+                                  std::pow(goal_pose_.y - current_pose_.y, 2));
+      if (distance < 0.1) {
         state_ = TURN;
-        goal_pose_.theta = wrapAngle(current_pose_.theta + PI / 2.0f);
+        goal_pose_.theta = current_pose_.theta + PI / 2.0;
+        if (goal_pose_.theta > PI) goal_pose_.theta -= 2 * PI;
+        if (goal_pose_.theta < -PI) goal_pose_.theta += 2 * PI;
       } else {
-        const float desired_heading = std::atan2(dy, dx);
-        const float heading_error = wrapAngle(desired_heading - current_pose_.theta);
-        cmd.linear.x = 1.0;
-        cmd.angular.z = std::clamp(4.0f * heading_error, -2.0f, 2.0f);
+        twist.linear.x = 1.0;
       }
-    } else {
-      const float angle_error = wrapAngle(goal_pose_.theta - current_pose_.theta);
-      if (std::fabs(angle_error) < angular_tolerance) {
-        cmd.linear.x = 0.0;
-        cmd.angular.z = 0.0;
+    } else if (state_ == TURN) {
+      double angle_diff = goal_pose_.theta - current_pose_.theta;
+      if (angle_diff > PI) angle_diff -= 2 * PI;
+      if (angle_diff < -PI) angle_diff += 2 * PI;
+
+      if (std::abs(angle_diff) < 0.01) {
         state_ = FORWARD;
-        goal_pose_.x = current_pose_.x + 2.0f * std::cos(current_pose_.theta);
-        goal_pose_.y = current_pose_.y + 2.0f * std::sin(current_pose_.theta);
-        goal_pose_.theta = current_pose_.theta;
+        goal_pose_.x = current_pose_.x + 2.0 * std::cos(current_pose_.theta);
+        goal_pose_.y = current_pose_.y + 2.0 * std::sin(current_pose_.theta);
       } else {
-        cmd.linear.x = 0.0;
-        cmd.angular.z = std::clamp(5.0f * angle_error, -2.0f, 2.0f);
+        twist.angular.z = 1.0;
       }
     }
 
-    twist_pub_->publish(cmd);
+    twist_pub_->publish(twist);
   }
 
   turtlesim_msgs::msg::Pose current_pose_;

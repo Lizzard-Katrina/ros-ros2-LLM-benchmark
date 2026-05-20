@@ -72,27 +72,22 @@ class GetJointValuesState(EventState):
         self._joints = joints
         self._joint_values = []
         self._return_code = None
-        self._timeout = Duration(seconds=timeout) if timeout is not None else None
-        self._start_time = None
+        self._timeout = Duration(seconds=timeout) if timeout is not None else Duration(seconds=0.0)
 
     def execute(self, userdata):
         while self._sub.has_buffered(self._topic):
             msg = self._sub.get_from_buffer(self._topic)
-            if msg is None:
-                continue
+            for i, joint in enumerate(self._joints):
+                if joint in msg.name:
+                    idx = msg.name.index(joint)
+                    self._joint_values[i] = msg.position[idx]
 
-            position_map = dict(zip(msg.name, msg.position))
-            for idx, joint_name in enumerate(self._joints):
-                if joint_name in position_map:
-                    self._joint_values[idx] = position_map[joint_name]
+        if all(val is not None for val in self._joint_values):
+            userdata.joint_values = self._joint_values
+            return 'retrieved'
 
-            if all(value is not None for value in self._joint_values):
-                userdata.joint_values = list(self._joint_values)
-                return 'retrieved'
-
-        if self._timeout is not None and self._start_time is not None:
-            if (self.get_clock().now() - self._start_time) > self._timeout:
-                return 'timeout'
+        if self._timeout.nanoseconds > 0 and (self.get_clock().now() - self._start_time) > self._timeout:
+            return 'timeout'
 
     def on_enter(self, userdata):
         self._sub.enable_buffer(self._topic)

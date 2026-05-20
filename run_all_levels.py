@@ -3,8 +3,8 @@ import os
 
 # Define the levels you want to run tonight
 LEVELS = [
-#    "interface_level",
-#    "behavior_level",
+    "interface_level",
+    "behavior_level",
     "system_level"
 ]
 

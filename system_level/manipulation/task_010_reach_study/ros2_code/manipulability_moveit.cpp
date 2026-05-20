@@ -22,6 +22,7 @@
 #include <reach/plugin_utils.h>
 #include <reach/utils.h>
 #include <yaml-cpp/yaml.h>
+#include <rclcpp/rclcpp.hpp>
 
 static std::vector<Eigen::Index> getJacobianRowSubset(const YAML::Node& config, const std::string& key = "jacobian_row_"
                                                                                                          "subset")
@@ -153,7 +154,7 @@ reach::Evaluator::ConstPtr ManipulabilityMoveItFactory::create(const YAML::Node&
   auto planning_group = reach::get<std::string>(config, "planning_group");
   std::vector<Eigen::Index> jacobian_row_subset = getJacobianRowSubset(config);
 
-  rclcpp::init(0, nullptr);
+  utils::initROS();
   moveit::core::RobotModelConstPtr model = moveit::planning_interface::getSharedRobotModel("robot_description");
   if (!model)
     throw std::runtime_error("Failed to initialize robot model pointer");
@@ -171,7 +172,7 @@ reach::Evaluator::ConstPtr ManipulabilityRatioFactory::create(const YAML::Node& 
   auto planning_group = reach::get<std::string>(config, "planning_group");
   std::vector<Eigen::Index> jacobian_row_subset = getJacobianRowSubset(config);
 
-  rclcpp::init(0, nullptr);
+  utils::initROS();
   moveit::core::RobotModelConstPtr model = moveit::planning_interface::getSharedRobotModel("robot_description");
   if (!model)
     throw std::runtime_error("Failed to initialize robot model pointer");
@@ -201,7 +202,7 @@ reach::Evaluator::ConstPtr ManipulabilityScaledFactory::create(const YAML::Node&
   std::vector<Eigen::Index> jacobian_row_subset = getJacobianRowSubset(config);
   std::vector<std::string> excluded_links = getExcludedLinks(config);
 
-  rclcpp::init(0, nullptr);
+  utils::initROS();
   moveit::core::RobotModelConstPtr model = moveit::planning_interface::getSharedRobotModel("robot_description");
   if (!model)
     throw std::runtime_error("Failed to initialize robot model pointer");
@@ -213,14 +214,16 @@ double calculateCharacteristicLength(moveit::core::RobotModelConstPtr model, con
                                      const std::vector<std::string>& excluded_links)
 {
   moveit::core::RobotState state(model);
-  state.setToDefaultValues(jmg, "random");
+  state.setToDefaultValues();
   state.update();
 
   Eigen::MatrixXd jacobian = state.getJacobian(jmg);
+
+  // Assuming a default subset of 6 if not provided in this context, or using the full jacobian
   Eigen::JacobiSVD<Eigen::MatrixXd> svd(jacobian);
   Eigen::MatrixXd singular_values = svd.singularValues();
-
-  return ManipulabilityMoveIt::calculateScore(singular_values);
+  
+  return singular_values.array().prod();
 }
 
 }  // namespace evaluation

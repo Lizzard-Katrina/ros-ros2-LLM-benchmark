@@ -74,15 +74,9 @@ private slots:
   void onUpdate();
 
 private:
-  rclcpp::Node::SharedPtr nh_;
-  rclcpp::executors::SingleThreadedExecutor executor_;
-
-  rclcpp::Service<std_srvs::srv::Empty>::SharedPtr clear_srv_;
-  rclcpp::Service<std_srvs::srv::Empty>::SharedPtr reset_srv_;
-  rclcpp::Service<turtlesim_msgs::srv::Spawn>::SharedPtr spawn_srv_;
-  rclcpp::Service<turtlesim_msgs::srv::Kill>::SharedPtr kill_srv_;
-
-  rclcpp::Subscription<rcl_interfaces::msg::ParameterEvent>::SharedPtr parameter_event_sub_;
+  void updateTurtles();
+  void clear();
+  bool hasTurtle(const std::string & name);
 
   bool clearCallback(
     const std_srvs::srv::Empty::Request::SharedPtr req,
@@ -96,17 +90,23 @@ private:
   bool killCallback(
     const turtlesim_msgs::srv::Kill::Request::SharedPtr req,
     turtlesim_msgs::srv::Kill::Response::SharedPtr res);
+  void parameterEventCallback(
+    const rcl_interfaces::msg::ParameterEvent::ConstSharedPtr event);
 
-  void parameterEventCallback(const rcl_interfaces::msg::ParameterEvent::ConstSharedPtr event);
+  rclcpp::Node::SharedPtr nh_;
+  rclcpp::executors::SingleThreadedExecutor executor_;
 
-  bool hasTurtle(const std::string & name);
-  void clear();
-  void updateTurtles();
+  rclcpp::Service<std_srvs::srv::Empty>::SharedPtr clear_srv_;
+  rclcpp::Service<std_srvs::srv::Empty>::SharedPtr reset_srv_;
+  rclcpp::Service<turtlesim_msgs::srv::Spawn>::SharedPtr spawn_srv_;
+  rclcpp::Service<turtlesim_msgs::srv::Kill>::SharedPtr kill_srv_;
 
+  rclcpp::Subscription<rcl_interfaces::msg::ParameterEvent>::SharedPtr parameter_event_sub_;
+
+  QTimer * update_timer_;
   QImage path_image_;
   QPainter path_painter_;
-  QTimer * update_timer_;
-  uint32_t frame_count_;
+  uint64_t frame_count_;
   rclcpp::Time last_turtle_update_;
 
   typedef std::map<std::string, TurtlePtr> M_Turtle;

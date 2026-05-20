@@ -69,14 +69,6 @@ protected:
 private:
   void foo(const sensor_msgs::msg::LaserScan::SharedPtr msg)
   {
-    (void)msg;
-  }
-
-  void deprecationTimerCallback()
-  {
-    RCLCPP_WARN(
-      nh_->get_logger(),
-      "This node is deprecated. Please migrate to 'scan_to_scan_filter_chain'.");
   }
 
 public:
@@ -85,42 +77,30 @@ public:
       : nh_(nh),
         buffer_(nh_->get_clock()),
         tf_(buffer_),
-        scan_sub_(nh_, "scan", rclcpp::SensorDataQoS()),
-        tf_filter_(
-          scan_sub_,
-          buffer_,
-          "base_link",
-          50,
-          nh_->get_node_logging_interface(),
-          nh_->get_node_clock_interface()),
+        scan_sub_(nh_, "scan", rclcpp::SensorDataQoS().get_rmw_qos_profile()),
+        tf_filter_(scan_sub_, buffer_, "base_link", 50, nh_->get_node_logging_interface(), nh_->get_node_clock_interface()),
         filter_chain_("sensor_msgs::msg::LaserScan")
   {
-    tf_filter_.setTolerance(rclcpp::Duration(30ms));
-    tf_filter_.registerCallback(std::bind(&GenericLaserScanFilterNode::callback, this, std::placeholders::_1));
-
-    output_pub_ = rclcpp::create_publisher<sensor_msgs::msg::LaserScan>(
-      nh_->get_node_topics_interface(),
-      "scan_filtered",
-      rclcpp::SensorDataQoS());
-
     filter_chain_.configure(
       "scan_filter_chain",
       nh_->get_node_logging_interface(),
       nh_->get_node_parameters_interface());
 
-    deprecation_timer_ = rclcpp::create_timer(
-      nh_->get_node_base_interface(),
-      nh_->get_node_timers_interface(),
-      nh_->get_clock(),
-      5s,
-      std::bind(&GenericLaserScanFilterNode::deprecationTimerCallback, this));
+    tf_filter_.setTolerance(30ms);
+    tf_filter_.registerCallback(std::bind(&GenericLaserScanFilterNode::callback, this, std::placeholders::_1));
+
+    output_pub_ = nh_->create_publisher<sensor_msgs::msg::LaserScan>("scan_filtered", rclcpp::SensorDataQoS());
+
+    deprecation_timer_ = nh_->create_wall_timer(5s, [this]() {
+      RCLCPP_WARN(nh_->get_logger(), "Use of generic_laser_filter_node is deprecated. Please use scan_to_scan_filter_chain.");
+    });
   }
 
   // Callback
   void callback(const std::shared_ptr<const sensor_msgs::msg::LaserScan>& msg_in)
   {
     // Run the filter chain
-    filter_chain_.update(*msg_in, msg_);
+    filter_chain_.update (*msg_in, msg_);
 
     // Publish the output
     output_pub_->publish(msg_);

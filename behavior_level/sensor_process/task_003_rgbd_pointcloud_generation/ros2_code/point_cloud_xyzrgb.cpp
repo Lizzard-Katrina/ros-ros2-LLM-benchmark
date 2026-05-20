@@ -40,7 +40,6 @@
 #include <image_transport/image_transport.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <sensor_msgs/image_encodings.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp>
 
 namespace depth_image_proc
@@ -149,8 +148,6 @@ void PointCloudXyzrgbNode::imageCb(
   const Image::ConstSharedPtr & rgb_msg_in,
   const CameraInfo::ConstSharedPtr & info_msg)
 {
-  namespace enc = sensor_msgs::image_encodings;
-
   // Check for bad inputs
   if (depth_msg->header.frame_id != rgb_msg_in->header.frame_id) {
     RCLCPP_WARN_THROTTLE(
@@ -163,95 +160,84 @@ void PointCloudXyzrgbNode::imageCb(
 
   // Update camera model
   model_.fromCameraInfo(info_msg);
-
+  
   Image::ConstSharedPtr rgb_msg = rgb_msg_in;
-  if (depth_msg->width != rgb_msg_in->width || depth_msg->height != rgb_msg_in->height) {
-    const double ratio_x = static_cast<double>(depth_msg->width) / static_cast<double>(rgb_msg_in->width);
-    const double ratio_y =
-      static_cast<double>(depth_msg->height) / static_cast<double>(rgb_msg_in->height);
+  if (depth_msg->width != rgb_msg->width || depth_msg->height != rgb_msg->height) {
+    CameraInfo info_msg_tmp = *info_msg;
+    float ratio = static_cast<float>(depth_msg->width) / static_cast<float>(rgb_msg->width);
+    info_msg_tmp.k[0] *= ratio; // fx
+    info_msg_tmp.k[2] *= ratio; // cx
+    info_msg_tmp.k[4] *= ratio; // fy
+    info_msg_tmp.k[5] *= ratio; // cy
+    info_msg_tmp.p[0] *= ratio; // fx
+    info_msg_tmp.p[2] *= ratio; // cx
+    info_msg_tmp.p[5] *= ratio; // fy
+    info_msg_tmp.p[6] *= ratio; // cy
+    info_msg_tmp.width = depth_msg->width;
+    info_msg_tmp.height = depth_msg->height;
+    model_.fromCameraInfo(info_msg_tmp);
 
-    auto scaled_info = std::make_shared<CameraInfo>(*info_msg);
-    scaled_info->width = depth_msg->width;
-    scaled_info->height = depth_msg->height;
-    scaled_info->k[0] *= ratio_x;  // fx
-    scaled_info->k[2] *= ratio_x;  // cx
-    scaled_info->k[4] *= ratio_y;  // fy
-    scaled_info->k[5] *= ratio_y;  // cy
-    scaled_info->p[0] *= ratio_x;  // fx'
-    scaled_info->p[2] *= ratio_x;  // cx'
-    scaled_info->p[5] *= ratio_y;  // fy'
-    scaled_info->p[6] *= ratio_y;  // cy'
-    model_.fromCameraInfo(scaled_info);
-
-    cv_bridge::CvImageConstPtr cv_ptr = cv_bridge::toCvShare(rgb_msg_in, rgb_msg_in->encoding);
-    cv::Mat resized;
-    cv::resize(
-      cv_ptr->image, resized,
-      cv::Size(static_cast<int>(depth_msg->width), static_cast<int>(depth_msg->height)),
-      0.0, 0.0, cv::INTER_LINEAR);
-
-    cv_bridge::CvImage cv_img(rgb_msg_in->header, rgb_msg_in->encoding, resized);
-    rgb_msg = cv_img.toImageMsg();
+    cv_bridge::CvImageConstPtr cv_ptr;
+    try {
+      cv_ptr = cv_bridge::toCvShare(rgb_msg, rgb_msg->encoding);
+    } catch (cv_bridge::Exception& e) {
+      RCLCPP_ERROR(get_logger(), "cv_bridge exception: %s", e.what());
+      return;
+    }
+    cv_bridge::CvImage cv_rsz;
+    cv_rsz.header = cv_ptr->header;
+    cv_rsz.encoding = cv_ptr->encoding;
+    cv::resize(cv_ptr->image, cv_rsz.image, cv::Size(depth_msg->width, depth_msg->height));
+    rgb_msg = cv_rsz.toImageMsg();
   }
 
-  int red_offset = 0;
-  int green_offset = 1;
-  int blue_offset = 2;
-  int color_step = 3;
-
-  if (rgb_msg->encoding == enc::RGB8) {
-    red_offset = 0;
+  int red_offset, green_offset, blue_offset, color_step;
+  if (rgb_msg->encoding == sensor_msgs::image_encodings::RGB8) {
+    red_offset   = 0;
     green_offset = 1;
-    blue_offset = 2;
-    color_step = 3;
-  } else if (rgb_msg->encoding == enc::BGR8) {
-    red_offset = 2;
+    blue_offset  = 2;
+    color_step   = 3;
+  } else if (rgb_msg->encoding == sensor_msgs::image_encodings::BGR8) {
+    red_offset   = 2;
     green_offset = 1;
-    blue_offset = 0;
-    color_step = 3;
-  } else if (rgb_msg->encoding == enc::MONO8) {
-    red_offset = 0;
+    blue_offset  = 0;
+    color_step   = 3;
+  } else if (rgb_msg->encoding == sensor_msgs::image_encodings::MONO8) {
+    red_offset   = 0;
     green_offset = 0;
-    blue_offset = 0;
-    color_step = 1;
+    blue_offset  = 0;
+    color_step   = 1;
   } else {
-    RCLCPP_ERROR(
-      get_logger(),
-      "Unsupported RGB encoding [%s]. Supported encodings are: rgb8, bgr8, mono8",
-      rgb_msg->encoding.c_str());
-    return;
+    try {
+      rgb_msg = cv_bridge::toCvCopy(rgb_msg, sensor_msgs::image_encodings::RGB8)->toImageMsg();
+    } catch (cv_bridge::Exception& e) {
+      RCLCPP_ERROR(get_logger(), "Unsupported encoding [%s]: %s", rgb_msg->encoding.c_str(), e.what());
+      return;
+    }
+    red_offset   = 0;
+    green_offset = 1;
+    blue_offset  = 2;
+    color_step   = 3;
   }
 
   auto cloud_msg = std::make_unique<PointCloud2>();
   cloud_msg->header = depth_msg->header;
   cloud_msg->height = depth_msg->height;
-  cloud_msg->width = depth_msg->width;
-  cloud_msg->is_bigendian = false;
+  cloud_msg->width  = depth_msg->width;
   cloud_msg->is_dense = false;
+  cloud_msg->is_bigendian = false;
 
   sensor_msgs::PointCloud2Modifier pcd_modifier(*cloud_msg);
   pcd_modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
-  pcd_modifier.resize(static_cast<size_t>(cloud_msg->width) * static_cast<size_t>(cloud_msg->height));
 
-  sensor_msgs::PointCloud2Iterator<float> iter_x(*cloud_msg, "x");
-  sensor_msgs::PointCloud2Iterator<float> iter_y(*cloud_msg, "y");
-  sensor_msgs::PointCloud2Iterator<float> iter_z(*cloud_msg, "z");
-
-  if (depth_msg->encoding == enc::TYPE_16UC1) {
-    convertDepth<uint16_t>(depth_msg, iter_x, iter_y, iter_z, model_, invalid_depth_);
-  } else if (depth_msg->encoding == enc::TYPE_32FC1) {
-    convertDepth<float>(depth_msg, iter_x, iter_y, iter_z, model_, invalid_depth_);
+  if (depth_msg->encoding == sensor_msgs::image_encodings::TYPE_16UC1) {
+    convert<uint16_t>(depth_msg, rgb_msg, cloud_msg, red_offset, green_offset, blue_offset, color_step);
+  } else if (depth_msg->encoding == sensor_msgs::image_encodings::TYPE_32FC1) {
+    convert<float>(depth_msg, rgb_msg, cloud_msg, red_offset, green_offset, blue_offset, color_step);
   } else {
-    RCLCPP_ERROR(
-      get_logger(), "Unsupported depth encoding [%s]. Supported encodings are: 16UC1, 32FC1",
-      depth_msg->encoding.c_str());
+    RCLCPP_ERROR(get_logger(), "Depth image has unsupported encoding [%s]", depth_msg->encoding.c_str());
     return;
   }
-
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_r(*cloud_msg, "r");
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_g(*cloud_msg, "g");
-  sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(*cloud_msg, "b");
-  convertRgb(rgb_msg, iter_r, iter_g, iter_b, red_offset, green_offset, blue_offset, color_step);
 
   pub_point_cloud_->publish(std::move(cloud_msg));
 }

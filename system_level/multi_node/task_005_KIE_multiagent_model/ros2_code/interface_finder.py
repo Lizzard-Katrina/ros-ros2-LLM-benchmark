@@ -8,7 +8,7 @@
 
 import time
 try:
-    import xmlrpcclient as xmlrpcclient
+    import xmlrpclib as xmlrpcclient
 except ImportError:
     import xmlrpc.client as xmlrpcclient
 
@@ -69,19 +69,25 @@ def get_stats_topic(masteruri, wait=True, check_host=True):
 
 
 def _get_topic(masteruri, ttype, wait=True, check_host=True):
-    node = Node('get_topic')
-    topic_names_and_types = node.get_topic_names_and_types()
     result = []
-    for topic, topic_type in topic_names_and_types:
-        if topic_type == ttype:
-            if check_host:
-                # get the hostname of the topic provider
-                provider_hostname = get_hostname(topic)
-                if provider_hostname == get_hostname(masteruri):
-                    result.append(topic)
-            else:
-                result.append(topic)
-    node.destroy_node()
+    if not rclpy.ok():
+        rclpy.init()
+    node = rclpy.create_node('interface_finder_get_topic_node')
+    try:
+        while not result and rclpy.ok():
+            topic_names_and_types = node.get_topic_names_and_types()
+            for topic_name, topic_types in topic_names_and_types:
+                for t in topic_types:
+                    if ttype in t:
+                        result.append(topic_name)
+                        break
+            if not result and wait:
+                Log.warn(f'Wait for topic type "{ttype}".')
+                time.sleep(1)
+            if not wait:
+                break
+    finally:
+        node.destroy_node()
     return result
 
 
@@ -161,17 +167,21 @@ def _get_service(masteruri, name, wait=True, check_host=True):
 
     :rtype: list of strings
     '''
-    node = Node('get_service')
-    service_names = node.get_service_names()
     result = []
-    for service in service_names:
-        if service.endswith(name):
-            if check_host:
-                # get the hostname of the service provider
-                provider_hostname = get_hostname(service)
-                if provider_hostname == get_hostname(masteruri):
-                    result.append(service)
-            else:
-                result.append(service)
-    node.destroy_node()
+    if not rclpy.ok():
+        rclpy.init()
+    node = rclpy.create_node('interface_finder_get_service_node')
+    try:
+        while not result and rclpy.ok():
+            service_names_and_types = node.get_service_names_and_types()
+            for srv_name, srv_types in service_names_and_types:
+                if srv_name.endswith(name):
+                    result.append(srv_name)
+            if not result and wait:
+                Log.warn(f'Wait for service "{name}".')
+                time.sleep(1)
+            if not wait:
+                break
+    finally:
+        node.destroy_node()
     return result

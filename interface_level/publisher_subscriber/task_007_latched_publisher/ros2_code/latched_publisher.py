@@ -1,52 +1,30 @@
 #!/usr/bin/env python3
-import time
-
 import rclpy
-from rclpy.executors import SingleThreadedExecutor
-from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSReliabilityPolicy, QoSHistoryPolicy
+from rclpy.qos import QoSProfile, DurabilityPolicy
 from std_msgs.msg import String
 
-
-def main():
-    rclpy.init()
+def main(args=None):
+    rclpy.init(args=args)
     node = rclpy.create_node('latched_pub_sub_node')
 
-    # TODO: Create a Publisher on 'latched_topic', define a Subscriber with a callback,
-    #       and implement the publish loop with rospy.is_shutdown().
-    #       The callback should log received messages.
-    qos_profile = QoSProfile(
-        history=QoSHistoryPolicy.KEEP_LAST,
-        depth=10,
-        reliability=QoSReliabilityPolicy.RELIABLE,
-        durability=QoSDurabilityPolicy.TRANSIENT_LOCAL,
-    )
+    latching_qos = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
 
-    def callback(msg: String):
-        node.get_logger().info(f"Received: {msg.data}")
+    def callback(msg):
+        node.get_logger().info('Received: "%s"' % msg.data)
 
-    publisher = node.create_publisher(String, 'latched_topic', qos_profile)
-    subscriber = node.create_subscription(String, 'latched_topic', callback, qos_profile)
-
-    executor = SingleThreadedExecutor()
-    executor.add_node(node)
+    pub = node.create_publisher(String, 'latched_topic', latching_qos)
+    sub = node.create_subscription(String, 'latched_topic', callback, latching_qos)
 
     count = 0
-    try:
-        while rclpy.ok():
-            msg = String()
-            msg.data = f"Hello from ROS2 (latched) #{count}"
-            publisher.publish(msg)
-            node.get_logger().info(f"Published: {msg.data}")
-            executor.spin_once(timeout_sec=0.1)
-            time.sleep(1.0)
-            count += 1
-    finally:
-        node.destroy_subscription(subscriber)
-        node.destroy_publisher(publisher)
-        node.destroy_node()
-        rclpy.shutdown()
-    # end: TODO block ends here
+    while rclpy.ok():
+        msg = String()
+        msg.data = 'Hello World %d' % count
+        pub.publish(msg)
+        rclpy.spin_once(node, timeout_sec=1.0)
+        count += 1
 
+    node.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == "__main__":
     main()

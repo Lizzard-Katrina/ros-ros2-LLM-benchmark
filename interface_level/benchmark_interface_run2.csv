@@ -1,0 +1,265 @@
+Model,Category,Task ID,Status,Score,Pass Rate,Tokens,Failed Functions
+google_gemini-3.1-pro-preview,service_client,service_client/task_001_simple_service,FAILED,7/8,87.50%,2095,test_client_uses_rclpy_and_node
+google_gemini-3.1-pro-preview,service_client,service_client/task_002_custom_srv,FAILED,5/7,71.43%,2644,"test_ros2_server_uses_node_subclass, test_server_defines_handler_and_accesses_request"
+google_gemini-3.1-pro-preview,service_client,service_client/task_003_mp3_db_service,FAILED,3/7,42.86%,3235,"test_ros2_client_creates_service_client, test_client_populates_request_fields, test_client_accesses_response_list, test_client_uses_response_to_drive_loop"
+google_gemini-3.1-pro-preview,service_client,service_client/task_005_gazebo,FAILED,4/7,57.14%,3299,"test_return_depends_on_service_response, test_response_used_in_return, test_multiple_service_calls_use_response"
+google_gemini-3.1-pro-preview,service_client,service_client/task_006_gazebo_set_get_state,FAILED,5/8,62.50%,3492,"test_02_service_client_type_and_name, test_04_request_assigns_all_model_state_fields, test_05_full_service_call_chain_success_and_failure_handling"
+google_gemini-3.1-pro-preview,service_client,service_client/task_007_navigation_make_plan,FAILED,3/4,75.00%,34666,test_03_requestmap_has_mutex_lock_guard
+google_gemini-3.1-pro-preview,service_client,service_client/task_008_clear_costmaps,FAILED,3/6,50.00%,3322,"test_equivalence_reset_distance_is_expressed, test_equivalence_layer_names_semantics_obstacles_static_map, test_equivalence_gates_both_obstacles_and_static_map"
+google_gemini-3.1-pro-preview,service_client,service_client/task_009_moveit_planning_scene,SUCCESS,4/4,100.00%,5679,None
+google_gemini-3.1-pro-preview,service_client,service_client/task_010_controller_manager,FAILED,2/5,40.00%,2489,"test_start_stop_controllers_semantics, test_list_controllers_semantics, test_reload_libraries_semantics"
+google_gemini-3.1-pro-preview,service_client,service_client/task_011_robot_services,FAILED,4/6,66.67%,2010,"test_target_camera_driver_is_referenced, test_init_sets_up_configuration_interface"
+google_gemini-3.1-pro-preview,parameter_server,parameter_server/task_001_basic_param,FAILED,5/7,71.43%,12255,"test_parameter_event_subscription_is_real, test_invalidate_parent_walks_up_namespaces_and_erases_parents"
+google_gemini-3.1-pro-preview,parameter_server,parameter_server/task_002_dynamic_robot_configuration,FAILED,5/6,83.33%,2631,test_type_strictness_casting
+google_gemini-3.1-pro-preview,parameter_server,parameter_server/task_003_Mobile_robot_control,SUCCESS,7/7,100.00%,22091,None
+google_gemini-3.1-pro-preview,parameter_server,parameter_server/task_004_turtlrbot3_params,SUCCESS,9/9,100.00%,8737,None
+google_gemini-3.1-pro-preview,parameter_server,parameter_server/task_005_laser_scan_filter_params,FAILED,5/6,83.33%,3383,test_qos_and_topics
+google_gemini-3.1-pro-preview,parameter_server,parameter_server/task_006_dynamic_param_rqt_reconfigure,SUCCESS,6/6,100.00%,4308,None
+google_gemini-3.1-pro-preview,parameter_server,parameter_server/task_007_navigation_stack_config,FAILED,6/7,85.71%,21784,test_min_max_constraint_logic
+google_gemini-3.1-pro-preview,parameter_server,parameter_server/task_008_gazebo_sim_param,FAILED,5/8,62.50%,13884,"test_multicamera_suffix_preservation, test_standard_library_pointer_migration, test_time_source_logic"
+google_gemini-3.1-pro-preview,parameter_server,parameter_server/task_009_fetch_arm_params,FAILED,2/6,33.33%,33466,"test_ros2_param_declaration, test_snake_case_naming, test_logging_migration, test_tip_frame_validation"
+google_gemini-3.1-pro-preview,parameter_server,parameter_server/task_010_sensor_fusion_params,FAILED,5/6,83.33%,26601,test_sensor_config_logic
+google_gemini-3.1-pro-preview,parameter_server,parameter_server/task_011_moveit_motion_params,FAILED,5/6,83.33%,6958,test_ros2_node_lifecycle_setup
+google_gemini-3.1-pro-preview,parameter_server,parameter_server/task_012_px4_flight_params,FAILED,6/8,75.00%,4145,"test_parameter_declaration_logic, test_dynamic_message_population_position"
+google_gemini-3.1-pro-preview,parameter_server,parameter_server/task_013_slam_mapping_params,FAILED,4/7,57.14%,16201,"test_ros2_lifecycle_sequence, test_explicit_type_casting, test_member_variable_assignment"
+google_gemini-3.1-pro-preview,publisher_subscriber,publisher_subscriber/task_001_simple_pub_sub,FAILED,1/2,50.00%,2337,test_talker_ros2_translation
+google_gemini-3.1-pro-preview,publisher_subscriber,publisher_subscriber/task_002_custom_msg_basic,SUCCESS,2/2,100.00%,2820,None
+google_gemini-3.1-pro-preview,publisher_subscriber,publisher_subscriber/task_003_image_transport,FAILED,1/3,33.33%,2502,"test_camera_publisher_translation, test_camera_subscriber_translation"
+google_gemini-3.1-pro-preview,publisher_subscriber,publisher_subscriber/task_004_laser_scan_origin,SUCCESS,3/3,100.00%,2540,None
+google_gemini-3.1-pro-preview,publisher_subscriber,publisher_subscriber/task_005_ros1_ros2_bridge,SUCCESS,1/1,100.00%,1124,None
+google_gemini-3.1-pro-preview,publisher_subscriber,publisher_subscriber/task_006_multi_topic_synchronization,FAILED,6/7,85.71%,2792,test_oracle_4_two_image_subscribers
+google_gemini-3.1-pro-preview,publisher_subscriber,publisher_subscriber/task_007_latched_publisher,FAILED,2/3,66.67%,1237,test_latched_behavior_for_new_subscriber
+google_gemini-3.1-pro-preview,publisher_subscriber,publisher_subscriber/task_009_nodelet_pubsub,FAILED,7/9,77.78%,1751,"test_ros2_parameter_usage, test_namespace_semantics_preserved"
+google_gemini-3.1-pro-preview,publisher_subscriber,publisher_subscriber/task_010_husky_stress_test,FAILED,0/7,0.00%,534,"test_translated_files_exist, test_no_ros1_artifacts_in_launch, test_robot_description_defined, test_robot_description_consumed_in_launch, test_imu_interface_present, test_gps_interface_present, test_sensor_update_rate_semantics"
+google_gemini-3.1-pro-preview,action_server,action_server/task_001_base_case,FAILED,6/9,66.67%,1767,"test_node_creation, test_execute_callback_exists, test_progress_loop_present"
+google_gemini-3.1-pro-preview,action_server,action_server/task_002_turtlebot3_patrol_action,FAILED,4/7,57.14%,4579,"test_node_creation, test_action_server_creation, test_execute_callback_contains_patrol_logic"
+google_gemini-3.1-pro-preview,action_server,action_server/task_003_pr2_gripper_action_server,FAILED,8/9,88.89%,7860,test_goalCB_exists
+google_gemini-3.1-pro-preview,action_server,action_server/task_004_turtle_bot_3,FAILED,7/12,58.33%,1617,"test_execute_callback_signature, test_execute_callback_no_return, test_feedback_published_iteratively, test_feedback_progress_updated, test_result_set_before_goal_termination"
+google_gemini-3.1-pro-preview,action_server,action_server/task_005_robot_voice_action,FAILED,4/7,57.14%,0,"test_control_logic_inside_timer_callback, test_ros_time_semantics_preserved, test_px4_qos_semantics_explicit"
+google_gemini-3.1-pro-preview,action_server,action_server/task_006_amcl_navigation,FAILED,3/10,30.00%,37891,"test_action_server_creation, test_handle_goal_defined, test_handle_cancel_defined, test_handle_accepted_defined, test_todo_comment_present, test_thread_usage_for_async, test_feedback_or_result_mentioned"
+google_gemini-3.1-pro-preview,action_server,action_server/task_007_move_base_navigation_action,FAILED,6/9,66.67%,23380,"test_mutex_translation, test_feedback_publishing_exists, test_plan_swap_under_lock"
+google_gemini-3.1-pro-preview,action_server,action_server/task_008_follow_joint_trajectory_action,FAILED,4/9,44.44%,17473,"test_class_exists, test_odom_lock_usage, test_tc_check_trajectory_args, test_warns_on_pose_fail, test_no_ros1_api_leftovers"
+google_gemini-3.1-pro-preview,action_server,action_server/task_009_moveit_motion_planning_action,FAILED,4/8,50.00%,7312,"test_class_exists, test_rclcpp_node_exists, test_initialize_creates_server_with_callback, test_setMoveState_publishes_feedback_with_state"
+google_gemini-3.1-pro-preview,action_server,action_server/task_010_pick_place,FAILED,2/6,33.33%,8802,"test_move_group_interface_created, test_ros2_node_and_spinner, test_gripper_operations, test_post_place_open_gripper"
+google_gemini-3.1-pro-preview,action_server,action_server/task_011_pr2_door,FAILED,3/7,42.86%,3540,"test_door_action_client_created, test_move_base_action_client_created, test_subscriber_exists, test_goal_initialization"
+google_gemini-3.1-pro-preview,action_server,action_server/task_012_move_arm_cartesian_action,FAILED,4/9,44.44%,13942,"test_ros2_node_initialization, test_move_group_interface_exists, test_path_constraints, test_cartesian_path_computation, test_collision_object_added"
+openai_gpt-5.5,service_client,service_client/task_001_simple_service,FAILED,7/8,87.50%,893,test_client_uses_rclpy_and_node
+openai_gpt-5.5,service_client,service_client/task_002_custom_srv,FAILED,6/7,85.71%,1011,test_ros2_server_uses_node_subclass
+openai_gpt-5.5,service_client,service_client/task_003_mp3_db_service,FAILED,2/7,28.57%,2078,"test_ros2_client_uses_node, test_ros2_client_creates_service_client, test_client_populates_request_fields, test_client_accesses_response_list, test_client_uses_response_to_drive_loop"
+openai_gpt-5.5,service_client,service_client/task_005_gazebo,FAILED,4/7,57.14%,1760,"test_return_depends_on_service_response, test_response_used_in_return, test_multiple_service_calls_use_response"
+openai_gpt-5.5,service_client,service_client/task_006_gazebo_set_get_state,FAILED,6/8,75.00%,1785,"test_03_retry_wait_for_service_with_shutdown_guard, test_05_full_service_call_chain_success_and_failure_handling"
+openai_gpt-5.5,service_client,service_client/task_007_navigation_make_plan,FAILED,3/4,75.00%,27497,test_03_requestmap_has_mutex_lock_guard
+openai_gpt-5.5,service_client,service_client/task_008_clear_costmaps,FAILED,5/6,83.33%,2349,test_equivalence_layer_names_semantics_obstacles_static_map
+openai_gpt-5.5,service_client,service_client/task_009_moveit_planning_scene,FAILED,3/4,75.00%,4043,test_category_2_core_transition_attach_step_world_remove_and_robot_attach
+openai_gpt-5.5,service_client,service_client/task_010_controller_manager,FAILED,2/5,40.00%,1956,"test_start_stop_controllers_semantics, test_list_controllers_semantics, test_reload_libraries_semantics"
+openai_gpt-5.5,service_client,service_client/task_011_robot_services,FAILED,5/6,83.33%,1455,test_target_camera_driver_is_referenced
+openai_gpt-5.5,parameter_server,parameter_server/task_001_basic_param,FAILED,2/7,28.57%,11762,"test_no_ros1_master_xmlrpc, test_has_cache_map_and_subscribed_set, test_parameter_event_subscription_is_real, test_invalidate_parent_walks_up_namespaces_and_erases_parents, test_getImpl_has_cache_hit_shortcut_and_subscribe_on_miss"
+openai_gpt-5.5,parameter_server,parameter_server/task_002_dynamic_robot_configuration,SUCCESS,6/6,100.00%,1345,None
+openai_gpt-5.5,parameter_server,parameter_server/task_003_Mobile_robot_control,FAILED,5/7,71.43%,17304,"test_absence_of_xmlrpc, test_no_ros1_nodehandle"
+openai_gpt-5.5,parameter_server,parameter_server/task_004_turtlrbot3_params,SUCCESS,9/9,100.00%,6098,None
+openai_gpt-5.5,parameter_server,parameter_server/task_005_laser_scan_filter_params,FAILED,5/6,83.33%,2446,test_qos_and_topics
+openai_gpt-5.5,parameter_server,parameter_server/task_006_dynamic_param_rqt_reconfigure,SUCCESS,6/6,100.00%,3166,None
+openai_gpt-5.5,parameter_server,parameter_server/task_007_navigation_stack_config,FAILED,6/7,85.71%,24386,test_internal_state_sync
+openai_gpt-5.5,parameter_server,parameter_server/task_008_gazebo_sim_param,FAILED,5/8,62.50%,11458,"test_multicamera_suffix_preservation, test_standard_library_pointer_migration, test_time_source_logic"
+openai_gpt-5.5,parameter_server,parameter_server/task_009_fetch_arm_params,FAILED,5/6,83.33%,28996,test_ros2_param_declaration
+openai_gpt-5.5,parameter_server,parameter_server/task_010_sensor_fusion_params,FAILED,5/6,83.33%,23153,test_sensor_config_logic
+openai_gpt-5.5,parameter_server,parameter_server/task_011_moveit_motion_params,FAILED,5/6,83.33%,4794,test_ros2_node_lifecycle_setup
+openai_gpt-5.5,parameter_server,parameter_server/task_012_px4_flight_params,FAILED,5/8,62.50%,2807,"test_parameter_declaration_logic, test_parameter_value_retrieval, test_dynamic_message_population_position"
+openai_gpt-5.5,parameter_server,parameter_server/task_013_slam_mapping_params,FAILED,4/7,57.14%,14538,"test_explicit_type_casting, test_no_fake_nodehandle, test_member_variable_assignment"
+openai_gpt-5.5,publisher_subscriber,publisher_subscriber/task_001_simple_pub_sub,FAILED,1/2,50.00%,974,test_talker_ros2_translation
+openai_gpt-5.5,publisher_subscriber,publisher_subscriber/task_002_custom_msg_basic,SUCCESS,2/2,100.00%,1104,None
+openai_gpt-5.5,publisher_subscriber,publisher_subscriber/task_003_image_transport,SUCCESS,3/3,100.00%,1097,None
+openai_gpt-5.5,publisher_subscriber,publisher_subscriber/task_004_laser_scan_origin,SUCCESS,3/3,100.00%,1670,None
+openai_gpt-5.5,publisher_subscriber,publisher_subscriber/task_005_ros1_ros2_bridge,SUCCESS,1/1,100.00%,526,None
+openai_gpt-5.5,publisher_subscriber,publisher_subscriber/task_006_multi_topic_synchronization,FAILED,5/7,71.43%,1063,"test_oracle_2_stereo_sync_class, test_oracle_4_two_image_subscribers"
+openai_gpt-5.5,publisher_subscriber,publisher_subscriber/task_007_latched_publisher,FAILED,2/3,66.67%,675,test_latched_behavior_for_new_subscriber
+openai_gpt-5.5,publisher_subscriber,publisher_subscriber/task_009_nodelet_pubsub,FAILED,6/9,66.67%,671,"test_uses_ros2_headers_not_ros1, test_ros2_parameter_usage, test_namespace_semantics_preserved"
+openai_gpt-5.5,publisher_subscriber,publisher_subscriber/task_010_husky_stress_test,FAILED,0/7,0.00%,267,"test_translated_files_exist, test_no_ros1_artifacts_in_launch, test_robot_description_defined, test_robot_description_consumed_in_launch, test_imu_interface_present, test_gps_interface_present, test_sensor_update_rate_semantics"
+openai_gpt-5.5,action_server,action_server/task_001_base_case,FAILED,7/9,77.78%,995,"test_node_creation, test_execute_callback_exists"
+openai_gpt-5.5,action_server,action_server/task_002_turtlebot3_patrol_action,FAILED,4/7,57.14%,3063,"test_node_creation, test_action_server_creation, test_execute_callback_contains_patrol_logic"
+openai_gpt-5.5,action_server,action_server/task_003_pr2_gripper_action_server,SUCCESS,9/9,100.00%,5580,None
+openai_gpt-5.5,action_server,action_server/task_004_turtle_bot_3,FAILED,6/12,50.00%,843,"test_execute_callback_signature, test_execute_callback_no_return, test_goal_data_accessed, test_long_running_execution_present, test_feedback_progress_updated, test_result_set_before_goal_termination"
+openai_gpt-5.5,action_server,action_server/task_005_robot_voice_action,FAILED,4/7,57.14%,3067,"test_control_logic_inside_timer_callback, test_ros_time_semantics_preserved, test_px4_qos_semantics_explicit"
+openai_gpt-5.5,action_server,action_server/task_006_amcl_navigation,FAILED,3/10,30.00%,25791,"test_action_server_creation, test_handle_goal_defined, test_handle_cancel_defined, test_handle_accepted_defined, test_todo_comment_present, test_thread_usage_for_async, test_feedback_or_result_mentioned"
+openai_gpt-5.5,action_server,action_server/task_007_move_base_navigation_action,FAILED,8/9,88.89%,20146,test_plan_swap_under_lock
+openai_gpt-5.5,action_server,action_server/task_008_follow_joint_trajectory_action,FAILED,4/9,44.44%,13061,"test_class_exists, test_odom_lock_usage, test_tc_check_trajectory_args, test_warns_on_pose_fail, test_no_ros1_api_leftovers"
+openai_gpt-5.5,action_server,action_server/task_009_moveit_motion_planning_action,FAILED,5/8,62.50%,4827,"test_class_exists, test_rclcpp_node_exists, test_initialize_creates_server_with_callback"
+openai_gpt-5.5,action_server,action_server/task_010_pick_place,FAILED,2/6,33.33%,5555,"test_move_group_interface_created, test_ros2_node_and_spinner, test_gripper_operations, test_post_place_open_gripper"
+openai_gpt-5.5,action_server,action_server/task_011_pr2_door,FAILED,2/7,28.57%,2498,"test_door_action_client_created, test_move_base_action_client_created, test_wait_for_server_called, test_subscriber_exists, test_goal_initialization"
+openai_gpt-5.5,action_server,action_server/task_012_move_arm_cartesian_action,FAILED,3/9,33.33%,8127,"test_ros2_node_initialization, test_move_group_interface_exists, test_path_constraints, test_cartesian_path_computation, test_collision_object_added, test_object_attached_to_robot"
+qwen_qwen3.5-plus-02-15,service_client,service_client/task_001_simple_service,SUCCESS,8/8,100.00%,1045,None
+qwen_qwen3.5-plus-02-15,service_client,service_client/task_002_custom_srv,FAILED,5/7,71.43%,1061,"test_ros2_server_uses_node_subclass, test_server_defines_handler_and_accesses_request"
+qwen_qwen3.5-plus-02-15,service_client,service_client/task_003_mp3_db_service,FAILED,2/7,28.57%,1539,"test_ros2_client_uses_node, test_ros2_client_creates_service_client, test_client_populates_request_fields, test_client_accesses_response_list, test_client_uses_response_to_drive_loop"
+qwen_qwen3.5-plus-02-15,service_client,service_client/task_005_gazebo,FAILED,4/7,57.14%,1843,"test_return_depends_on_service_response, test_response_used_in_return, test_multiple_service_calls_use_response"
+qwen_qwen3.5-plus-02-15,service_client,service_client/task_006_gazebo_set_get_state,FAILED,6/8,75.00%,1997,"test_03_retry_wait_for_service_with_shutdown_guard, test_05_full_service_call_chain_success_and_failure_handling"
+qwen_qwen3.5-plus-02-15,service_client,service_client/task_007_navigation_make_plan,FAILED,3/4,75.00%,34806,test_03_requestmap_has_mutex_lock_guard
+qwen_qwen3.5-plus-02-15,service_client,service_client/task_008_clear_costmaps,FAILED,4/6,66.67%,2374,"test_equivalence_layer_names_semantics_obstacles_static_map, test_equivalence_gates_both_obstacles_and_static_map"
+qwen_qwen3.5-plus-02-15,service_client,service_client/task_009_moveit_planning_scene,SUCCESS,4/4,100.00%,4434,None
+qwen_qwen3.5-plus-02-15,service_client,service_client/task_010_controller_manager,FAILED,4/5,80.00%,2324,test_reload_libraries_semantics
+qwen_qwen3.5-plus-02-15,service_client,service_client/task_011_robot_services,FAILED,2/6,33.33%,1079,"test_ros2_only_no_rospy_dynamic_reconfigure, test_target_camera_driver_is_referenced, test_parameters_are_used, test_init_sets_up_configuration_interface"
+qwen_qwen3.5-plus-02-15,parameter_server,parameter_server/task_001_basic_param,FAILED,4/7,57.14%,14425,"test_parameter_event_subscription_is_real, test_update_is_gated_by_subscribed_set_and_mutates_cache, test_getImpl_has_cache_hit_shortcut_and_subscribe_on_miss"
+qwen_qwen3.5-plus-02-15,parameter_server,parameter_server/task_002_dynamic_robot_configuration,FAILED,4/6,66.67%,1393,"test_default_value_integrity, test_type_strictness_casting"
+qwen_qwen3.5-plus-02-15,parameter_server,parameter_server/task_003_Mobile_robot_control,SUCCESS,7/7,100.00%,18477,None
+qwen_qwen3.5-plus-02-15,parameter_server,parameter_server/task_004_turtlrbot3_params,FAILED,8/9,88.89%,6776,test_physics_logic_preservation
+qwen_qwen3.5-plus-02-15,parameter_server,parameter_server/task_005_laser_scan_filter_params,FAILED,3/6,50.00%,2646,"test_filter_chain_interface_usage, test_tf_filter_binding, test_qos_and_topics"
+qwen_qwen3.5-plus-02-15,parameter_server,parameter_server/task_006_dynamic_param_rqt_reconfigure,SUCCESS,6/6,100.00%,3345,None
+qwen_qwen3.5-plus-02-15,parameter_server,parameter_server/task_007_navigation_stack_config,FAILED,4/7,57.14%,28140,"test_min_max_constraint_logic, test_internal_state_sync, test_no_legacy_artifacts"
+qwen_qwen3.5-plus-02-15,parameter_server,parameter_server/task_008_gazebo_sim_param,FAILED,7/8,87.50%,13040,test_time_source_logic
+qwen_qwen3.5-plus-02-15,parameter_server,parameter_server/task_009_fetch_arm_params,FAILED,3/6,50.00%,30026,"test_ros2_param_declaration, test_snake_case_naming, test_logging_migration"
+qwen_qwen3.5-plus-02-15,parameter_server,parameter_server/task_010_sensor_fusion_params,FAILED,5/6,83.33%,22693,test_sensor_config_logic
+qwen_qwen3.5-plus-02-15,parameter_server,parameter_server/task_011_moveit_motion_params,FAILED,4/6,66.67%,5146,"test_ros2_node_lifecycle_setup, test_planning_scene_availability"
+qwen_qwen3.5-plus-02-15,parameter_server,parameter_server/task_012_px4_flight_params,FAILED,6/8,75.00%,3157,"test_parameter_declaration_logic, test_dynamic_message_population_position"
+qwen_qwen3.5-plus-02-15,parameter_server,parameter_server/task_013_slam_mapping_params,FAILED,4/7,57.14%,17385,"test_scanner_physical_validation_logic, test_no_fake_nodehandle, test_member_variable_assignment"
+qwen_qwen3.5-plus-02-15,publisher_subscriber,publisher_subscriber/task_001_simple_pub_sub,FAILED,1/2,50.00%,956,test_listener_ros2_translation
+qwen_qwen3.5-plus-02-15,publisher_subscriber,publisher_subscriber/task_002_custom_msg_basic,SUCCESS,2/2,100.00%,1137,None
+qwen_qwen3.5-plus-02-15,publisher_subscriber,publisher_subscriber/task_003_image_transport,SUCCESS,3/3,100.00%,1274,None
+qwen_qwen3.5-plus-02-15,publisher_subscriber,publisher_subscriber/task_004_laser_scan_origin,FAILED,2/3,66.67%,1732,test_lidar_publisher_translation
+qwen_qwen3.5-plus-02-15,publisher_subscriber,publisher_subscriber/task_005_ros1_ros2_bridge,SUCCESS,1/1,100.00%,532,None
+qwen_qwen3.5-plus-02-15,publisher_subscriber,publisher_subscriber/task_006_multi_topic_synchronization,FAILED,6/7,85.71%,1154,test_oracle_4_two_image_subscribers
+qwen_qwen3.5-plus-02-15,publisher_subscriber,publisher_subscriber/task_007_latched_publisher,FAILED,2/3,66.67%,775,test_latched_behavior_for_new_subscriber
+qwen_qwen3.5-plus-02-15,publisher_subscriber,publisher_subscriber/task_009_nodelet_pubsub,FAILED,8/9,88.89%,775,test_namespace_semantics_preserved
+qwen_qwen3.5-plus-02-15,publisher_subscriber,publisher_subscriber/task_010_husky_stress_test,FAILED,0/7,0.00%,309,"test_translated_files_exist, test_no_ros1_artifacts_in_launch, test_robot_description_defined, test_robot_description_consumed_in_launch, test_imu_interface_present, test_gps_interface_present, test_sensor_update_rate_semantics"
+qwen_qwen3.5-plus-02-15,action_server,action_server/task_001_base_case,FAILED,6/9,66.67%,1167,"test_no_ros1_artifacts, test_execute_callback_exists, test_progress_loop_present"
+qwen_qwen3.5-plus-02-15,action_server,action_server/task_002_turtlebot3_patrol_action,FAILED,4/7,57.14%,3112,"test_node_creation, test_action_server_creation, test_execute_callback_contains_patrol_logic"
+qwen_qwen3.5-plus-02-15,action_server,action_server/task_003_pr2_gripper_action_server,FAILED,8/9,88.89%,6083,test_action_type_present
+qwen_qwen3.5-plus-02-15,action_server,action_server/task_004_turtle_bot_3,FAILED,7/12,58.33%,922,"test_execute_callback_signature, test_execute_callback_no_return, test_long_running_execution_present, test_feedback_published_iteratively, test_feedback_progress_updated"
+qwen_qwen3.5-plus-02-15,action_server,action_server/task_005_robot_voice_action,FAILED,4/7,57.14%,3369,"test_control_logic_inside_timer_callback, test_ros_time_semantics_preserved, test_px4_qos_semantics_explicit"
+qwen_qwen3.5-plus-02-15,action_server,action_server/task_006_amcl_navigation,FAILED,3/10,30.00%,32520,"test_action_server_creation, test_handle_goal_defined, test_handle_cancel_defined, test_handle_accepted_defined, test_todo_comment_present, test_thread_usage_for_async, test_feedback_or_result_mentioned"
+qwen_qwen3.5-plus-02-15,action_server,action_server/task_007_move_base_navigation_action,FAILED,5/9,55.56%,25645,"test_mutex_translation, test_feedback_publishing_exists, test_plan_swap_under_lock, test_action_server_success_abort_calls"
+qwen_qwen3.5-plus-02-15,action_server,action_server/task_008_follow_joint_trajectory_action,FAILED,6/9,66.67%,14653,"test_class_exists, test_warns_on_pose_fail, test_no_ros1_api_leftovers"
+qwen_qwen3.5-plus-02-15,action_server,action_server/task_009_moveit_motion_planning_action,FAILED,5/8,62.50%,5380,"test_class_exists, test_rclcpp_node_exists, test_initialize_creates_server_with_callback"
+qwen_qwen3.5-plus-02-15,action_server,action_server/task_010_pick_place,FAILED,1/6,16.67%,6076,"test_move_group_interface_created, test_ros2_node_and_spinner, test_pick_place_sequence, test_gripper_operations, test_post_place_open_gripper"
+qwen_qwen3.5-plus-02-15,action_server,action_server/task_011_pr2_door,FAILED,2/7,28.57%,2621,"test_door_action_client_created, test_move_base_action_client_created, test_wait_for_server_called, test_subscriber_exists, test_goal_initialization"
+qwen_qwen3.5-plus-02-15,action_server,action_server/task_012_move_arm_cartesian_action,FAILED,4/9,44.44%,11065,"test_ros2_node_initialization, test_move_group_interface_exists, test_path_constraints, test_cartesian_path_computation, test_collision_object_added"
+z-ai_glm-5-turbo,service_client,service_client/task_001_simple_service,SUCCESS,8/8,100.00%,863,None
+z-ai_glm-5-turbo,service_client,service_client/task_002_custom_srv,FAILED,6/7,85.71%,878,test_ros2_server_uses_node_subclass
+z-ai_glm-5-turbo,service_client,service_client/task_003_mp3_db_service,FAILED,2/7,28.57%,1372,"test_ros2_client_uses_node, test_ros2_client_creates_service_client, test_client_populates_request_fields, test_client_accesses_response_list, test_client_uses_response_to_drive_loop"
+z-ai_glm-5-turbo,service_client,service_client/task_005_gazebo,FAILED,5/7,71.43%,1798,"test_response_used_in_return, test_multiple_service_calls_use_response"
+z-ai_glm-5-turbo,service_client,service_client/task_006_gazebo_set_get_state,FAILED,6/8,75.00%,1740,"test_03_retry_wait_for_service_with_shutdown_guard, test_05_full_service_call_chain_success_and_failure_handling"
+z-ai_glm-5-turbo,service_client,service_client/task_007_navigation_make_plan,FAILED,3/4,75.00%,31069,test_03_requestmap_has_mutex_lock_guard
+z-ai_glm-5-turbo,service_client,service_client/task_008_clear_costmaps,FAILED,4/6,66.67%,2170,"test_equivalence_layer_names_semantics_obstacles_static_map, test_equivalence_gates_both_obstacles_and_static_map"
+z-ai_glm-5-turbo,service_client,service_client/task_009_moveit_planning_scene,SUCCESS,4/4,100.00%,3981,None
+z-ai_glm-5-turbo,service_client,service_client/task_010_controller_manager,FAILED,1/5,20.00%,1597,"test_uses_service_clients, test_start_stop_controllers_semantics, test_list_controllers_semantics, test_reload_libraries_semantics"
+z-ai_glm-5-turbo,service_client,service_client/task_011_robot_services,FAILED,3/6,50.00%,1001,"test_target_camera_driver_is_referenced, test_disable_auto_sets_both_flags_false, test_enable_auto_sets_both_flags_true"
+z-ai_glm-5-turbo,parameter_server,parameter_server/task_001_basic_param,FAILED,5/7,71.43%,11719,"test_parameter_event_subscription_is_real, test_getImpl_has_cache_hit_shortcut_and_subscribe_on_miss"
+z-ai_glm-5-turbo,parameter_server,parameter_server/task_002_dynamic_robot_configuration,FAILED,5/6,83.33%,1280,test_type_strictness_casting
+z-ai_glm-5-turbo,parameter_server,parameter_server/task_003_Mobile_robot_control,SUCCESS,7/7,100.00%,16896,None
+z-ai_glm-5-turbo,parameter_server,parameter_server/task_004_turtlrbot3_params,FAILED,7/9,77.78%,6010,"test_physics_logic_preservation, test_value_extraction_style"
+z-ai_glm-5-turbo,parameter_server,parameter_server/task_005_laser_scan_filter_params,FAILED,5/6,83.33%,2347,test_qos_and_topics
+z-ai_glm-5-turbo,parameter_server,parameter_server/task_006_dynamic_param_rqt_reconfigure,SUCCESS,6/6,100.00%,3111,None
+z-ai_glm-5-turbo,parameter_server,parameter_server/task_007_navigation_stack_config,FAILED,5/7,71.43%,24650,"test_min_max_constraint_logic, test_internal_state_sync"
+z-ai_glm-5-turbo,parameter_server,parameter_server/task_008_gazebo_sim_param,FAILED,5/8,62.50%,11810,"test_standard_library_pointer_migration, test_time_source_logic, test_std_function_migration"
+z-ai_glm-5-turbo,parameter_server,parameter_server/task_009_fetch_arm_params,FAILED,3/6,50.00%,27593,"test_ros2_param_declaration, test_logging_migration, test_tip_frame_validation"
+z-ai_glm-5-turbo,parameter_server,parameter_server/task_010_sensor_fusion_params,FAILED,5/6,83.33%,23022,test_ros2_parameter_declaration
+z-ai_glm-5-turbo,parameter_server,parameter_server/task_011_moveit_motion_params,FAILED,2/6,33.33%,4692,"test_ros2_node_lifecycle_setup, test_moveit_cpp_namespace_accuracy, test_async_execution_paradigm, test_planning_scene_availability"
+z-ai_glm-5-turbo,parameter_server,parameter_server/task_012_px4_flight_params,FAILED,6/8,75.00%,2889,"test_parameter_declaration_logic, test_dynamic_message_population_position"
+z-ai_glm-5-turbo,parameter_server,parameter_server/task_013_slam_mapping_params,FAILED,4/7,57.14%,15521,"test_scanner_physical_validation_logic, test_no_fake_nodehandle, test_member_variable_assignment"
+z-ai_glm-5-turbo,publisher_subscriber,publisher_subscriber/task_001_simple_pub_sub,FAILED,1/2,50.00%,843,test_talker_ros2_translation
+z-ai_glm-5-turbo,publisher_subscriber,publisher_subscriber/task_002_custom_msg_basic,SUCCESS,2/2,100.00%,905,None
+z-ai_glm-5-turbo,publisher_subscriber,publisher_subscriber/task_003_image_transport,SUCCESS,3/3,100.00%,855,None
+z-ai_glm-5-turbo,publisher_subscriber,publisher_subscriber/task_004_laser_scan_origin,FAILED,2/3,66.67%,1520,test_lidar_publisher_translation
+z-ai_glm-5-turbo,publisher_subscriber,publisher_subscriber/task_005_ros1_ros2_bridge,SUCCESS,1/1,100.00%,502,None
+z-ai_glm-5-turbo,publisher_subscriber,publisher_subscriber/task_006_multi_topic_synchronization,FAILED,4/7,57.14%,1081,"test_oracle_2_stereo_sync_class, test_oracle_3_message_filters_synchronizer, test_oracle_4_two_image_subscribers"
+z-ai_glm-5-turbo,publisher_subscriber,publisher_subscriber/task_007_latched_publisher,FAILED,2/3,66.67%,576,test_latched_behavior_for_new_subscriber
+z-ai_glm-5-turbo,publisher_subscriber,publisher_subscriber/task_009_nodelet_pubsub,FAILED,7/9,77.78%,673,"test_uses_ros2_headers_not_ros1, test_namespace_semantics_preserved"
+z-ai_glm-5-turbo,publisher_subscriber,publisher_subscriber/task_010_husky_stress_test,TRANSLATION_FAILED,0/0,0.00%,0,None
+z-ai_glm-5-turbo,action_server,action_server/task_001_base_case,FAILED,6/9,66.67%,981,"test_node_creation, test_execute_callback_exists, test_progress_loop_present"
+z-ai_glm-5-turbo,action_server,action_server/task_002_turtlebot3_patrol_action,FAILED,4/7,57.14%,2780,"test_node_creation, test_action_server_creation, test_execute_callback_contains_patrol_logic"
+z-ai_glm-5-turbo,action_server,action_server/task_003_pr2_gripper_action_server,FAILED,7/9,77.78%,5409,"test_action_type_present, test_goalCB_exists"
+z-ai_glm-5-turbo,action_server,action_server/task_004_turtle_bot_3,FAILED,7/12,58.33%,886,"test_execute_callback_signature, test_execute_callback_no_return, test_feedback_published_iteratively, test_feedback_progress_updated, test_result_set_before_goal_termination"
+z-ai_glm-5-turbo,action_server,action_server/task_005_robot_voice_action,FAILED,4/7,57.14%,3012,"test_control_logic_inside_timer_callback, test_ros_time_semantics_preserved, test_px4_qos_semantics_explicit"
+z-ai_glm-5-turbo,action_server,action_server/task_006_amcl_navigation,FAILED,3/10,30.00%,29373,"test_action_server_creation, test_handle_goal_defined, test_handle_cancel_defined, test_handle_accepted_defined, test_todo_comment_present, test_thread_usage_for_async, test_feedback_or_result_mentioned"
+z-ai_glm-5-turbo,action_server,action_server/task_007_move_base_navigation_action,FAILED,7/9,77.78%,21305,"test_mutex_translation, test_plan_swap_under_lock"
+z-ai_glm-5-turbo,action_server,action_server/task_008_follow_joint_trajectory_action,FAILED,5/9,55.56%,13655,"test_class_exists, test_odom_lock_usage, test_warns_on_pose_fail, test_no_ros1_api_leftovers"
+z-ai_glm-5-turbo,action_server,action_server/task_009_moveit_motion_planning_action,FAILED,4/8,50.00%,4582,"test_class_exists, test_action_server_usage, test_rclcpp_node_exists, test_initialize_creates_server_with_callback"
+z-ai_glm-5-turbo,action_server,action_server/task_010_pick_place,FAILED,2/6,33.33%,5794,"test_move_group_interface_created, test_ros2_node_and_spinner, test_gripper_operations, test_post_place_open_gripper"
+z-ai_glm-5-turbo,action_server,action_server/task_011_pr2_door,FAILED,2/7,28.57%,2245,"test_door_action_client_created, test_move_base_action_client_created, test_wait_for_server_called, test_subscriber_exists, test_goal_initialization"
+z-ai_glm-5-turbo,action_server,action_server/task_012_move_arm_cartesian_action,FAILED,4/9,44.44%,10384,"test_ros2_node_initialization, test_move_group_interface_exists, test_path_constraints, test_cartesian_path_computation, test_collision_object_added"
+anthropic_claude-opus-4.6,service_client,service_client/task_001_simple_service,FAILED,7/8,87.50%,1095,test_client_uses_rclpy_and_node
+anthropic_claude-opus-4.6,service_client,service_client/task_002_custom_srv,FAILED,5/7,71.43%,1130,"test_ros2_server_uses_node_subclass, test_server_defines_handler_and_accesses_request"
+anthropic_claude-opus-4.6,service_client,service_client/task_003_mp3_db_service,FAILED,3/7,42.86%,1885,"test_ros2_client_uses_node, test_ros2_client_creates_service_client, test_client_accesses_response_list, test_client_uses_response_to_drive_loop"
+anthropic_claude-opus-4.6,service_client,service_client/task_005_gazebo,FAILED,4/7,57.14%,2233,"test_return_depends_on_service_response, test_response_used_in_return, test_multiple_service_calls_use_response"
+anthropic_claude-opus-4.6,service_client,service_client/task_006_gazebo_set_get_state,FAILED,5/8,62.50%,2293,"test_02_service_client_type_and_name, test_05_full_service_call_chain_success_and_failure_handling, test_06_task_specific_subscriptions_combined"
+anthropic_claude-opus-4.6,service_client,service_client/task_007_navigation_make_plan,FAILED,3/4,75.00%,38144,test_03_requestmap_has_mutex_lock_guard
+anthropic_claude-opus-4.6,service_client,service_client/task_008_clear_costmaps,SUCCESS,6/6,100.00%,3509,None
+anthropic_claude-opus-4.6,service_client,service_client/task_009_moveit_planning_scene,SUCCESS,4/4,100.00%,5490,None
+anthropic_claude-opus-4.6,service_client,service_client/task_010_controller_manager,FAILED,2/5,40.00%,2162,"test_start_stop_controllers_semantics, test_list_controllers_semantics, test_reload_libraries_semantics"
+anthropic_claude-opus-4.6,service_client,service_client/task_011_robot_services,FAILED,2/6,33.33%,1692,"test_target_camera_driver_is_referenced, test_init_sets_up_configuration_interface, test_disable_auto_sets_both_flags_false, test_enable_auto_sets_both_flags_true"
+anthropic_claude-opus-4.6,parameter_server,parameter_server/task_001_basic_param,FAILED,6/7,85.71%,14643,test_parameter_event_subscription_is_real
+anthropic_claude-opus-4.6,parameter_server,parameter_server/task_002_dynamic_robot_configuration,FAILED,5/6,83.33%,1731,test_type_strictness_casting
+anthropic_claude-opus-4.6,parameter_server,parameter_server/task_003_Mobile_robot_control,SUCCESS,7/7,100.00%,23011,None
+anthropic_claude-opus-4.6,parameter_server,parameter_server/task_004_turtlrbot3_params,FAILED,8/9,88.89%,8088,test_value_extraction_style
+anthropic_claude-opus-4.6,parameter_server,parameter_server/task_005_laser_scan_filter_params,SUCCESS,6/6,100.00%,3174,None
+anthropic_claude-opus-4.6,parameter_server,parameter_server/task_006_dynamic_param_rqt_reconfigure,SUCCESS,6/6,100.00%,4069,None
+anthropic_claude-opus-4.6,parameter_server,parameter_server/task_007_navigation_stack_config,FAILED,6/7,85.71%,35853,test_min_max_constraint_logic
+anthropic_claude-opus-4.6,parameter_server,parameter_server/task_008_gazebo_sim_param,FAILED,6/8,75.00%,15283,"test_standard_library_pointer_migration, test_time_source_logic"
+anthropic_claude-opus-4.6,parameter_server,parameter_server/task_009_fetch_arm_params,FAILED,3/6,50.00%,35897,"test_ros2_param_declaration, test_snake_case_naming, test_logging_migration"
+anthropic_claude-opus-4.6,parameter_server,parameter_server/task_010_sensor_fusion_params,FAILED,4/6,66.67%,34226,"test_ros2_parameter_declaration, test_sensor_config_logic"
+anthropic_claude-opus-4.6,parameter_server,parameter_server/task_011_moveit_motion_params,FAILED,5/6,83.33%,6249,test_ros2_node_lifecycle_setup
+anthropic_claude-opus-4.6,parameter_server,parameter_server/task_012_px4_flight_params,FAILED,7/8,87.50%,3782,test_dynamic_message_population_position
+anthropic_claude-opus-4.6,parameter_server,parameter_server/task_013_slam_mapping_params,FAILED,4/7,57.14%,18492,"test_scanner_physical_validation_logic, test_explicit_type_casting, test_member_variable_assignment"
+anthropic_claude-opus-4.6,publisher_subscriber,publisher_subscriber/task_001_simple_pub_sub,FAILED,1/2,50.00%,974,test_talker_ros2_translation
+anthropic_claude-opus-4.6,publisher_subscriber,publisher_subscriber/task_002_custom_msg_basic,FAILED,1/2,50.00%,1172,test_publisher_custom_msg_translation
+anthropic_claude-opus-4.6,publisher_subscriber,publisher_subscriber/task_003_image_transport,SUCCESS,3/3,100.00%,1343,None
+anthropic_claude-opus-4.6,publisher_subscriber,publisher_subscriber/task_004_laser_scan_origin,FAILED,2/3,66.67%,1545,test_lidar_publisher_translation
+anthropic_claude-opus-4.6,publisher_subscriber,publisher_subscriber/task_005_ros1_ros2_bridge,SUCCESS,1/1,100.00%,629,None
+anthropic_claude-opus-4.6,publisher_subscriber,publisher_subscriber/task_006_multi_topic_synchronization,FAILED,5/7,71.43%,1321,"test_oracle_2_stereo_sync_class, test_oracle_4_two_image_subscribers"
+anthropic_claude-opus-4.6,publisher_subscriber,publisher_subscriber/task_007_latched_publisher,FAILED,2/3,66.67%,865,test_latched_behavior_for_new_subscriber
+anthropic_claude-opus-4.6,publisher_subscriber,publisher_subscriber/task_009_nodelet_pubsub,FAILED,8/9,88.89%,844,test_namespace_semantics_preserved
+anthropic_claude-opus-4.6,publisher_subscriber,publisher_subscriber/task_010_husky_stress_test,TRANSLATION_FAILED,0/0,0.00%,0,None
+anthropic_claude-opus-4.6,action_server,action_server/task_001_base_case,FAILED,6/9,66.67%,1253,"test_node_creation, test_execute_callback_exists, test_progress_loop_present"
+anthropic_claude-opus-4.6,action_server,action_server/task_002_turtlebot3_patrol_action,FAILED,4/7,57.14%,3754,"test_node_creation, test_action_server_creation, test_execute_callback_contains_patrol_logic"
+anthropic_claude-opus-4.6,action_server,action_server/task_003_pr2_gripper_action_server,FAILED,7/9,77.78%,7107,"test_action_type_present, test_goalCB_exists"
+anthropic_claude-opus-4.6,action_server,action_server/task_004_turtle_bot_3,FAILED,7/12,58.33%,1007,"test_execute_callback_signature, test_execute_callback_no_return, test_feedback_published_iteratively, test_feedback_progress_updated, test_result_set_before_goal_termination"
+anthropic_claude-opus-4.6,action_server,action_server/task_005_robot_voice_action,FAILED,4/7,57.14%,4096,"test_control_logic_inside_timer_callback, test_ros_time_semantics_preserved, test_px4_qos_semantics_explicit"
+anthropic_claude-opus-4.6,action_server,action_server/task_006_amcl_navigation,FAILED,3/10,30.00%,36656,"test_action_server_creation, test_handle_goal_defined, test_handle_cancel_defined, test_handle_accepted_defined, test_todo_comment_present, test_thread_usage_for_async, test_feedback_or_result_mentioned"
+anthropic_claude-opus-4.6,action_server,action_server/task_007_move_base_navigation_action,FAILED,5/9,55.56%,27949,"test_mutex_translation, test_feedback_publishing_exists, test_plan_swap_under_lock, test_action_server_success_abort_calls"
+anthropic_claude-opus-4.6,action_server,action_server/task_008_follow_joint_trajectory_action,FAILED,6/9,66.67%,17677,"test_class_exists, test_warns_on_pose_fail, test_no_ros1_api_leftovers"
+anthropic_claude-opus-4.6,action_server,action_server/task_009_moveit_motion_planning_action,FAILED,5/8,62.50%,6436,"test_class_exists, test_rclcpp_node_exists, test_initialize_creates_server_with_callback"
+anthropic_claude-opus-4.6,action_server,action_server/task_010_pick_place,FAILED,2/6,33.33%,6932,"test_move_group_interface_created, test_ros2_node_and_spinner, test_gripper_operations, test_post_place_open_gripper"
+anthropic_claude-opus-4.6,action_server,action_server/task_011_pr2_door,FAILED,3/7,42.86%,2920,"test_door_action_client_created, test_move_base_action_client_created, test_wait_for_server_called, test_subscriber_exists"
+anthropic_claude-opus-4.6,action_server,action_server/task_012_move_arm_cartesian_action,FAILED,4/9,44.44%,13119,"test_ros2_node_initialization, test_move_group_interface_exists, test_path_constraints, test_cartesian_path_computation, test_collision_object_added"
+deepseek_deepseek-v4-pro,service_client,service_client/task_001_simple_service,FAILED,7/8,87.50%,990,test_client_uses_rclpy_and_node
+deepseek_deepseek-v4-pro,service_client,service_client/task_002_custom_srv,FAILED,6/7,85.71%,1053,test_server_defines_handler_and_accesses_request
+deepseek_deepseek-v4-pro,service_client,service_client/task_003_mp3_db_service,FAILED,3/7,42.86%,1934,"test_ros2_client_creates_service_client, test_client_populates_request_fields, test_client_accesses_response_list, test_client_uses_response_to_drive_loop"
+deepseek_deepseek-v4-pro,service_client,service_client/task_005_gazebo,FAILED,4/7,57.14%,1963,"test_return_depends_on_service_response, test_response_used_in_return, test_multiple_service_calls_use_response"
+deepseek_deepseek-v4-pro,service_client,service_client/task_006_gazebo_set_get_state,FAILED,6/8,75.00%,1786,"test_03_retry_wait_for_service_with_shutdown_guard, test_05_full_service_call_chain_success_and_failure_handling"
+deepseek_deepseek-v4-pro,service_client,service_client/task_007_navigation_make_plan,FAILED,3/4,75.00%,36532,test_03_requestmap_has_mutex_lock_guard
+deepseek_deepseek-v4-pro,service_client,service_client/task_008_clear_costmaps,FAILED,3/6,50.00%,2293,"test_equivalence_reset_distance_is_expressed, test_equivalence_layer_names_semantics_obstacles_static_map, test_equivalence_gates_both_obstacles_and_static_map"
+deepseek_deepseek-v4-pro,service_client,service_client/task_009_moveit_planning_scene,SUCCESS,4/4,100.00%,4628,None
+deepseek_deepseek-v4-pro,service_client,service_client/task_010_controller_manager,FAILED,2/5,40.00%,2350,"test_start_stop_controllers_semantics, test_list_controllers_semantics, test_reload_libraries_semantics"
+deepseek_deepseek-v4-pro,service_client,service_client/task_011_robot_services,FAILED,4/6,66.67%,1262,"test_target_camera_driver_is_referenced, test_init_sets_up_configuration_interface"
+deepseek_deepseek-v4-pro,parameter_server,parameter_server/task_001_basic_param,FAILED,5/7,71.43%,11996,"test_parameter_event_subscription_is_real, test_update_is_gated_by_subscribed_set_and_mutates_cache"
+deepseek_deepseek-v4-pro,parameter_server,parameter_server/task_002_dynamic_robot_configuration,FAILED,4/6,66.67%,1477,"test_default_value_integrity, test_type_strictness_casting"
+deepseek_deepseek-v4-pro,parameter_server,parameter_server/task_003_Mobile_robot_control,FAILED,6/7,85.71%,18920,test_cmd_vel_timeout_assignment
+deepseek_deepseek-v4-pro,parameter_server,parameter_server/task_004_turtlrbot3_params,FAILED,8/9,88.89%,6914,test_physics_logic_preservation
+deepseek_deepseek-v4-pro,parameter_server,parameter_server/task_005_laser_scan_filter_params,FAILED,5/6,83.33%,2754,test_tf_filter_binding
+deepseek_deepseek-v4-pro,parameter_server,parameter_server/task_006_dynamic_param_rqt_reconfigure,SUCCESS,6/6,100.00%,3421,None
+deepseek_deepseek-v4-pro,parameter_server,parameter_server/task_007_navigation_stack_config,FAILED,4/7,57.14%,28421,"test_min_max_constraint_logic, test_internal_state_sync, test_no_legacy_artifacts"
+deepseek_deepseek-v4-pro,parameter_server,parameter_server/task_008_gazebo_sim_param,FAILED,5/8,62.50%,13003,"test_multicamera_suffix_preservation, test_standard_library_pointer_migration, test_time_source_logic"
+deepseek_deepseek-v4-pro,parameter_server,parameter_server/task_009_fetch_arm_params,FAILED,4/6,66.67%,29376,"test_ros2_param_declaration, test_logging_migration"
+deepseek_deepseek-v4-pro,parameter_server,parameter_server/task_010_sensor_fusion_params,FAILED,5/6,83.33%,22836,test_ros2_parameter_declaration
+deepseek_deepseek-v4-pro,parameter_server,parameter_server/task_011_moveit_motion_params,FAILED,4/6,66.67%,5312,"test_ros2_node_lifecycle_setup, test_moveit_cpp_namespace_accuracy"
+deepseek_deepseek-v4-pro,parameter_server,parameter_server/task_012_px4_flight_params,FAILED,5/8,62.50%,3155,"test_parameter_declaration_logic, test_dynamic_message_population_yaw, test_dynamic_message_population_position"
+deepseek_deepseek-v4-pro,parameter_server,parameter_server/task_013_slam_mapping_params,FAILED,5/7,71.43%,18039,"test_no_fake_nodehandle, test_member_variable_assignment"
+deepseek_deepseek-v4-pro,publisher_subscriber,publisher_subscriber/task_001_simple_pub_sub,FAILED,1/2,50.00%,901,test_listener_ros2_translation
+deepseek_deepseek-v4-pro,publisher_subscriber,publisher_subscriber/task_002_custom_msg_basic,SUCCESS,2/2,100.00%,1087,None
+deepseek_deepseek-v4-pro,publisher_subscriber,publisher_subscriber/task_003_image_transport,SUCCESS,3/3,100.00%,1205,None
+deepseek_deepseek-v4-pro,publisher_subscriber,publisher_subscriber/task_004_laser_scan_origin,FAILED,1/3,33.33%,1429,"test_lidar_publisher_translation, test_lidar_subscriber_translation"
+deepseek_deepseek-v4-pro,publisher_subscriber,publisher_subscriber/task_005_ros1_ros2_bridge,FAILED,0/1,0.00%,574,test_talker_translation
+deepseek_deepseek-v4-pro,publisher_subscriber,publisher_subscriber/task_006_multi_topic_synchronization,FAILED,5/7,71.43%,1147,"test_oracle_2_stereo_sync_class, test_oracle_4_two_image_subscribers"
+deepseek_deepseek-v4-pro,publisher_subscriber,publisher_subscriber/task_007_latched_publisher,FAILED,2/3,66.67%,659,test_latched_behavior_for_new_subscriber
+deepseek_deepseek-v4-pro,publisher_subscriber,publisher_subscriber/task_009_nodelet_pubsub,FAILED,8/9,88.89%,715,test_namespace_semantics_preserved
+deepseek_deepseek-v4-pro,publisher_subscriber,publisher_subscriber/task_010_husky_stress_test,FAILED,0/7,0.00%,2400,"test_translated_files_exist, test_no_ros1_artifacts_in_launch, test_robot_description_defined, test_robot_description_consumed_in_launch, test_imu_interface_present, test_gps_interface_present, test_sensor_update_rate_semantics"
+deepseek_deepseek-v4-pro,action_server,action_server/task_001_base_case,FAILED,7/9,77.78%,1045,"test_node_creation, test_execute_callback_exists"
+deepseek_deepseek-v4-pro,action_server,action_server/task_002_turtlebot3_patrol_action,FAILED,4/7,57.14%,3105,"test_node_creation, test_action_server_creation, test_execute_callback_contains_patrol_logic"
+deepseek_deepseek-v4-pro,action_server,action_server/task_003_pr2_gripper_action_server,FAILED,7/9,77.78%,5575,"test_action_type_present, test_goalCB_exists"
+deepseek_deepseek-v4-pro,action_server,action_server/task_004_turtle_bot_3,FAILED,7/12,58.33%,1088,"test_execute_callback_signature, test_execute_callback_no_return, test_feedback_published_iteratively, test_feedback_progress_updated, test_result_set_before_goal_termination"
+deepseek_deepseek-v4-pro,action_server,action_server/task_005_robot_voice_action,FAILED,4/7,57.14%,3528,"test_control_logic_inside_timer_callback, test_ros_time_semantics_preserved, test_px4_qos_semantics_explicit"
+deepseek_deepseek-v4-pro,action_server,action_server/task_006_amcl_navigation,FAILED,3/10,30.00%,32877,"test_action_server_creation, test_handle_goal_defined, test_handle_cancel_defined, test_handle_accepted_defined, test_todo_comment_present, test_thread_usage_for_async, test_feedback_or_result_mentioned"
+deepseek_deepseek-v4-pro,action_server,action_server/task_007_move_base_navigation_action,FAILED,6/9,66.67%,23977,"test_mutex_translation, test_plan_swap_under_lock, test_ros2_logging"
+deepseek_deepseek-v4-pro,action_server,action_server/task_008_follow_joint_trajectory_action,FAILED,4/9,44.44%,15336,"test_class_exists, test_odom_lock_usage, test_tc_check_trajectory_args, test_warns_on_pose_fail, test_no_ros1_api_leftovers"
+deepseek_deepseek-v4-pro,action_server,action_server/task_009_moveit_motion_planning_action,FAILED,4/8,50.00%,5220,"test_class_exists, test_rclcpp_node_exists, test_initialize_creates_server_with_callback, test_setMoveState_publishes_feedback_with_state"
+deepseek_deepseek-v4-pro,action_server,action_server/task_010_pick_place,FAILED,2/6,33.33%,6605,"test_move_group_interface_created, test_ros2_node_and_spinner, test_gripper_operations, test_post_place_open_gripper"
+deepseek_deepseek-v4-pro,action_server,action_server/task_011_pr2_door,FAILED,2/7,28.57%,2802,"test_door_action_client_created, test_move_base_action_client_created, test_wait_for_server_called, test_subscriber_exists, test_goal_initialization"
+deepseek_deepseek-v4-pro,action_server,action_server/task_012_move_arm_cartesian_action,FAILED,4/9,44.44%,11389,"test_ros2_node_initialization, test_move_group_interface_exists, test_path_constraints, test_cartesian_path_computation, test_collision_object_added"

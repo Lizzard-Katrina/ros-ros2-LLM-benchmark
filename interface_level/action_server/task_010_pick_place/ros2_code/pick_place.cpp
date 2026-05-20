@@ -34,26 +34,15 @@
 
 /* Author: Ioan Sucan, Ridhwan Luthra*/
 
-// ROS2
+// ROS
 #include <rclcpp/rclcpp.hpp>
 
 // MoveIt
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
 
-// Messages
-#include <moveit_msgs/msg/collision_object.hpp>
-#include <moveit_msgs/msg/grasp.hpp>
-#include <moveit_msgs/msg/place_location.hpp>
-#include <shape_msgs/msg/solid_primitive.hpp>
-#include <trajectory_msgs/msg/joint_trajectory.hpp>
-
 // TF2
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#include <tf2/LinearMath/Quaternion.h>
-
-#include <thread>
-#include <chrono>
 
 // The circle constant tau = 2*pi. One tau is one rotation in radians.
 const double tau = 2 * M_PI;
@@ -71,7 +60,8 @@ void openGripper(trajectory_msgs::msg::JointTrajectory& posture)
   posture.points[0].positions.resize(2);
   posture.points[0].positions[0] = 0.04;
   posture.points[0].positions[1] = 0.04;
-  posture.points[0].time_from_start = rclcpp::Duration::from_seconds(0.5).to_msg();
+  posture.points[0].time_from_start.sec = 0;
+  posture.points[0].time_from_start.nanosec = 500000000;
   // END_SUB_TUTORIAL
 }
 
@@ -88,29 +78,17 @@ void closedGripper(trajectory_msgs::msg::JointTrajectory& posture)
   posture.points[0].positions.resize(2);
   posture.points[0].positions[0] = 0.00;
   posture.points[0].positions[1] = 0.00;
-  posture.points[0].time_from_start = rclcpp::Duration::from_seconds(0.5).to_msg();
+  posture.points[0].time_from_start.sec = 0;
+  posture.points[0].time_from_start.nanosec = 500000000;
   // END_SUB_TUTORIAL
 }
 
-
-//TODO
-// - Initialize MoveGroupInterface in ROS2
-// - Add collision objects to the planning scene
-// - Implement the pick sequence:
-//      * Set pre-grasp approach
-//      *gripper
-//      * grasp
-//      * Apply post-grasp retreat
-// - Implement the place sequence:
-//      * Set pre-place approach
-//      * place location
-//      * Open gripper to release
-//      * Apply post-place retreat
 void pick(moveit::planning_interface::MoveGroupInterface& move_group)
 {
   std::vector<moveit_msgs::msg::Grasp> grasps;
   grasps.resize(1);
 
+  // Grasp pose
   grasps[0].grasp_pose.header.frame_id = "panda_link0";
   tf2::Quaternion orientation;
   orientation.setRPY(-tau / 4, -tau / 8, -tau / 4);
@@ -119,21 +97,22 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group)
   grasps[0].grasp_pose.pose.position.y = 0.0;
   grasps[0].grasp_pose.pose.position.z = 0.5;
 
+  // Pre-grasp approach
   grasps[0].pre_grasp_approach.direction.header.frame_id = "panda_link0";
   grasps[0].pre_grasp_approach.direction.vector.x = 1.0;
   grasps[0].pre_grasp_approach.min_distance = 0.095;
   grasps[0].pre_grasp_approach.desired_distance = 0.115;
 
+  // Post-grasp retreat
   grasps[0].post_grasp_retreat.direction.header.frame_id = "panda_link0";
   grasps[0].post_grasp_retreat.direction.vector.z = 1.0;
   grasps[0].post_grasp_retreat.min_distance = 0.1;
   grasps[0].post_grasp_retreat.desired_distance = 0.25;
 
+  // Gripper postures
   openGripper(grasps[0].pre_grasp_posture);
   closedGripper(grasps[0].grasp_posture);
 
-  grasps[0].allowed_touch_objects.push_back("object");
-  move_group.setSupportSurfaceName("table1");
   move_group.pick("object", grasps);
 }
 
@@ -142,6 +121,7 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
   std::vector<moveit_msgs::msg::PlaceLocation> place_location;
   place_location.resize(1);
 
+  // Place pose
   place_location[0].place_pose.header.frame_id = "panda_link0";
   tf2::Quaternion orientation;
   orientation.setRPY(0, 0, tau / 4);
@@ -150,22 +130,24 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
   place_location[0].place_pose.pose.position.y = 0.5;
   place_location[0].place_pose.pose.position.z = 0.5;
 
+  // Pre-place approach
   place_location[0].pre_place_approach.direction.header.frame_id = "panda_link0";
   place_location[0].pre_place_approach.direction.vector.z = -1.0;
   place_location[0].pre_place_approach.min_distance = 0.095;
   place_location[0].pre_place_approach.desired_distance = 0.115;
 
+  // Post-place retreat
   place_location[0].post_place_retreat.direction.header.frame_id = "panda_link0";
   place_location[0].post_place_retreat.direction.vector.y = -1.0;
   place_location[0].post_place_retreat.min_distance = 0.1;
   place_location[0].post_place_retreat.desired_distance = 0.25;
 
+  // Gripper posture
   openGripper(place_location[0].post_place_posture);
 
-  group.setSupportSurfaceName("table2");
   group.place("object", place_location);
 }
-//END OF TODO
+
 void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& planning_scene_interface)
 {
   // BEGIN_SUB_TUTORIAL table1
@@ -250,15 +232,15 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
+  rclcpp::NodeOptions node_options;
+  node_options.automatically_declare_parameters_from_overrides(true);
+  auto node = rclcpp::Node::make_shared("panda_arm_pick_place", node_options);
 
-  auto node = std::make_shared<rclcpp::Node>("panda_arm_pick_place");
   rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
-  std::thread spinner([&executor]() { executor.spin(); });
+  std::thread spinner = std::thread([&executor]() { executor.spin(); });
 
-  using namespace std::chrono_literals;
-
-  rclcpp::sleep_for(1s);
+  rclcpp::sleep_for(std::chrono::seconds(1));
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
   moveit::planning_interface::MoveGroupInterface group(node, "panda_arm");
   group.setPlanningTime(45.0);
@@ -266,17 +248,16 @@ int main(int argc, char** argv)
   addCollisionObjects(planning_scene_interface);
 
   // Wait a bit for ROS things to initialize
-  rclcpp::sleep_for(1s);
+  rclcpp::sleep_for(std::chrono::seconds(1));
 
   pick(group);
 
-  rclcpp::sleep_for(1s);
+  rclcpp::sleep_for(std::chrono::seconds(1));
 
   place(group);
 
   rclcpp::shutdown();
-  if (spinner.joinable())
-    spinner.join();
+  spinner.join();
   return 0;
 }
 

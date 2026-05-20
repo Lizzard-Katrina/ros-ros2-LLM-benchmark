@@ -139,72 +139,52 @@ void PointCloudXyzrgbRadialNode::imageCb(
   }
 
   // Update camera model
-  auto info_to_use = std::make_shared<CameraInfo>(*info_msg);
-  cv_bridge::CvImagePtr rgb_msg = cv_bridge::toCvCopy(rgb_msg_in, rgb_msg_in->encoding);
+  model_.fromCameraInfo(info_msg);
 
-  if (depth_msg->width != rgb_msg_in->width || depth_msg->height != rgb_msg_in->height) {
-    const double ratio = static_cast<double>(depth_msg->width) / static_cast<double>(rgb_msg_in->width);
-    info_to_use->k[0] *= ratio;
-    info_to_use->k[2] *= ratio;
-    info_to_use->k[4] *= ratio;
-    info_to_use->k[5] *= ratio;
+  // Check if the input image has to be resized
+  Image::ConstSharedPtr rgb_msg = rgb_msg_in;
+  if (depth_msg->width != rgb_msg->width || depth_msg->height != rgb_msg->height) {
+    CameraInfo info_msg_tmp = *info_msg;
+    info_msg_tmp.width = depth_msg->width;
+    info_msg_tmp.height = depth_msg->height;
+    float ratio = static_cast<float>(depth_msg->width) / static_cast<float>(rgb_msg->width);
+    info_msg_tmp.k[0] *= ratio;
+    info_msg_tmp.k[2] *= ratio;
+    info_msg_tmp.k[4] *= ratio;
+    info_msg_tmp.k[5] *= ratio;
+    info_msg_tmp.p[0] *= ratio;
+    info_msg_tmp.p[2] *= ratio;
+    info_msg_tmp.p[5] *= ratio;
+    info_msg_tmp.p[6] *= ratio;
+    model_.fromCameraInfo(info_msg_tmp);
+
+    cv_bridge::CvImageConstPtr cv_ptr;
+    try {
+      cv_ptr = cv_bridge::toCvShare(rgb_msg, rgb_msg->encoding);
+    } catch (cv_bridge::Exception & e) {
+      RCLCPP_ERROR(get_logger(), "cv_bridge exception: %s", e.what());
+      return;
+    }
+    cv_bridge::CvImage cv_rsz;
+    cv_rsz.header = cv_ptr->header;
+    cv_rsz.encoding = cv_ptr->encoding;
     cv::resize(
-      rgb_msg->image, rgb_msg->image,
-      cv::Size(static_cast<int>(depth_msg->width), static_cast<int>(depth_msg->height)),
-      0.0, 0.0, cv::INTER_LINEAR);
-  }
-
-  model_.fromCameraInfo(info_to_use);
-
-  static bool have_cached_info = false;
-  static CameraInfo cached_info;
-  static uint32_t cached_width = 0;
-  static uint32_t cached_height = 0;
-
-  const bool camera_info_changed =
-    !have_cached_info ||
-    (cached_info.k != info_to_use->k) ||
-    (cached_info.d != info_to_use->d) ||
-    (cached_info.r != info_to_use->r) ||
-    (cached_info.p != info_to_use->p) ||
-    (cached_width != depth_msg->width) ||
-    (cached_height != depth_msg->height);
-
-  if (camera_info_changed) {
-    initMatrix(model_, depth_msg->width, depth_msg->height, transform_);
-    cached_info = *info_to_use;
-    cached_width = depth_msg->width;
-    cached_height = depth_msg->height;
-    have_cached_info = true;
-  }
-
-  auto cloud_msg = std::make_unique<PointCloud2>();
-  cloud_msg->header.stamp = depth_msg->header.stamp;
-  cloud_msg->header.frame_id = depth_msg->header.frame_id;
-  cloud_msg->height = depth_msg->height;
-  cloud_msg->width = depth_msg->width;
-  cloud_msg->is_dense = false;
-
-  sensor_msgs::PointCloud2Modifier modifier(*cloud_msg);
-  modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
-  modifier.resize(static_cast<size_t>(cloud_msg->width) * static_cast<size_t>(cloud_msg->height));
-
-  if (depth_msg->encoding == sensor_msgs::image_encodings::TYPE_16UC1) {
-    convertDepthRadial<uint16_t>(depth_msg, *cloud_msg, transform_);
-  } else if (depth_msg->encoding == sensor_msgs::image_encodings::TYPE_32FC1) {
-    convertDepthRadial<float>(depth_msg, *cloud_msg, transform_);
+      cv_ptr->image.rowRange(0, depth_msg->height / ratio), cv_rsz.image,
+      cv::Size(depth_msg->width, depth_msg->height));
+    if ((rgb_msg->encoding == sensor_msgs::image_encodings::RGB8) ||
+      (rgb_msg->encoding == sensor_msgs::image_encodings::BGR8) ||
+      (rgb_msg->encoding == sensor_msgs::image_encodings::MONO8))
+    {
+      rgb_msg = cv_rsz.toImageMsg();
+    } else {
+      rgb_msg = cv_bridge::toCvCopy(cv_rsz.toImageMsg(), sensor_msgs::image_encodings::RGB8)->toImageMsg();
+    }
   } else {
-    RCLCPP_ERROR(
-      get_logger(),
-      "Depth image has unsupported encoding [%s]", depth_msg->encoding.c_str());
-    return;
+    rgb_msg = rgb_msg_in;
   }
 
-  int red_offset = 0;
-  int green_offset = 0;
-  int blue_offset = 0;
-  int color_step = 0;
-
+  // Supported color encodings: RGB8, BGR8, MONO8
+  int red_offset, green_offset, blue_offset, color_step;
   if (rgb_msg->encoding == sensor_msgs::image_encodings::RGB8) {
     red_offset = 0;
     green_offset = 1;
@@ -215,56 +195,46 @@ void PointCloudXyzrgbRadialNode::imageCb(
     green_offset = 1;
     blue_offset = 0;
     color_step = 3;
-  } else if (rgb_msg->encoding == sensor_msgs::image_encodings::RGBA8) {
-    red_offset = 0;
-    green_offset = 1;
-    blue_offset = 2;
-    color_step = 4;
-  } else if (rgb_msg->encoding == sensor_msgs::image_encodings::BGRA8) {
-    red_offset = 2;
-    green_offset = 1;
-    blue_offset = 0;
-    color_step = 4;
   } else if (rgb_msg->encoding == sensor_msgs::image_encodings::MONO8) {
     red_offset = 0;
     green_offset = 0;
     blue_offset = 0;
     color_step = 1;
   } else {
-    RCLCPP_ERROR(
-      get_logger(),
-      "RGB image has unsupported encoding [%s]", rgb_msg->encoding.c_str());
-    return;
-  }
-
-  const int r_field = sensor_msgs::getPointCloud2FieldIndex(*cloud_msg, "r");
-  const int g_field = sensor_msgs::getPointCloud2FieldIndex(*cloud_msg, "g");
-  const int b_field = sensor_msgs::getPointCloud2FieldIndex(*cloud_msg, "b");
-
-  if (r_field == -1 || g_field == -1 || b_field == -1) {
-    RCLCPP_ERROR(get_logger(), "PointCloud2 RGB fields are missing");
-    return;
-  }
-
-  const size_t r_offset = cloud_msg->fields[static_cast<size_t>(r_field)].offset;
-  const size_t g_offset = cloud_msg->fields[static_cast<size_t>(g_field)].offset;
-  const size_t b_offset = cloud_msg->fields[static_cast<size_t>(b_field)].offset;
-
-  const uint32_t width = cloud_msg->width;
-  const uint32_t height = cloud_msg->height;
-  const size_t point_step = cloud_msg->point_step;
-
-  for (uint32_t v = 0; v < height; ++v) {
-    const uint8_t * rgb_row = &rgb_msg->image.data[static_cast<size_t>(v) * rgb_msg->image.step];
-    for (uint32_t u = 0; u < width; ++u) {
-      const size_t idx = static_cast<size_t>(v) * width + u;
-      uint8_t * point = &cloud_msg->data[idx * point_step];
-      const uint8_t * color = rgb_row + static_cast<size_t>(u) * static_cast<size_t>(color_step);
-
-      point[r_offset] = color[red_offset];
-      point[g_offset] = color[green_offset];
-      point[b_offset] = color[blue_offset];
+    try {
+      rgb_msg = cv_bridge::toCvCopy(rgb_msg, sensor_msgs::image_encodings::RGB8)->toImageMsg();
+    } catch (cv_bridge::Exception & e) {
+      RCLCPP_ERROR(get_logger(), "Unsupported encoding [%s]: %s", rgb_msg->encoding.c_str(), e.what());
+      return;
     }
+    red_offset = 0;
+    green_offset = 1;
+    blue_offset = 2;
+    color_step = 3;
+  }
+
+  auto cloud_msg = std::make_unique<PointCloud2>();
+  cloud_msg->header = depth_msg->header;
+  cloud_msg->height = depth_msg->height;
+  cloud_msg->width = depth_msg->width;
+  cloud_msg->is_dense = false;
+  cloud_msg->is_bigendian = false;
+
+  sensor_msgs::PointCloud2Modifier pcd_modifier(*cloud_msg);
+  pcd_modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
+
+  if (info_msg != info_msg_ || transform_.empty()) {
+    info_msg_ = info_msg;
+    transform_ = depth_image_proc::initMatrix(cv::Mat_<double>(3, 3, const_cast<double *>(&model_.fullIntrinsicMatrix()(0, 0))), cv::Mat(model_.distortionCoeffs()), depth_msg->width, depth_msg->height, true);
+  }
+
+  if (depth_msg->encoding == sensor_msgs::image_encodings::TYPE_16UC1) {
+    depth_image_proc::convert<uint16_t>(depth_msg, rgb_msg, cloud_msg, red_offset, green_offset, blue_offset, color_step, transform_);
+  } else if (depth_msg->encoding == sensor_msgs::image_encodings::TYPE_32FC1) {
+    depth_image_proc::convert<float>(depth_msg, rgb_msg, cloud_msg, red_offset, green_offset, blue_offset, color_step, transform_);
+  } else {
+    RCLCPP_ERROR(get_logger(), "Depth image has unsupported encoding [%s]", depth_msg->encoding.c_str());
+    return;
   }
 
   pub_point_cloud_->publish(std::move(cloud_msg));

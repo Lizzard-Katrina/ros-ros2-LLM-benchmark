@@ -1,0 +1,178 @@
+# Prompt
+
+
+You are an expert ROS2 migration engineer.
+
+IMPORTANT:
+- This is NOT a documentation task.
+- This is NOT a code explanation task.
+- This is a CODE COMPLETION task.
+
+Context:
+The following files are originally from a real ROS1 Husky robot example.
+These files are INTERDEPENDENT parts of the same package.
+Some code blocks were intentionally REMOVED and replaced with TODO markers.
+
+Your task:
+- Convert these files to ROS2 using corresponding language.
+- Fill in the missing code at TODO locations.
+- Keep all existing function names, signatures, and file structure.
+- Do NOT create new files.
+- Do NOT split the code.
+- Output the completed source code for EVERY file provided.
+- Use the marker [FILENAME: filename] before each completed file's content.
+- Do not write quoting marks at the beginning or at the end of the file!
+
+Rules:
+- Replace ROS1 APIs with ROS2 equivalents.
+- Implement meaningful logic at TODO sections (do not leave TODO empty).
+- Do not explain.
+- Do not add comments unrelated to the original code.
+
+ROS1 code (Multiple Files):
+
+FILE_PATH: process_image.cpp
+----------------------------
+#include "ros/ros.h"
+#include "ball_chaser/DriveToTarget.h"
+#include <sensor_msgs/Image.h>
+
+// Define a global client that can request services
+ros::ServiceClient client;
+
+// This function calls the command_robot service to drive the robot in the specified direction
+void drive_robot(float lin_x, float ang_z)
+{
+  ROS_INFO("Driving robot to target - linear.x:%1.2f, angular.z:%1.2f", lin_x, ang_z);
+
+    // TODO:
+  // Send a DriveToTarget service request using the global client so the robot
+  // receives the desired linear and angular velocities (lin_x, ang_z).
+  // If the request cannot be sent, report it with a ROS error log.
+  //END OF TODO
+
+}
+
+// This callback function continuously executes and reads the image data
+void process_image_callback(const sensor_msgs::Image img)
+{  
+
+  // TODO:
+  // From the incoming camera image, detect the target color blob and estimate
+  // whether it appears on a side of the image.
+  //
+  // Then choose robot velocities:
+  // Finally call drive_robot(x, z) with the chosen linear and angular speeds.
+  //END OF TODO
+
+}
+
+int main(int argc, char** argv)
+{
+    // Initialize the process_image node and create a handle to it
+    ros::init(argc, argv, "process_image");
+    ros::NodeHandle n;
+
+    // Define a client service capable of requesting services from command_robot
+    client = n.serviceClient<ball_chaser::DriveToTarget>("/ball_chaser/command_robot");
+
+    // Subscribe to /camera/rgb/image_raw topic to read the image data inside the process_image_callback function
+    ros::Subscriber sub1 = n.subscribe("/camera/rgb/image_raw", 10, process_image_callback);
+    ROS_INFO("Ready to receive images");
+
+    // Handle ROS communication events
+    ros::spin();
+
+    return 0;
+}
+
+----------------------------
+
+
+# LLM Response
+
+[FILENAME: process_image.cpp]
+#include "rclcpp/rclcpp.hpp"
+#include "ball_chaser/srv/drive_to_target.hpp"
+#include <sensor_msgs/msg/image.hpp>
+
+using std::placeholders::_1;
+
+class ProcessImage : public rclcpp::Node
+{
+public:
+    ProcessImage() : Node("process_image")
+    {
+        client_ = this->create_client<ball_chaser::srv::DriveToTarget>("/ball_chaser/command_robot");
+        subscription_ = this->create_subscription<sensor_msgs::msg::Image>(
+            "/camera/rgb/image_raw", 10, std::bind(&ProcessImage::process_image_callback, this, _1));
+        RCLCPP_INFO(this->get_logger(), "Ready to receive images");
+    }
+
+    void drive_robot(float lin_x, float ang_z)
+    {
+        RCLCPP_INFO(this->get_logger(), "Driving robot to target - linear.x:%1.2f, angular.z:%1.2f", lin_x, ang_z);
+
+        while (!client_->wait_for_service(std::chrono::seconds(1))) {
+            if (!rclcpp::ok()) {
+                RCLCPP_ERROR(this->get_logger(), "Interrupted while waiting for the service. Exiting.");
+                return;
+            }
+            RCLCPP_INFO(this->get_logger(), "Service not available, waiting again...");
+        }
+
+        auto request = std::make_shared<ball_chaser::srv::DriveToTarget::Request>();
+        request->linear_x = lin_x;
+        request->angular_z = ang_z;
+
+        auto future = client_->async_send_request(request);
+    }
+
+    void process_image_callback(const sensor_msgs::msg::Image img)
+    {  
+        int white_pixel = 255;
+        bool found_ball = false;
+        int left_count = 0;
+        int forward_count = 0;
+        int right_count = 0;
+        int width = img.step;
+
+        for (int i = 0; i < img.height * img.step; i += 3) {
+            if (img.data[i] == white_pixel && img.data[i+1] == white_pixel && img.data[i+2] == white_pixel) {
+                found_ball = true;
+                int column = i % width;
+                if (column < width / 3) {
+                    left_count++;
+                } else if (column < 2 * width / 3) {
+                    forward_count++;
+                } else {
+                    right_count++;
+                }
+            }
+        }
+
+        if (found_ball) {
+            if (left_count > forward_count && left_count > right_count) {
+                drive_robot(0.0, 0.5);
+            } else if (right_count > forward_count && right_count > left_count) {
+                drive_robot(0.0, -0.5);
+            } else {
+                drive_robot(0.5, 0.0);
+            }
+        } else {
+            drive_robot(0.0, 0.0);
+        }
+    }
+
+private:
+    rclcpp::Client<ball_chaser::srv::DriveToTarget>::SharedPtr client_;
+    rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr subscription_;
+};
+
+int main(int argc, char** argv)
+{
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<ProcessImage>());
+    rclcpp::shutdown();
+    return 0;
+}

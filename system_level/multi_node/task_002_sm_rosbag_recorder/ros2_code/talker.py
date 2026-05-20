@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Software License Agreement (BSD License)
 #
 # Copyright (c) 2008, Willow Garage, Inc.
@@ -31,38 +31,44 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+## Simple talker demo that publishes std_msg/Strings to the 'chatter' topic
+
+PKG = 'test_rospy' # this package name
+NAME = 'talker'
+
+import sys
+import time
+
 import rclpy
 from rclpy.node import Node
-from rclpy.executors import ExternalShutdownException
-from rclpy.qos import QoSProfile
-from rclpy.timer import Timer
 from std_msgs.msg import String
 
-class Talker(Node):
+class TalkerNode(Node):
     def __init__(self):
         super().__init__('talker')
-        self.timer = self.create_timer(0.1, self.timer_callback)
-        self.get_logger().info('Talker node started')
+        self.publisher_ = self.create_publisher(String, 'chatter', 10)
+        timer_period = 0.1  # 10Hz
+        self.timer = self.create_timer(timer_period, self.timer_callback)
+        self.i = 0
 
     def timer_callback(self):
         msg = String()
-        msg.data = 'Hello World: %d' % self.get_clock().now().nanoseconds
-        self.get_logger().info('Publishing: %s' % msg.data)
-        self.publisher = self.create_publisher(String, 'chatter', 10)
-        self.publisher.publish(msg)
+        current_time = self.get_clock().now().to_msg()
+        msg.data = f'Hello World: {self.i} at {current_time.sec}.{current_time.nanosec}'
+        self.publisher_.publish(msg)
+        self.get_logger().info(f'Publishing: "{msg.data}"')
+        self.i += 1
 
-def main(args=None):
-    rclpy.init(args=args)
-    talker = Talker()
+def talker():
+    rclpy.init()
+    node = TalkerNode()
     try:
-        rclpy.spin(talker)
+        rclpy.spin(node)
     except KeyboardInterrupt:
-        talker.get_logger().info('Keyboard Interrupt (SIGINT)')
-    except ExternalShutdownException:
-        talker.get_logger().info('External shutdown request')
+        pass
     finally:
-        talker.destroy_node()
+        node.destroy_node()
         rclpy.shutdown()
-
+        
 if __name__ == '__main__':
-    main()
+    talker()

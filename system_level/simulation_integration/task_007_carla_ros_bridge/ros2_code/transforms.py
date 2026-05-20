@@ -175,9 +175,9 @@ def carla_vector_to_ros_vector_rotated(carla_vector, carla_rotation):
 
 def carla_velocity_to_ros_twist(carla_linear_velocity, carla_angular_velocity, carla_rotation=None):
     ros_twist = Twist()
-
     if carla_rotation:
-        ros_twist.linear = carla_vector_to_ros_vector_rotated(carla_linear_velocity, carla_rotation)
+        ros_twist.linear = carla_vector_to_ros_vector_rotated(
+            carla_linear_velocity, carla_rotation)
     else:
         ros_twist.linear.x = carla_linear_velocity.x
         ros_twist.linear.y = -carla_linear_velocity.y

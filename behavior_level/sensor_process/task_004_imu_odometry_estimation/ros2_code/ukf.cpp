@@ -31,7 +31,6 @@
  */
 #include "robot_localization/ukf.hpp"
 
-#include <cmath>
 #include <vector>
 
 #include "angles/angles.h"
@@ -407,81 +406,61 @@ void Ukf::generateSigmaPoints()
 
 void Ukf::projectSigmaPoint(Eigen::VectorXd & sigma_point, const rclcpp::Duration & delta)
 {
-  const double delta_sec = delta.seconds();
-  const double delta_sec_sq = delta_sec * delta_sec;
-  const double one_half_delta_sec_sq = 0.5 * delta_sec_sq;
+  double roll = sigma_point(StateMemberRoll);
+  double pitch = sigma_point(StateMemberPitch);
+  double yaw = sigma_point(StateMemberYaw);
 
-  const double roll = sigma_point(StateMemberRoll);
-  const double pitch = sigma_point(StateMemberPitch);
-  const double yaw = sigma_point(StateMemberYaw);
+  double sp = ::sin(pitch);
+  double cp = ::cos(pitch);
+  double cpi = 1.0 / cp;
+  double tp = sp * cpi;
 
-  const double sr = ::sin(roll);
-  const double cr = ::cos(roll);
-  const double sp = ::sin(pitch);
-  const double cp = ::cos(pitch);
-  const double sy = ::sin(yaw);
-  const double cy = ::cos(yaw);
+  double sr = ::sin(roll);
+  double cr = ::cos(roll);
 
-  const double cpi = 1.0 / cp;
-  const double tp = sp * cpi;
+  double sy = ::sin(yaw);
+  double cy = ::cos(yaw);
 
-  transfer_function_.setIdentity();
+  double dt = delta.seconds();
 
-  // Position from body-frame velocities (RZYX) and accelerations
-  transfer_function_(StateMemberX, StateMemberVx) = cy * cp * delta_sec;
-  transfer_function_(StateMemberX, StateMemberVy) = (cy * sp * sr - sy * cr) * delta_sec;
-  transfer_function_(StateMemberX, StateMemberVz) = (cy * sp * cr + sy * sr) * delta_sec;
-  transfer_function_(StateMemberX, StateMemberAx) =
-    transfer_function_(StateMemberX, StateMemberVx) * one_half_delta_sec_sq / delta_sec;
-  transfer_function_(StateMemberX, StateMemberAy) =
-    transfer_function_(StateMemberX, StateMemberVy) * one_half_delta_sec_sq / delta_sec;
-  transfer_function_(StateMemberX, StateMemberAz) =
-    transfer_function_(StateMemberX, StateMemberVz) * one_half_delta_sec_sq / delta_sec;
+  transfer_function_(StateMemberX, StateMemberVx) = cy * cp * dt;
+  transfer_function_(StateMemberX, StateMemberVy) = (cy * sp * sr - sy * cr) * dt;
+  transfer_function_(StateMemberX, StateMemberVz) = (cy * sp * cr + sy * sr) * dt;
+  transfer_function_(StateMemberX, StateMemberAx) = 0.5 * transfer_function_(StateMemberX, StateMemberVx) * dt;
+  transfer_function_(StateMemberX, StateMemberAy) = 0.5 * transfer_function_(StateMemberX, StateMemberVy) * dt;
+  transfer_function_(StateMemberX, StateMemberAz) = 0.5 * transfer_function_(StateMemberX, StateMemberVz) * dt;
 
-  transfer_function_(StateMemberY, StateMemberVx) = sy * cp * delta_sec;
-  transfer_function_(StateMemberY, StateMemberVy) = (sy * sp * sr + cy * cr) * delta_sec;
-  transfer_function_(StateMemberY, StateMemberVz) = (sy * sp * cr - cy * sr) * delta_sec;
-  transfer_function_(StateMemberY, StateMemberAx) =
-    transfer_function_(StateMemberY, StateMemberVx) * one_half_delta_sec_sq / delta_sec;
-  transfer_function_(StateMemberY, StateMemberAy) =
-    transfer_function_(StateMemberY, StateMemberVy) * one_half_delta_sec_sq / delta_sec;
-  transfer_function_(StateMemberY, StateMemberAz) =
-    transfer_function_(StateMemberY, StateMemberVz) * one_half_delta_sec_sq / delta_sec;
+  transfer_function_(StateMemberY, StateMemberVx) = sy * cp * dt;
+  transfer_function_(StateMemberY, StateMemberVy) = (sy * sp * sr + cy * cr) * dt;
+  transfer_function_(StateMemberY, StateMemberVz) = (sy * sp * cr - cy * sr) * dt;
+  transfer_function_(StateMemberY, StateMemberAx) = 0.5 * transfer_function_(StateMemberY, StateMemberVx) * dt;
+  transfer_function_(StateMemberY, StateMemberAy) = 0.5 * transfer_function_(StateMemberY, StateMemberVy) * dt;
+  transfer_function_(StateMemberY, StateMemberAz) = 0.5 * transfer_function_(StateMemberY, StateMemberVz) * dt;
 
-  transfer_function_(StateMemberZ, StateMemberVx) = -sp * delta_sec;
-  transfer_function_(StateMemberZ, StateMemberVy) = cp * sr * delta_sec;
-  transfer_function_(StateMemberZ, StateMemberVz) = cp * cr * delta_sec;
-  transfer_function_(StateMemberZ, StateMemberAx) =
-    transfer_function_(StateMemberZ, StateMemberVx) * one_half_delta_sec_sq / delta_sec;
-  transfer_function_(StateMemberZ, StateMemberAy) =
-    transfer_function_(StateMemberZ, StateMemberVy) * one_half_delta_sec_sq / delta_sec;
-  transfer_function_(StateMemberZ, StateMemberAz) =
-    transfer_function_(StateMemberZ, StateMemberVz) * one_half_delta_sec_sq / delta_sec;
+  transfer_function_(StateMemberZ, StateMemberVx) = -sp * dt;
+  transfer_function_(StateMemberZ, StateMemberVy) = cp * sr * dt;
+  transfer_function_(StateMemberZ, StateMemberVz) = cp * cr * dt;
+  transfer_function_(StateMemberZ, StateMemberAx) = 0.5 * transfer_function_(StateMemberZ, StateMemberVx) * dt;
+  transfer_function_(StateMemberZ, StateMemberAy) = 0.5 * transfer_function_(StateMemberZ, StateMemberVy) * dt;
+  transfer_function_(StateMemberZ, StateMemberAz) = 0.5 * transfer_function_(StateMemberZ, StateMemberVz) * dt;
 
-  // Euler angle derivatives from body-frame angular rates
-  transfer_function_(StateMemberRoll, StateMemberVroll) = delta_sec;
-  transfer_function_(StateMemberRoll, StateMemberVpitch) = sr * tp * delta_sec;
-  transfer_function_(StateMemberRoll, StateMemberVyaw) = cr * tp * delta_sec;
+  transfer_function_(StateMemberRoll, StateMemberVroll) = dt;
+  transfer_function_(StateMemberRoll, StateMemberVpitch) = sr * tp * dt;
+  transfer_function_(StateMemberRoll, StateMemberVyaw) = cr * tp * dt;
 
-  transfer_function_(StateMemberPitch, StateMemberVpitch) = cr * delta_sec;
-  transfer_function_(StateMemberPitch, StateMemberVyaw) = -sr * delta_sec;
+  transfer_function_(StateMemberPitch, StateMemberVroll) = 0.0;
+  transfer_function_(StateMemberPitch, StateMemberVpitch) = cr * dt;
+  transfer_function_(StateMemberPitch, StateMemberVyaw) = -sr * dt;
 
-  transfer_function_(StateMemberYaw, StateMemberVpitch) = sr * cpi * delta_sec;
-  transfer_function_(StateMemberYaw, StateMemberVyaw) = cr * cpi * delta_sec;
+  transfer_function_(StateMemberYaw, StateMemberVroll) = 0.0;
+  transfer_function_(StateMemberYaw, StateMemberVpitch) = sr * cpi * dt;
+  transfer_function_(StateMemberYaw, StateMemberVyaw) = cr * cpi * dt;
 
-  // Linear velocity integration
-  transfer_function_(StateMemberVx, StateMemberAx) = delta_sec;
-  transfer_function_(StateMemberVy, StateMemberAy) = delta_sec;
-  transfer_function_(StateMemberVz, StateMemberAz) = delta_sec;
+  transfer_function_(StateMemberVx, StateMemberAx) = dt;
+  transfer_function_(StateMemberVy, StateMemberAy) = dt;
+  transfer_function_(StateMemberVz, StateMemberAz) = dt;
 
   sigma_point.applyOnTheLeft(transfer_function_);
-
-  sigma_point(StateMemberVx) += control_acceleration_(ControlMemberVx) * delta_sec;
-  sigma_point(StateMemberVy) += control_acceleration_(ControlMemberVy) * delta_sec;
-  sigma_point(StateMemberVz) += control_acceleration_(ControlMemberVz) * delta_sec;
-  sigma_point(StateMemberVroll) += control_acceleration_(ControlMemberVroll) * delta_sec;
-  sigma_point(StateMemberVpitch) += control_acceleration_(ControlMemberVpitch) * delta_sec;
-  sigma_point(StateMemberVyaw) += control_acceleration_(ControlMemberVyaw) * delta_sec;
 }
 
 }  // namespace robot_localization

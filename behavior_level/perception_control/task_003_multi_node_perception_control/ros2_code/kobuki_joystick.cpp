@@ -1,4 +1,4 @@
-#include "slamcore_ros1_examples/kobuki_joystick.h"
+#include "slamcore_ros1_examples/kobuki_joystick.hpp"
 
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist.hpp"
@@ -6,14 +6,10 @@
 
 #include <fcntl.h>
 #include <unistd.h>
+#include <linux/joystick.h>
 
 namespace kobuki_joystick
 {
-namespace
-{
-rclcpp::Node::SharedPtr g_node;
-}  // namespace
-
 enum DS4_BUTTONS
 {
   CROSS,
@@ -35,47 +31,42 @@ enum DS4_AXIS
 
 bool KobukiJoystick::init()
 {
-  g_node = rclcpp::Node::make_shared("kobuki_joystick");
+  m_node = rclcpp::Node::make_shared("kobuki_joystick");
 
-  g_node->declare_parameter<std::string>("input_device", m_input_device);
-  g_node->declare_parameter<double>("scale_linear", static_cast<double>(m_scale_linear));
-  g_node->declare_parameter<double>("scale_angular", static_cast<double>(m_scale_angular));
+  m_node->declare_parameter<std::string>("input_device", m_input_device);
+  m_node->declare_parameter<float>("scale_linear", m_scale_linear);
+  m_node->declare_parameter<float>("scale_angular", m_scale_angular);
 
-  g_node->get_parameter("input_device", m_input_device);
+  m_node->get_parameter("input_device", m_input_device);
+  m_node->get_parameter("scale_linear", m_scale_linear);
+  m_node->get_parameter("scale_angular", m_scale_angular);
 
-  double scale_linear = static_cast<double>(m_scale_linear);
-  double scale_angular = static_cast<double>(m_scale_angular);
-  g_node->get_parameter("scale_linear", scale_linear);
-  g_node->get_parameter("scale_angular", scale_angular);
-  m_scale_linear = static_cast<float>(scale_linear);
-  m_scale_angular = static_cast<float>(scale_angular);
-
-  RCLCPP_INFO_STREAM(g_node->get_logger(), "KobukiJoystick : input device [" << m_input_device << "]");
+  RCLCPP_INFO_STREAM(m_node->get_logger(), "KobukiJoystick : input device [" << m_input_device << "]");
   m_fd = open(m_input_device.c_str(), O_RDONLY | O_NONBLOCK);
   if (m_fd == -1)
   {
-    RCLCPP_ERROR_STREAM(g_node->get_logger(),
-                        "KobukiJoystick: Error opening joystick device \""
-                          << m_input_device
-                          << "\", is the joystick paired and connected?");
+    RCLCPP_ERROR_STREAM(m_node->get_logger(), "KobukiJoystick: Error opening joystick device \""
+                     << m_input_device
+                     << "\", is the joystick paired and connected?");
     return false;
   }
 
-  m_velocity_publisher = g_node->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 1);
-  m_motor_power_publisher = g_node->create_publisher<kobuki_msgs::msg::MotorPower>("motor_power", 1);
+  m_velocity_publisher = m_node->create_publisher<geometry_msgs::msg::Twist>("cmd_vel", 1);
+  m_motor_power_publisher =
+    m_node->create_publisher<kobuki_msgs::msg::MotorPower>("motor_power", 1);
 
   return true;
 }
 
 void KobukiJoystick::spin()
 {
-  float axes[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+  rclcpp::Rate rate(50);
+  js_event event;
+  geometry_msgs::msg::Twist cmd;
   bool enabled = false;
 
-  rclcpp::Rate rate(50.0);
   while (rclcpp::ok())
   {
-    js_event event;
     while (readEvent(event))
     {
       if (event.type == JS_EVENT_BUTTON)
@@ -95,28 +86,24 @@ void KobukiJoystick::spin()
       }
       else if (event.type == JS_EVENT_AXIS)
       {
-        if (event.number <= R3_Y)
+        if (event.number == L3_Y)
         {
-          axes[event.number] = static_cast<float>(event.value) / 32767.0f;
+          cmd.linear.x = -event.value / 32767.0 * m_scale_linear;
+        }
+        else if (event.number == L3_X)
+        {
+          cmd.angular.z = -event.value / 32767.0 * m_scale_angular;
         }
       }
     }
 
     if (enabled)
     {
-      geometry_msgs::msg::Twist velocity;
-      velocity.linear.x = -axes[L3_Y] * m_scale_linear;
-      velocity.angular.z = -axes[L3_X] * m_scale_angular;
-      m_velocity_publisher->publish(velocity);
+      m_velocity_publisher->publish(cmd);
     }
 
-    rclcpp::spin_some(g_node);
+    rclcpp::spin_some(m_node);
     rate.sleep();
-  }
-
-  if (enabled)
-  {
-    disable();
   }
 }
 
@@ -134,38 +121,39 @@ bool KobukiJoystick::readEvent(js_event& event)
 
 void KobukiJoystick::enable()
 {
-  kobuki_msgs::msg::MotorPower power_msg;
-  power_msg.state = kobuki_msgs::msg::MotorPower::ON;
-  m_motor_power_publisher->publish(power_msg);
+  kobuki_msgs::msg::MotorPower power_cmd;
+  power_cmd.state = kobuki_msgs::msg::MotorPower::ON;
+  m_motor_power_publisher->publish(power_cmd);
 }
 
 void KobukiJoystick::disable()
 {
-  geometry_msgs::msg::Twist stop_msg;
-  m_velocity_publisher->publish(stop_msg);
+  geometry_msgs::msg::Twist cmd;
+  m_velocity_publisher->publish(cmd);
 
-  kobuki_msgs::msg::MotorPower power_msg;
-  power_msg.state = kobuki_msgs::msg::MotorPower::OFF;
-  m_motor_power_publisher->publish(power_msg);
+  kobuki_msgs::msg::MotorPower power_cmd;
+  power_cmd.state = kobuki_msgs::msg::MotorPower::OFF;
+  m_motor_power_publisher->publish(power_cmd);
 }
-}  // namespace kobuki_joystick
+
+} // namespace kobuki_joystick
 
 int main(int argc, char* argv[])
 {
-  rclcpp::init(argc, argv);
+    rclcpp::init(argc, argv);
 
-  kobuki_joystick::KobukiJoystick joystick;
-  if (joystick.init())
-  {
-    joystick.spin();
-  }
-  else
-  {
-    RCLCPP_ERROR(rclcpp::get_logger("kobuki_joystick"), "Couldn't initialise KobukiJoystick!");
-  }
+    kobuki_joystick::KobukiJoystick joystick;
+    if (joystick.init())
+    {
+        joystick.spin();
+    }
+    else
+    {
+        std::cerr << "Couldn't initialise KobukiJoystick!" << std::endl;
+    }
 
-  RCLCPP_INFO(rclcpp::get_logger("kobuki_joystick"), "Cave Johnson. We're Done Here");
+    std::cout << "Cave Johnson. We're Done Here" << std::endl;
 
-  rclcpp::shutdown();
-  return 0;
+    rclcpp::shutdown();
+    return 0;
 }

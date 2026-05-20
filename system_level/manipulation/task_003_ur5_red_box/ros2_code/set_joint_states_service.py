@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
 import sys
+import copy
 import rclpy
 from rclpy.node import Node
-from rclpy.executors import ExternalShutdownException
-from robotic_arm_algorithms.srv import SetJointStates
 import moveit_commander
 import moveit_msgs.msg
 import geometry_msgs.msg
@@ -12,6 +11,7 @@ from math import pi
 from std_msgs.msg import String
 from std_msgs.msg import Float32
 from moveit_commander.conversions import pose_to_list
+from robotic_arm_algorithms.srv import SetJointStates
 
 class MoveItContext(object):
     """
@@ -51,10 +51,10 @@ class MoveItContext(object):
     def go_to_joint_state(self, req):
         print("Starting planning to go to joint state.\n")
         joint_goal = self.move_group.get_current_joint_values()
-        joint_goal[0] = req.forearm_0   # forearm 0
-        joint_goal[1] = req.forearm_1   # forearm 1
-        joint_goal[2] = req.arm_0   # arm 0
-        joint_goal[3] = req.arm_1   # arm 1
+        joint_goal[0] = req.forearm_0.data   # forearm 0
+        joint_goal[1] = req.forearm_1.data   # forearm 1
+        joint_goal[2] = req.arm_0.data   # arm 0
+        joint_goal[3] = req.arm_1.data   # arm 1
 
         print("Setting joint goal:")
         print(joint_goal)
@@ -67,32 +67,29 @@ class MoveItContext(object):
         # Calling ``stop()`` ensures that there is no residual movement
         self.move_group.stop()
 
-class SetJointStatesServer(Node):
-    def __init__(self):
-        super().__init__('set_joint_states_server')
-        self.srv = self.create_service(SetJointStates, 'set_joint_states', self.set_joint_states_callback)
-        self.moveit_context = MoveItContext()
-
-    def set_joint_states_callback(self, req, resp):
-        self.moveit_context.go_to_joint_state(req)
-        resp.success = True
-        return resp
+def set_joint_states(req, res):
+    global moveit_context
+    moveit_context.go_to_joint_state(req)
+    res.success = True
+    return res
 
 def set_joint_states_server():
     rclpy.init()
-    server = SetJointStatesServer()
-    try:
-        rclpy.spin(server)
-    except KeyboardInterrupt:
-        server.get_logger().info('Keyboard Interrupt (SIGINT)')
-    except ExternalShutdownException:
-        server.get_logger().info('Received shutdown request')
-    finally:
-        server.destroy_node()
-        rclpy.shutdown()
+    node = rclpy.create_node('set_joint_states_server')
+    
+    global moveit_context
+    moveit_context = MoveItContext()
+    
+    srv = node.create_service(SetJointStates, 'set_joint_states', set_joint_states)
+    node.get_logger().info("Ready to set joint states.")
+    
+    rclpy.spin(node)
+    
+    node.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == '__main__':
     try:
         set_joint_states_server()
-    except Exception as e:
-        print(e)
+    except KeyboardInterrupt:
+        pass

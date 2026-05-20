@@ -2,10 +2,11 @@
 #include <reach_ros/utils.h>
 
 #include <reach/plugin_utils.h>
-#include <tf2_eigen/tf2_eigen.h>
+#include <tf2_eigen/tf2_eigen.hpp>
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_listener.h>
 #include <yaml-cpp/yaml.h>
+#include <rclcpp/rclcpp.hpp>
 
 namespace reach_ros
 {
@@ -18,32 +19,35 @@ TransformedPointCloudTargetPoseGenerator::TransformedPointCloudTargetPoseGenerat
 {
 }
 
-std::vector<Eigen::Isometry3d> TransformedPointCloudTargetPoseGenerator::generatePoses() const
+std::vector<Eigen::Isometry3d> TransformedPointCloudTargetPoseGenerator::generate() const
 {
-  std::vector<Eigen::Isometry3d> poses = reach::PointCloudTargetPoseGenerator::generatePoses();
+  auto poses = reach::PointCloudTargetPoseGenerator::generate();
 
-  tf2_ros::Buffer tf_buffer;
+  auto node = rclcpp::Node::make_shared("tf_lookup_node");
+  tf2_ros::Buffer tf_buffer(node->get_clock());
   tf2_ros::TransformListener tf_listener(tf_buffer);
 
-  geometry_msgs::msg::TransformStamped transform;
+  geometry_msgs::msg::TransformStamped transform_stamped;
   try
   {
-    transform = tf_buffer.lookupTransform(target_frame_, points_frame_, tf2::Time(0), tf2::Duration(3.0));
+    transform_stamped = tf_buffer.lookupTransform(target_frame_, points_frame_, tf2::TimePointZero, tf2::durationFromSec(3.0));
   }
-  catch (tf2::TransformException& ex)
+  catch (const tf2::TransformException& ex)
   {
-    throw std::runtime_error("Failed to lookup transform from " + points_frame_ + " to " + target_frame_);
+    RCLCPP_ERROR(node->get_logger(), "Transform lookup failed: %s", ex.what());
+    return {};
   }
 
-  Eigen::Isometry3d transform_eigen;
-  tf2::fromMsg(transform.transform, transform_eigen);
+  Eigen::Isometry3d transform = tf2::transformToEigen(transform_stamped);
+  std::vector<Eigen::Isometry3d> transformed_poses;
+  transformed_poses.reserve(poses.size());
 
-  for (auto& pose : poses)
+  for (const auto& pose : poses)
   {
-    pose = transform_eigen * pose;
+    transformed_poses.push_back(transform * pose);
   }
 
-  return poses;
+  return transformed_poses;
 }
 
 }  // namespace reach_ros

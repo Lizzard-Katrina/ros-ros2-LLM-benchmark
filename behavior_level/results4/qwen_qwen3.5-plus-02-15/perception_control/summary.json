@@ -1,0 +1,182 @@
+[
+    {
+        "task_id": "perception_control/task_001_color_blob_tracking",
+        "status": "FAILED",
+        "score": "4/7",
+        "pass_rate": "57.14%",
+        "tokens": 1744,
+        "failed_cases": [
+            {
+                "test_function": "test_02_node_spin_and_image_subscription_pipeline",
+                "error_message": "AssertionError: Expected a ROS2 Node (subclass of rclcpp::Node or constructed via std::make_shared<...>()).\nMissing pattern:\n:\\s*public\\s+rclcpp::Node\\b|std::make_shared\\s*<\\s*\\w+\\s*>"
+            },
+            {
+                "test_function": "test_03_drive_service_client_request_fields_and_send",
+                "error_message": "AssertionError: Expected assignment to request linear component (e.g., request->linear_x = ...).\nMissing pattern:\n(request\\s*(->|\\.)\\s*(linear_x|linear)\\b)\\s*=\\s*[^;]+;"
+            },
+            {
+                "test_function": "test_07_stop_and_motion_semantics_without_literal_numbers",
+                "error_message": "AssertionError: Expected turning mapping: an assignment that sets angular component to a NEGATED expression (turn one direction).\nMissing pattern:\n(request\\s*(->|\\.)\\s*(angular_z|angular)\\b|angular\\.\\w+)\\s*=\\s*-\\s*[^;]+;"
+            }
+        ]
+    },
+    {
+        "task_id": "perception_control/task_002_camera_depth_reach_target",
+        "status": "SUCCESS",
+        "score": "9/9",
+        "pass_rate": "100.00%",
+        "tokens": 3555,
+        "failed_cases": []
+    },
+    {
+        "task_id": "perception_control/task_003_multi_node_perception_control",
+        "status": "FAILED",
+        "score": "2/5",
+        "pass_rate": "40.00%",
+        "tokens": 2256,
+        "failed_cases": [
+            {
+                "test_function": "test_ds4_enum_mapping_present_and_used",
+                "error_message": "AssertionError: Must map L1 button via event.number == DS4_BUTTONS::L1 (reference behavior).\nMissing pattern:\nevent\\s*\\.\\s*number\\s*==\\s*DS4_BUTTONS::L1"
+            },
+            {
+                "test_function": "test_l1_toggle_semantics_fidelity",
+                "error_message": "AssertionError: Must check button-press event.value == 1 (reference enable on press).\nMissing pattern:\nevent\\s*\\.\\s*value\\s*==\\s*1"
+            },
+            {
+                "test_function": "test_axis_scaling_and_publish_gating_fidelity",
+                "error_message": "AssertionError: cmd_vel must be published only when enabled AND (linear.x != 0 OR angular.z != 0) (reference gating).\nMissing pattern:\nif\\s*\\(\\s*[^)]*\\b(m_enabled|enabled)\\b[^)]*&&\\s*\\(\\s*[^)]*linear\\s*\\.\\s*x\\s*!=\\s*0[^)]*\\|\\|[^)]*angular\\s*\\.\\s*z\\s*!=\\s*0[^)]*\\)\\s*\\)"
+            }
+        ]
+    },
+    {
+        "task_id": "perception_control/task_004_mobile_lidar_obstacle_avoidance",
+        "status": "FAILED",
+        "score": "5/9",
+        "pass_rate": "55.56%",
+        "tokens": 3856,
+        "failed_cases": [
+            {
+                "test_function": "test_ros2_timer_rate_and_publish",
+                "error_message": "AssertionError: Should use a ROS2 timer at ~10Hz (create_timer(0.1, ...) or 1/10).\nMissing pattern:\ncreate_timer\\s*\\(\\s*(0\\.1|1\\s*/\\s*10|1\\.0\\s*/\\s*10)"
+            },
+            {
+                "test_function": "test_partitions_ranges_by_slicing",
+                "error_message": "AssertionError: Must chunk ranges via slicing (ranges[a:b]) to form contiguous regions (fidelity to ROS1 partitioning).\nMissing pattern:\n(ranges|msg\\.ranges|scan\\.ranges)\\s*\\[\\s*[^:\\]]+\\s*:\\s*[^:\\]]+\\s*\\]"
+            },
+            {
+                "test_function": "test_decision_uses_signed_cost_table_and_abs_cost",
+                "error_message": "AssertionError: Regions_Distances should include both negative and positive integer costs (fidelity to reference).\nMissing pattern:\nRegions_Distances\\s*=\\s*\\{[^}]*:\\s*-\\d+[^}]*:\\s*\\d+"
+            },
+            {
+                "test_function": "test_control_laws_and_modes_match_reference_semantics",
+                "error_message": "AssertionError: angular_vel should depend on a signed regional_dist with normalization/sign logic (reference: regional_dist/max(1,abs(regional_dist))).\nMissing pattern:\n(regional_dist|max\\s*\\(\\s*1\\s*,\\s*abs\\s*\\(\\s*regional_dist\\s*\\)\\s*\\))|(\\bregional_dist\\b.*\\babs\\s*\\(\\s*regional_dist\\s*\\))"
+            }
+        ]
+    },
+    {
+        "task_id": "perception_control/task_005_ORBBEC",
+        "status": "FAILED",
+        "score": "5/12",
+        "pass_rate": "41.67%",
+        "tokens": 57606,
+        "failed_cases": [
+            {
+                "test_function": "test_frameset_retrieves_multimodal_frames_semantically",
+                "error_message": "AssertionError: onNewFrameSetCallback should obtain left color stream frame (left_color_frame / ...COLOR_LEFT...).\nExpected one of patterns:\n\\bleft_?color_?frame\\b\ngetFrame\\s*\\(\\s*OB_FRAME_COLOR_LEFT\\s*\\)\ngetFrame\\s*\\(\\s*.*COLOR_LEFT.*\\)\n\\bCOLOR_LEFT\\b"
+            },
+            {
+                "test_function": "test_frameset_alignment_semantics_present",
+                "error_message": "AssertionError: onNewFrameSetCallback should reference align_filter_ (alignment filter) when alignment is supported.\nExpected pattern:\n\\balign_filter_\\b"
+            },
+            {
+                "test_function": "test_frameset_dispatches_to_color_queue_or_falls_back_to_pointcloud_publish",
+                "error_message": "AssertionError: onNewFrameSetCallback should enqueue framesets for color processing (colorFrameQueue_.push(...)).\nExpected pattern:\ncolorFrameQueue_\\.push\\s*\\("
+            },
+            {
+                "test_function": "test_frameset_forwards_non_color_streams_through_common_handler",
+                "error_message": "AssertionError: onNewFrameSetCallback should iterate over IMAGE_STREAMS (range-for) to forward frames.\nExpected one of patterns:\nfor\\s*\\([^)]*:\\s*IMAGE_STREAMS\\s*\\)\nfor\\s*\\([^)]*IMAGE_STREAMS[^)]*\\)"
+            },
+            {
+                "test_function": "test_color_thread_consumes_fifo_and_processes_in_pipeline_order",
+                "error_message": "AssertionError: onNewColorFrameCallback should decode, then publish point cloud, then forward frame to onNewFrameCallback.\nExpected pattern:\ndecodeColorFrameToBuffer[\\s\\S]*publishPointCloud\\s*\\([\\s\\S]*\\)[\\s\\S]*onNewFrameCallback\\s*\\("
+            },
+            {
+                "test_function": "test_single_frame_has_subscriber_gate_includes_image_and_camerainfo",
+                "error_message": "AssertionError: onNewFrameCallback should gate processing based on subscriber counts (getNumSubscribers()).\nExpected pattern:\ngetNumSubscribers\\s*\\("
+            },
+            {
+                "test_function": "test_single_frame_supports_flip_branch_and_depth_scaling_hook",
+                "error_message": "AssertionError: onNewFrameCallback should incorporate depth scale semantics (getValueScale/depth_scale) when handling DEPTH frames.\nExpected one of patterns:\ngetValueScale\\s*\\(\ndepth_scale\n\\*\\s*depth_scale"
+            }
+        ]
+    },
+    {
+        "task_id": "perception_control/task_006_3d_sensor_moveit_arm_control",
+        "status": "FAILED",
+        "score": "2/4",
+        "pass_rate": "50.00%",
+        "tokens": 5363,
+        "failed_cases": [
+            {
+                "test_function": "test_3_grasp_sequence_integrity",
+                "error_message": "AssertionError: \u274c Grasp sequence violated. Must follow: Cleanup -> Add Part & Table -> Sync.\nassert None\n +  where None = <function search at 0x7ffa88399f30>('remove[\\\\s\\\\S]*?add_box[\\\\s\\\\S]*?add_box[\\\\s\\\\S]*?wait_for_planning_scene', '\\n\\t\\tself.get_logger().info(\"Removing any previous \\'part\\' object\")\\n\\t\\t\\n\\t\\t# 1. Scene cleanup and sequential po..._result is not None:\\n\\t\\t\\treturn self._pickup_result.error_code.val\\n\\t\\t\\n\\t\\treturn MoveItErrorCodes.FAILURE\\n\\n\\t')\n +    where <function search at 0x7ffa88399f30> = re.search"
+            },
+            {
+                "test_function": "test_4_async_fallback_mastery",
+                "error_message": "AssertionError: \u274c Failed to implement a perfect async fallback structure with result return.\nassert None\n +  where None = <function search at 0x7ffa88399f30>('await[\\\\s\\\\S]*?if\\\\s+[\\\\s\\\\S]*?[\\'\\\\\"]arm_torso[\\'\\\\\"][\\\\s\\\\S]*?await[\\\\s\\\\S]*?return\\\\s+.*?(?:code|val|result)', '\\n\\t\\tself.get_logger().info(\"Clearing octomap\")\\n\\t\\treq = Empty.Request()\\n\\t\\tfuture = self.clear_octomap_srv.call...place_result is not None:\\n\\t\\t\\treturn self._place_result.error_code.val\\n\\n\\t\\treturn MoveItErrorCodes.FAILURE\\n\\n\\t')\n +    where <function search at 0x7ffa88399f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "perception_control/task_007_autonomous_navigation",
+        "status": "FAILED",
+        "score": "3/4",
+        "pass_rate": "75.00%",
+        "tokens": 4049,
+        "failed_cases": [
+            {
+                "test_function": "test_proportional_control_law",
+                "error_message": "AssertionError: \u274c Steady-state velocity detected. Use Proportional Control (Kp * error) for smoothness.\nassert None\n +  where None = <function search at 0x7f0fabf6df30>('angular\\\\.z\\\\s*=\\\\s*.*?\\\\*.*?(diff|error)', '\\n        start_theta = self.get_yaw()\\n        target_theta = start_theta + math.radians(target_angle)\\n        \\n  ...   self.twist.linear.x = 0.0\\n        self.twist.angular.z = 0.0\\n        self.cmd_vel_pub.publish(self.twist)\\n\\n    ')\n +    where <function search at 0x7f0fabf6df30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "perception_control/task_008_limo_robot",
+        "status": "FAILED",
+        "score": "2/6",
+        "pass_rate": "33.33%",
+        "tokens": 10931,
+        "failed_cases": [
+            {
+                "test_function": "test_ackermann_inverse_kinematics",
+                "error_message": "AssertionError: Missing Ackermann geometry (atan/tan) using wheelbase.\nassert None"
+            },
+            {
+                "test_function": "test_steering_limit_clamping",
+                "error_message": "AssertionError: Steering angle must be clamped by max_inner_angle_.\nassert False"
+            },
+            {
+                "test_function": "test_odom_integration_frames",
+                "error_message": "AssertionError: Incorrect velocity projection into global frame.\nassert (None)"
+            },
+            {
+                "test_function": "test_time_differential_consistency",
+                "error_message": "AssertionError: Pose update missing time delta (dt) scaling.\nassert ('dt' in '\\n    double vx = 0.0;\\n    double vy = 0.0;\\n    double wz = 0.0;\\n\\n    if (use_mcnamu_) {\\n        vx = linear_velocity;\\n        vy = lateral_velocity;\\n        wz = angular_velocity;\\n    ')"
+            }
+        ]
+    },
+    {
+        "task_id": "perception_control/task_009_stretch_pipeline",
+        "status": "FAILED",
+        "score": "5/6",
+        "pass_rate": "83.33%",
+        "tokens": 9284,
+        "failed_cases": [
+            {
+                "test_function": "test_depth_unit_scaling",
+                "error_message": "AssertionError: Depth must be scaled from mm to meters.\nassert False"
+            }
+        ]
+    }
+]

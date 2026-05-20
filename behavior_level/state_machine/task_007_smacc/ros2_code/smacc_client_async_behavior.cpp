@@ -1,82 +1,56 @@
 #include <smacc/smacc_asynchronous_client_behavior.h>
-#include <chrono>
+#include <rclcpp/rclcpp.hpp>
 
 namespace smacc
 {
-void SmaccAsyncClientBehavior::executeOnEntry()
-{
-  RCLCPP_INFO_STREAM(this->getLogger(), "[" << getName() << "] Creating asynchronous onEntry thread");
-  this->onEntryThread_ = std::async(std::launch::async, [=] {
-    this->onEntry();
-    this->postFinishEventFn_();
-    return 0;
-  });
-}
+    void SmaccAsyncClientBehavior::executeOnEntry()
+    {
+        RCLCPP_INFO_STREAM(getLogger(), "[" << getName() << "] Creating asynchronous onEntry thread");
+        this->onEntryThread_ = std::async(std::launch::async,
+                                          [=] {
+                                              this->onEntry();
+                                              this->postFinishEventFn_();
+                                              return 0;
+                                          });
+    }
 
-void SmaccAsyncClientBehavior::executeOnExit()
-{
-  RCLCPP_DEBUG_STREAM(
-    this->getLogger(),
-    "[" << getName() << "] Waiting for asynchronous onEntry thread to finish before onExit");
+    void SmaccAsyncClientBehavior::executeOnExit()
+    {
+        RCLCPP_INFO_STREAM(getLogger(), "[" << getName() << "] Joining asynchronous onEntry thread");
+        rclcpp::Rate rate(10);
+        while (rclcpp::ok() && this->onEntryThread_.valid() && this->onEntryThread_.wait_for(std::chrono::seconds(0)) != std::future_status::ready)
+        {
+            rate.sleep();
+        }
+    }
 
-  rclcpp::Rate rate(100);
-  auto status = this->onEntryThread_.wait_for(std::chrono::milliseconds(0));
+    void SmaccAsyncClientBehavior::dispose()
+    {
+        RCLCPP_DEBUG_STREAM(getLogger(), "[" << getName() << "] Destroying client behavior- Waiting finishing of asynchronous onExit thread");
+        try
+        {
+            this->onExitThread_.get();
+        }
+        catch (...)
+        {
+            RCLCPP_DEBUG(getLogger(), "[SmaccAsyncClientBehavior] trying to Join onExit function, but it was already finished.");
+        }
 
-  while (rclcpp::ok() && status != std::future_status::ready)
-  {
-    rate.sleep();
-    status = this->onEntryThread_.wait_for(std::chrono::milliseconds(0));
-  }
+        RCLCPP_DEBUG_STREAM(getLogger(), "[" << getName() << "] Destroying client behavior-  onExit thread finished. Proccedding destruction.");
+    }
 
-  try
-  {
-    this->onEntryThread_.get();
-    RCLCPP_DEBUG_STREAM(
-      this->getLogger(), "[" << getName() << "] Asynchronous onEntry thread joined successfully");
-  }
-  catch (...)
-  {
-    RCLCPP_DEBUG_STREAM(
-      this->getLogger(),
-      "[" << getName() << "] onEntry thread join skipped/already finished or raised during join");
-  }
-}
+    SmaccAsyncClientBehavior::~SmaccAsyncClientBehavior()
+    {
+    }
 
-void SmaccAsyncClientBehavior::dispose()
-{
-  RCLCPP_DEBUG_STREAM(
-    this->getLogger(),
-    "[" << getName()
-         << "] Destroying client behavior- Waiting finishing of asynchronous onExit thread");
-  try
-  {
-    this->onExitThread_.get();
-  }
-  catch (...)
-  {
-    RCLCPP_DEBUG(
-      this->getLogger(),
-      "[SmaccAsyncClientBehavior] trying to Join onExit function, but it was already finished.");
-  }
+    void SmaccAsyncClientBehavior::postSuccessEvent()
+    {
+        postSuccessEventFn_();
+    }
 
-  RCLCPP_DEBUG_STREAM(
-    this->getLogger(),
-    "[" << getName()
-         << "] Destroying client behavior-  onExit thread finished. Proccedding destruction.");
-}
+    void SmaccAsyncClientBehavior::postFailureEvent()
+    {
+        postFailureEventFn_();
+    }
 
-SmaccAsyncClientBehavior::~SmaccAsyncClientBehavior()
-{
-}
-
-void SmaccAsyncClientBehavior::postSuccessEvent()
-{
-  postSuccessEventFn_();
-}
-
-void SmaccAsyncClientBehavior::postFailureEvent()
-{
-  postFailureEventFn_();
-}
-
-}  // namespace smacc
+} // namespace smacc

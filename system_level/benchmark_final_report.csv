@@ -25,6 +25,50 @@ google_gemini-3.1-pro-preview,simulation_integration,simulation_integration/task
 google_gemini-3.1-pro-preview,simulation_integration,simulation_integration/task_006-ardupilot-gazebo,FAILED,2/9,22.22%,1138,"test_socket_pollin_logic, test_socket_recv_semantics, test_preupdate_protocol_parsing, test_lockstep_logic, test_pwm_normalization_logic, test_joint_command_application, test_failsafe_handling"
 google_gemini-3.1-pro-preview,simulation_integration,simulation_integration/task_007_carla_ros_bridge,FAILED,6/8,75.00%,36521,"test_twist_linear_rotation_logic, test_actor_factory_pre_tick_update"
 google_gemini-3.1-pro-preview,simulation_integration,simulation_integration/task_008_navigation_recovery_action,FAILED,3/4,75.00%,13041,test_service_client_and_call
+google_gemini-3.1-pro-preview,multi_node,multi_node/task_001_rosserial_python_integration,FAILED,9/10,90.00%,49309,test_absence_of_global_node_init
+google_gemini-3.1-pro-preview,multi_node,multi_node/task_002_sm_rosbag_recorder,SUCCESS,7/7,100.00%,33477,None
+google_gemini-3.1-pro-preview,multi_node,multi_node/task_004_talker_relay_listener,SUCCESS,8/8,100.00%,7491,None
+google_gemini-3.1-pro-preview,multi_node,multi_node/task_005_KIE_multiagent_model,FAILED,10/11,90.91%,44543,test_if_no_xmlrpc_usage
+google_gemini-3.1-pro-preview,multi_node,multi_node/task_006_swarm_ros_bridge,FAILED,4/8,50.00%,30728,"test_hpp_ros2_interface_migration, test_cpp_node_inheritance_usage, test_cpp_qos_usage, test_system_callback_consistency"
+google_gemini-3.1-pro-preview,multi_node,multi_node/task_007_aws_les,FAILED,2/8,25.00%,12293,"test_member_variable_consistency, test_callback_signature_sync, test_service_binding_pattern, test_inheritance_pattern, test_message_namespace_migration, test_ros1_leakage_cleanup"
+google_gemini-3.1-pro-preview,multi_node,multi_node/task_009_fleet_system,FAILED,1/5,20.00%,20647,"test_time_struct_field_sync, test_header_schema_no_seq, test_namespace_conversion_logic, test_no_ros1_naming_leakage"
+google_gemini-3.1-pro-preview,multi_node,multi_node/task_011_amr_interop,FAILED,4/6,66.67%,17966,"test_py_ros_to_mqtt_orchestration, test_no_ros1_terminology_leakage"
+google_gemini-3.1-pro-preview,multi_node,multi_node/task_012_multimaster_flie,FAILED,5/8,62.50%,47476,"test_monitor_uses_succeed_helper, test_sync_loop_prevention, test_absence_of_hardcoded_names"
+minimax_minimax-m2.7,manipulation,manipulation/task_001_pick_and_place,FAILED,4/6,66.67%,10734,"test_detector_async_non_blocking_pattern, test_static_interface_linkage_consistency"
+minimax_minimax-m2.7,manipulation,manipulation/task_002_ur5_pick_and_place,FAILED,6/9,66.67%,11788,"test_controller_move_to_logic, test_trajectory_interpolation_integrity, test_strict_naming_compliance"
+minimax_minimax-m2.7,manipulation,manipulation/task_003_ur5_red_box,FAILED,2/5,40.00%,2750,"test_service_server_migration, test_cmakelists_rosidl_integrity, test_package_xml_modern_format"
+minimax_minimax-m2.7,manipulation,manipulation/task_004_simplified_pick_place,FAILED,3/7,42.86%,18748,"test_migration_node_initialization, test_migration_tf2_logic, test_migration_async_handling, test_integration_logic_params"
+minimax_minimax-m2.7,manipulation,manipulation/task_005_interbotix_demo,FAILED,4/7,57.14%,1714,"test_shared_node_instance, test_tf_naming_convention, test_cluster_position_destructuring"
+minimax_minimax-m2.7,manipulation,manipulation/task_006_pick_up_objects,FAILED,6/9,66.67%,10015,"test_no_leading_slashes_in_topics, test_no_nested_spin, test_qos_usage"
+minimax_minimax-m2.7,manipulation,manipulation/task_007_tm_robot_arms,FAILED,7/10,70.00%,14050,"test_sync_wait_logic, test_mutex_safety, test_demo_blocking_call"
+minimax_minimax-m2.7,manipulation,manipulation/task_008_allegro_hand,FAILED,4/7,57.14%,9373,"test_control_sync_flow, test_emergency_stop_logic, test_variable_naming_consistency"
+minimax_minimax-m2.7,manipulation,manipulation/task_009_urdf,FAILED,0/3,0.00%,493,"test_urdf_kinematics, test_srdf_semantic_logic, test_joint_limits_overrides"
+minimax_minimax-m2.7,manipulation,manipulation/task_010_reach_study,FAILED,2/4,50.00%,10377,"test_ros1_remnants_check, test_tf2_ros2_migration"
+minimax_minimax-m2.7,navigation,navigation/task_001_simple_map_navigation_2d,FAILED,0/7,0.00%,681,None
+minimax_minimax-m2.7,navigation,navigation/task_002_husky_sim_navigation,FAILED,3/7,42.86%,4538,"test_nav_stack_replacement, test_cmake_asset_installation, test_launch_path_resolution, test_launch_conditional_logic"
+minimax_minimax-m2.7,navigation,navigation/task_003_waypoint_following,FAILED,0/4,0.00%,3025,"test_dependency_sync_xml_and_cmake, test_interface_sync_cmake_and_cpp, test_cpp_action_server_logic, test_build_system_migration"
+minimax_minimax-m2.7,navigation,navigation/task_004_obstacle_avoidance,FAILED,3/5,60.00%,6989,"test_cmake_integration, test_package_xml_deps"
+minimax_minimax-m2.7,navigation,navigation/task_005_plugin_replacement,FAILED,1/5,20.00%,10611,"test_interface_signature_consistency, test_implementation_semantic_flow, test_build_system_bridge, test_class_export_match"
+minimax_minimax-m2.7,navigation,navigation/task_006_exploration_mapping,FAILED,0/3,0.00%,3866,"test_hole1_slam_node_translation, test_hole2_costmap_sensor_translation, test_rviz_migration_consistency"
+minimax_minimax-m2.7,navigation,navigation/task_007_navigation_sensor_failure,FAILED,4/8,50.00%,8852,"test_service_callback_signatures, test_parameter_safety_logic, test_non_blocking_execution_logic, test_service_binding_logic"
+minimax_minimax-m2.7,navigation,navigation/task_008_exploration_mapping,FAILED,3/6,50.00%,3427,"test_architecture_transformation, test_interface_matching_logic, test_yaml_structure_and_sync"
+minimax_minimax-m2.7,simulation_integration,simulation_integration/task_001_urdf,FAILED,0/7,0.00%,1353,"test_urdf_base_link_consistency, test_urdf_inertial_integration, test_launch_xacro_command_api, test_launch_resource_indexing, test_launch_parameter_wrapping, test_anti_leakage_ros1_substitution, test_launch_integration_completeness"
+minimax_minimax-m2.7,simulation_integration,simulation_integration/task_002_gazebo_plugin,FAILED,2/7,28.57%,1102,"test_cpp_load_function_signature, test_launch_empty_world_inclusion, test_launch_world_parameter_passing, test_launch_xml_structure, test_anti_leakage_ros2_substitution"
+minimax_minimax-m2.7,simulation_integration,simulation_integration/task_003_turtlebot3_gazebo,FAILED,3/9,33.33%,2492,"test_burger_base_link_mesh, test_burger_collision_geometry, test_burger_inertial_properties, test_waffle_dual_caster_structure, test_waffle_base_link_mesh, test_launch_server_client_separation"
+minimax_minimax-m2.7,simulation_integration,simulation_integration/task_004_industrial_robot_simulator,TRANSLATION_FAILED,0/0,0.00%,0,None
+minimax_minimax-m2.7,simulation_integration,simulation_integration/task_005_Allegro_Hand_V5_ROS1_Task,FAILED,2/8,25.00%,8497,"test_cmake_ros2_ament_integrity, test_imu_physics_frequency_scaling_semantics, test_ros2_api_usage, test_msgbuffer_memory_logic, test_msgbuffer_safety_assertions, test_header_inclusion_semantics"
+minimax_minimax-m2.7,simulation_integration,simulation_integration/task_006-ardupilot-gazebo,FAILED,2/9,22.22%,1539,"test_socket_pollin_logic, test_socket_recv_semantics, test_preupdate_protocol_parsing, test_lockstep_logic, test_pwm_normalization_logic, test_joint_command_application, test_failsafe_handling"
+minimax_minimax-m2.7,simulation_integration,simulation_integration/task_007_carla_ros_bridge,FAILED,3/8,37.50%,13652,"test_twist_linear_rotation_logic, test_twist_angular_unit_conversion, test_twist_angular_handedness_inversion, test_bridge_update_trigger_with_timestamp, test_actor_factory_pre_tick_update"
+minimax_minimax-m2.7,simulation_integration,simulation_integration/task_008_navigation_recovery_action,FAILED,2/4,50.00%,2557,"test_service_client_and_call, test_pose_and_twist_initialization"
+minimax_minimax-m2.7,multi_node,multi_node/task_001_rosserial_python_integration,FAILED,8/10,80.00%,17399,"test_executor_spin, test_absence_of_global_node_init"
+minimax_minimax-m2.7,multi_node,multi_node/task_002_sm_rosbag_recorder,FAILED,6/7,85.71%,12799,test_absence_of_legacy_ros1
+minimax_minimax-m2.7,multi_node,multi_node/task_004_talker_relay_listener,FAILED,7/8,87.50%,3785,test_babbler_timer_paradigm
+minimax_minimax-m2.7,multi_node,multi_node/task_005_KIE_multiagent_model,SUCCESS,11/11,100.00%,27889,None
+minimax_minimax-m2.7,multi_node,multi_node/task_006_swarm_ros_bridge,TRANSLATION_FAILED,0/0,0.00%,0,None
+minimax_minimax-m2.7,multi_node,multi_node/task_007_aws_les,TRANSLATION_FAILED,0/0,0.00%,0,None
+minimax_minimax-m2.7,multi_node,multi_node/task_009_fleet_system,FAILED,1/5,20.00%,8645,"test_time_struct_field_sync, test_header_schema_no_seq, test_namespace_conversion_logic, test_no_ros1_naming_leakage"
+minimax_minimax-m2.7,multi_node,multi_node/task_011_amr_interop,FAILED,5/6,83.33%,10618,test_no_ros1_terminology_leakage
+minimax_minimax-m2.7,multi_node,multi_node/task_012_multimaster_flie,FAILED,7/8,87.50%,31587,test_absence_of_hardcoded_names
 openai_gpt-4o,manipulation,manipulation/task_001_pick_and_place,FAILED,3/6,50.00%,9108,"test_detector_async_non_blocking_pattern, test_state_machine_future_synchronization, test_static_interface_linkage_consistency"
 openai_gpt-4o,manipulation,manipulation/task_002_ur5_pick_and_place,FAILED,5/9,55.56%,9138,"test_controller_move_to_logic, test_no_nested_deadlocks, test_trajectory_interpolation_integrity, test_strict_naming_compliance"
 openai_gpt-4o,manipulation,manipulation/task_003_ur5_red_box,FAILED,2/5,40.00%,2003,"test_service_server_migration, test_cmakelists_rosidl_integrity, test_package_xml_modern_format"
@@ -51,6 +95,190 @@ openai_gpt-4o,simulation_integration,simulation_integration/task_005_Allegro_Han
 openai_gpt-4o,simulation_integration,simulation_integration/task_006-ardupilot-gazebo,TRANSLATION_FAILED,0/0,0.00%,0,None
 openai_gpt-4o,simulation_integration,simulation_integration/task_007_carla_ros_bridge,FAILED,5/8,62.50%,12449,"test_twist_linear_rotation_logic, test_bridge_update_trigger_with_timestamp, test_actor_factory_pre_tick_update"
 openai_gpt-4o,simulation_integration,simulation_integration/task_008_navigation_recovery_action,FAILED,2/4,50.00%,1396,"test_service_client_and_call, test_pose_and_twist_initialization"
+openai_gpt-4o,multi_node,multi_node/task_001_rosserial_python_integration,FAILED,9/10,90.00%,14459,test_parameter_declaration_pattern
+openai_gpt-4o,multi_node,multi_node/task_002_sm_rosbag_recorder,FAILED,6/7,85.71%,11824,test_recorder_qos_awareness
+openai_gpt-4o,multi_node,multi_node/task_004_talker_relay_listener,SUCCESS,8/8,100.00%,2511,None
+openai_gpt-4o,multi_node,multi_node/task_005_KIE_multiagent_model,SUCCESS,11/11,100.00%,21895,None
+openai_gpt-4o,multi_node,multi_node/task_006_swarm_ros_bridge,FAILED,4/8,50.00%,5118,"test_hpp_ros2_interface_migration, test_cpp_node_inheritance_usage, test_cpp_qos_usage, test_system_callback_consistency"
+openai_gpt-4o,multi_node,multi_node/task_007_aws_les,FAILED,3/8,37.50%,1886,"test_member_variable_consistency, test_callback_signature_sync, test_inheritance_pattern, test_message_namespace_migration, test_ros1_leakage_cleanup"
+openai_gpt-4o,multi_node,multi_node/task_009_fleet_system,FAILED,1/5,20.00%,4560,"test_time_struct_field_sync, test_header_schema_no_seq, test_namespace_conversion_logic, test_no_ros1_naming_leakage"
+openai_gpt-4o,multi_node,multi_node/task_011_amr_interop,FAILED,4/6,66.67%,9121,"test_py_ros_to_mqtt_orchestration, test_no_ros1_terminology_leakage"
+openai_gpt-4o,multi_node,multi_node/task_012_multimaster_flie,FAILED,7/8,87.50%,26525,test_absence_of_hardcoded_names
+deepseek_deepseek-v3.2,manipulation,manipulation/task_001_pick_and_place,FAILED,3/6,50.00%,10112,"test_detector_async_non_blocking_pattern, test_state_machine_future_synchronization, test_static_interface_linkage_consistency"
+deepseek_deepseek-v3.2,manipulation,manipulation/task_002_ur5_pick_and_place,FAILED,6/9,66.67%,11455,"test_controller_move_to_logic, test_no_nested_deadlocks, test_trajectory_interpolation_integrity"
+deepseek_deepseek-v3.2,manipulation,manipulation/task_003_ur5_red_box,FAILED,3/5,60.00%,2362,"test_cmakelists_rosidl_integrity, test_package_xml_modern_format"
+deepseek_deepseek-v3.2,manipulation,manipulation/task_004_simplified_pick_place,FAILED,3/7,42.86%,16190,"test_migration_node_initialization, test_migration_tf2_logic, test_migration_scaling_logic, test_integration_logic_params"
+deepseek_deepseek-v3.2,manipulation,manipulation/task_005_interbotix_demo,FAILED,4/7,57.14%,1410,"test_shared_node_instance, test_constructor_params_migration, test_cluster_position_destructuring"
+deepseek_deepseek-v3.2,manipulation,manipulation/task_006_pick_up_objects,FAILED,6/9,66.67%,9216,"test_service_interface_alignment, test_no_leading_slashes_in_topics, test_no_nested_spin"
+deepseek_deepseek-v3.2,manipulation,manipulation/task_007_tm_robot_arms,FAILED,8/10,80.00%,13753,"test_sync_wait_logic, test_demo_blocking_call"
+deepseek_deepseek-v3.2,manipulation,manipulation/task_008_allegro_hand,FAILED,5/7,71.43%,9485,"test_emergency_stop_logic, test_variable_naming_consistency"
+deepseek_deepseek-v3.2,manipulation,manipulation/task_009_urdf,TRANSLATION_FAILED,0/0,0.00%,0,None
+deepseek_deepseek-v3.2,manipulation,manipulation/task_010_reach_study,FAILED,2/4,50.00%,10338,"test_ros1_remnants_check, test_tf2_ros2_migration"
+deepseek_deepseek-v3.2,navigation,navigation/task_001_simple_map_navigation_2d,TRANSLATION_FAILED,0/0,0.00%,0,None
+deepseek_deepseek-v3.2,navigation,navigation/task_002_husky_sim_navigation,TRANSLATION_FAILED,0/0,0.00%,0,None
+deepseek_deepseek-v3.2,navigation,navigation/task_003_waypoint_following,FAILED,0/4,0.00%,2235,"test_dependency_sync_xml_and_cmake, test_interface_sync_cmake_and_cpp, test_cpp_action_server_logic, test_build_system_migration"
+deepseek_deepseek-v3.2,navigation,navigation/task_004_obstacle_avoidance,FAILED,3/5,60.00%,6889,"test_cmake_integration, test_package_xml_deps"
+deepseek_deepseek-v3.2,navigation,navigation/task_005_plugin_replacement,FAILED,3/5,60.00%,7311,"test_interface_signature_consistency, test_build_system_bridge"
+deepseek_deepseek-v3.2,navigation,navigation/task_006_exploration_mapping,TRANSLATION_FAILED,0/0,0.00%,0,None
+deepseek_deepseek-v3.2,navigation,navigation/task_007_navigation_sensor_failure,FAILED,6/8,75.00%,7610,"test_non_blocking_execution_logic, test_service_binding_logic"
+deepseek_deepseek-v3.2,navigation,navigation/task_008_exploration_mapping,FAILED,3/6,50.00%,2355,"test_architecture_transformation, test_interface_matching_logic, test_yaml_structure_and_sync"
+deepseek_deepseek-v3.2,simulation_integration,simulation_integration/task_001_urdf,TRANSLATION_FAILED,0/0,0.00%,0,None
+deepseek_deepseek-v3.2,simulation_integration,simulation_integration/task_002_gazebo_plugin,FAILED,3/7,42.86%,765,"test_launch_empty_world_inclusion, test_launch_world_parameter_passing, test_launch_xml_structure, test_anti_leakage_ros2_substitution"
+deepseek_deepseek-v3.2,simulation_integration,simulation_integration/task_003_turtlebot3_gazebo,FAILED,3/9,33.33%,1695,"test_burger_base_link_mesh, test_burger_collision_geometry, test_burger_inertial_properties, test_waffle_dual_caster_structure, test_waffle_base_link_mesh, test_launch_server_client_separation"
+deepseek_deepseek-v3.2,simulation_integration,simulation_integration/task_004_industrial_robot_simulator,FAILED,2/4,50.00%,8861,"test_ros2_state_node_lifecycle, test_launch_system_migration_check"
+deepseek_deepseek-v3.2,simulation_integration,simulation_integration/task_005_Allegro_Hand_V5_ROS1_Task,FAILED,2/8,25.00%,6667,"test_cmake_ros2_ament_integrity, test_imu_physics_frequency_scaling_semantics, test_ros2_api_usage, test_msgbuffer_memory_logic, test_msgbuffer_safety_assertions, test_header_inclusion_semantics"
+deepseek_deepseek-v3.2,simulation_integration,simulation_integration/task_006-ardupilot-gazebo,TRANSLATION_FAILED,0/0,0.00%,0,None
+deepseek_deepseek-v3.2,simulation_integration,simulation_integration/task_007_carla_ros_bridge,FAILED,4/8,50.00%,13849,"test_twist_linear_rotation_logic, test_bridge_sync_tick_order, test_bridge_update_trigger_with_timestamp, test_actor_factory_pre_tick_update"
+deepseek_deepseek-v3.2,simulation_integration,simulation_integration/task_008_navigation_recovery_action,FAILED,2/4,50.00%,1900,"test_subscriber_migration, test_service_client_and_call"
+deepseek_deepseek-v3.2,multi_node,multi_node/task_001_rosserial_python_integration,FAILED,7/10,70.00%,16380,"test_dependency_injection_linkage, test_executor_spin, test_absence_of_global_node_init"
+deepseek_deepseek-v3.2,multi_node,multi_node/task_002_sm_rosbag_recorder,FAILED,6/7,85.71%,12727,test_recorder_qos_awareness
+deepseek_deepseek-v3.2,multi_node,multi_node/task_004_talker_relay_listener,SUCCESS,8/8,100.00%,4013,None
+deepseek_deepseek-v3.2,multi_node,multi_node/task_005_KIE_multiagent_model,FAILED,8/11,72.73%,22566,"test_md_udp_protocol_preservation, test_md_variable_consistency, test_if_no_xmlrpc_usage"
+deepseek_deepseek-v3.2,multi_node,multi_node/task_006_swarm_ros_bridge,FAILED,4/8,50.00%,8796,"test_hpp_ros2_interface_migration, test_cpp_node_inheritance_usage, test_cpp_qos_usage, test_system_callback_consistency"
+deepseek_deepseek-v3.2,multi_node,multi_node/task_007_aws_les,FAILED,3/8,37.50%,1931,"test_member_variable_consistency, test_callback_signature_sync, test_inheritance_pattern, test_message_namespace_migration, test_ros1_leakage_cleanup"
+deepseek_deepseek-v3.2,multi_node,multi_node/task_009_fleet_system,FAILED,1/5,20.00%,5068,"test_time_struct_field_sync, test_header_schema_no_seq, test_namespace_conversion_logic, test_no_ros1_naming_leakage"
+deepseek_deepseek-v3.2,multi_node,multi_node/task_011_amr_interop,FAILED,4/6,66.67%,10743,"test_py_ros_to_mqtt_orchestration, test_no_ros1_terminology_leakage"
+deepseek_deepseek-v3.2,multi_node,multi_node/task_012_multimaster_flie,FAILED,2/8,25.00%,22450,"test_monitor_uses_succeed_helper, test_sync_uses_multicall, test_sync_loop_prevention, test_sync_filter_application, test_sync_preserves_remote_uri, test_absence_of_hardcoded_names"
+openai_gpt-5.3-codex,manipulation,manipulation/task_001_pick_and_place,FAILED,4/6,66.67%,13397,"test_detector_async_non_blocking_pattern, test_static_interface_linkage_consistency"
+openai_gpt-5.3-codex,manipulation,manipulation/task_002_ur5_pick_and_place,FAILED,7/9,77.78%,13464,"test_controller_move_to_logic, test_trajectory_interpolation_integrity"
+openai_gpt-5.3-codex,manipulation,manipulation/task_003_ur5_red_box,FAILED,3/5,60.00%,4246,"test_cmakelists_rosidl_integrity, test_package_xml_modern_format"
+openai_gpt-5.3-codex,manipulation,manipulation/task_004_simplified_pick_place,FAILED,6/7,85.71%,18890,test_migration_tf2_logic
+openai_gpt-5.3-codex,manipulation,manipulation/task_005_interbotix_demo,FAILED,2/7,28.57%,3144,"test_shared_node_instance, test_tf_naming_convention, test_constructor_params_migration, test_no_rospy_artifacts, test_cluster_position_destructuring"
+openai_gpt-5.3-codex,manipulation,manipulation/task_006_pick_up_objects,FAILED,7/9,77.78%,10618,"test_no_leading_slashes_in_topics, test_no_nested_spin"
+openai_gpt-5.3-codex,manipulation,manipulation/task_007_tm_robot_arms,FAILED,8/10,80.00%,17230,"test_sync_wait_logic, test_demo_blocking_call"
+openai_gpt-5.3-codex,manipulation,manipulation/task_008_allegro_hand,FAILED,4/7,57.14%,12938,"test_velocity_calculation, test_emergency_stop_logic, test_variable_naming_consistency"
+openai_gpt-5.3-codex,manipulation,manipulation/task_009_urdf,FAILED,0/3,0.00%,327,"test_urdf_kinematics, test_srdf_semantic_logic, test_joint_limits_overrides"
+openai_gpt-5.3-codex,manipulation,manipulation/task_010_reach_study,FAILED,2/4,50.00%,13601,"test_ros1_remnants_check, test_tf2_ros2_migration"
+openai_gpt-5.3-codex,navigation,navigation/task_001_simple_map_navigation_2d,FAILED,0/7,0.00%,321,None
+openai_gpt-5.3-codex,navigation,navigation/task_002_husky_sim_navigation,FAILED,1/7,14.29%,348,"test_pkg_format_and_buildtool, test_nav_stack_replacement, test_cmake_asset_installation, test_cmake_ament_registration, test_launch_path_resolution, test_launch_conditional_logic"
+openai_gpt-5.3-codex,navigation,navigation/task_003_waypoint_following,FAILED,0/4,0.00%,2891,"test_dependency_sync_xml_and_cmake, test_interface_sync_cmake_and_cpp, test_cpp_action_server_logic, test_build_system_migration"
+openai_gpt-5.3-codex,navigation,navigation/task_004_obstacle_avoidance,FAILED,2/5,40.00%,7799,"test_parameter_logic, test_cmake_integration, test_package_xml_deps"
+openai_gpt-5.3-codex,navigation,navigation/task_005_plugin_replacement,FAILED,3/5,60.00%,10271,"test_interface_signature_consistency, test_build_system_bridge"
+openai_gpt-5.3-codex,navigation,navigation/task_006_exploration_mapping,FAILED,0/3,0.00%,339,"test_hole1_slam_node_translation, test_hole2_costmap_sensor_translation, test_rviz_migration_consistency"
+openai_gpt-5.3-codex,navigation,navigation/task_007_navigation_sensor_failure,FAILED,6/8,75.00%,8244,"test_service_callback_signatures, test_service_binding_logic"
+openai_gpt-5.3-codex,navigation,navigation/task_008_exploration_mapping,FAILED,3/6,50.00%,3895,"test_architecture_transformation, test_interface_matching_logic, test_yaml_structure_and_sync"
+openai_gpt-5.3-codex,simulation_integration,simulation_integration/task_001_urdf,FAILED,0/7,0.00%,324,"test_urdf_base_link_consistency, test_urdf_inertial_integration, test_launch_xacro_command_api, test_launch_resource_indexing, test_launch_parameter_wrapping, test_anti_leakage_ros1_substitution, test_launch_integration_completeness"
+openai_gpt-5.3-codex,simulation_integration,simulation_integration/task_002_gazebo_plugin,FAILED,3/7,42.86%,2543,"test_launch_empty_world_inclusion, test_launch_world_parameter_passing, test_launch_xml_structure, test_anti_leakage_ros2_substitution"
+openai_gpt-5.3-codex,simulation_integration,simulation_integration/task_003_turtlebot3_gazebo,FAILED,3/9,33.33%,1991,"test_burger_base_link_mesh, test_burger_collision_geometry, test_burger_inertial_properties, test_waffle_dual_caster_structure, test_waffle_base_link_mesh, test_launch_server_client_separation"
+openai_gpt-5.3-codex,simulation_integration,simulation_integration/task_004_industrial_robot_simulator,FAILED,2/4,50.00%,12156,"test_ros2_state_node_lifecycle, test_launch_system_migration_check"
+openai_gpt-5.3-codex,simulation_integration,simulation_integration/task_005_Allegro_Hand_V5_ROS1_Task,FAILED,1/8,12.50%,7376,"test_cmake_ros2_ament_integrity, test_imu_physics_frequency_scaling_semantics, test_ros2_api_usage, test_no_legacy_remnants, test_msgbuffer_memory_logic, test_msgbuffer_safety_assertions, test_header_inclusion_semantics"
+openai_gpt-5.3-codex,simulation_integration,simulation_integration/task_006-ardupilot-gazebo,FAILED,2/9,22.22%,375,"test_socket_pollin_logic, test_socket_recv_semantics, test_preupdate_protocol_parsing, test_lockstep_logic, test_pwm_normalization_logic, test_joint_command_application, test_failsafe_handling"
+openai_gpt-5.3-codex,simulation_integration,simulation_integration/task_007_carla_ros_bridge,FAILED,7/8,87.50%,14007,test_actor_factory_pre_tick_update
+openai_gpt-5.3-codex,simulation_integration,simulation_integration/task_008_navigation_recovery_action,FAILED,3/4,75.00%,2884,test_service_client_and_call
+openai_gpt-5.3-codex,multi_node,multi_node/task_001_rosserial_python_integration,FAILED,8/10,80.00%,18561,"test_client_constructor_interface, test_absence_of_global_node_init"
+openai_gpt-5.3-codex,multi_node,multi_node/task_002_sm_rosbag_recorder,FAILED,5/7,71.43%,15264,"test_recorder_qos_awareness, test_absence_of_legacy_ros1"
+openai_gpt-5.3-codex,multi_node,multi_node/task_004_talker_relay_listener,SUCCESS,8/8,100.00%,4181,None
+openai_gpt-5.3-codex,multi_node,multi_node/task_005_KIE_multiagent_model,FAILED,10/11,90.91%,30627,test_md_no_rospy_time_leakage
+openai_gpt-5.3-codex,multi_node,multi_node/task_006_swarm_ros_bridge,FAILED,5/8,62.50%,11081,"test_hpp_ros2_interface_migration, test_cpp_node_inheritance_usage, test_system_callback_consistency"
+openai_gpt-5.3-codex,multi_node,multi_node/task_007_aws_les,FAILED,2/8,25.00%,4757,"test_member_variable_consistency, test_callback_signature_sync, test_service_binding_pattern, test_inheritance_pattern, test_message_namespace_migration, test_ros1_leakage_cleanup"
+openai_gpt-5.3-codex,multi_node,multi_node/task_009_fleet_system,FAILED,1/5,20.00%,8402,"test_time_struct_field_sync, test_header_schema_no_seq, test_namespace_conversion_logic, test_no_ros1_naming_leakage"
+openai_gpt-5.3-codex,multi_node,multi_node/task_011_amr_interop,FAILED,4/6,66.67%,11276,"test_py_ros_to_mqtt_orchestration, test_no_ros1_terminology_leakage"
+openai_gpt-5.3-codex,multi_node,multi_node/task_012_multimaster_flie,FAILED,7/8,87.50%,29704,test_absence_of_hardcoded_names
+qwen_qwen3.5-plus-02-15,manipulation,manipulation/task_001_pick_and_place,FAILED,4/6,66.67%,31152,"test_detector_async_non_blocking_pattern, test_static_interface_linkage_consistency"
+qwen_qwen3.5-plus-02-15,manipulation,manipulation/task_002_ur5_pick_and_place,FAILED,6/9,66.67%,10998,"test_controller_move_to_logic, test_trajectory_interpolation_integrity, test_strict_naming_compliance"
+qwen_qwen3.5-plus-02-15,manipulation,manipulation/task_003_ur5_red_box,FAILED,3/5,60.00%,18099,"test_cmakelists_rosidl_integrity, test_package_xml_modern_format"
+qwen_qwen3.5-plus-02-15,manipulation,manipulation/task_004_simplified_pick_place,FAILED,5/7,71.43%,16436,"test_migration_tf2_logic, test_migration_async_handling"
+qwen_qwen3.5-plus-02-15,manipulation,manipulation/task_005_interbotix_demo,FAILED,4/7,57.14%,15266,"test_shared_node_instance, test_tf_naming_convention, test_cluster_position_destructuring"
+qwen_qwen3.5-plus-02-15,manipulation,manipulation/task_006_pick_up_objects,FAILED,7/9,77.78%,10442,"test_no_leading_slashes_in_topics, test_no_nested_spin"
+qwen_qwen3.5-plus-02-15,manipulation,manipulation/task_007_tm_robot_arms,FAILED,7/10,70.00%,30136,"test_sync_wait_logic, test_mutex_safety, test_demo_blocking_call"
+qwen_qwen3.5-plus-02-15,manipulation,manipulation/task_008_allegro_hand,FAILED,5/7,71.43%,47459,"test_emergency_stop_logic, test_variable_naming_consistency"
+qwen_qwen3.5-plus-02-15,manipulation,manipulation/task_009_urdf,FAILED,0/3,0.00%,28706,"test_urdf_kinematics, test_srdf_semantic_logic, test_joint_limits_overrides"
+qwen_qwen3.5-plus-02-15,manipulation,manipulation/task_010_reach_study,FAILED,2/4,50.00%,10772,"test_ros1_remnants_check, test_tf2_ros2_migration"
+qwen_qwen3.5-plus-02-15,navigation,navigation/task_001_simple_map_navigation_2d,FAILED,0/7,0.00%,5250,None
+qwen_qwen3.5-plus-02-15,navigation,navigation/task_002_husky_sim_navigation,FAILED,1/7,14.29%,5981,"test_pkg_format_and_buildtool, test_nav_stack_replacement, test_cmake_asset_installation, test_cmake_ament_registration, test_launch_path_resolution, test_launch_conditional_logic"
+qwen_qwen3.5-plus-02-15,navigation,navigation/task_003_waypoint_following,FAILED,0/4,0.00%,5660,"test_dependency_sync_xml_and_cmake, test_interface_sync_cmake_and_cpp, test_cpp_action_server_logic, test_build_system_migration"
+qwen_qwen3.5-plus-02-15,navigation,navigation/task_004_obstacle_avoidance,FAILED,3/5,60.00%,7112,"test_cmake_integration, test_package_xml_deps"
+qwen_qwen3.5-plus-02-15,navigation,navigation/task_005_plugin_replacement,FAILED,2/5,40.00%,21498,"test_interface_signature_consistency, test_build_system_bridge, test_class_export_match"
+qwen_qwen3.5-plus-02-15,navigation,navigation/task_006_exploration_mapping,TRANSLATION_FAILED,0/0,0.00%,0,None
+qwen_qwen3.5-plus-02-15,navigation,navigation/task_007_navigation_sensor_failure,TRANSLATION_FAILED,0/0,0.00%,0,None
+qwen_qwen3.5-plus-02-15,navigation,navigation/task_008_exploration_mapping,FAILED,3/6,50.00%,26396,"test_architecture_transformation, test_interface_matching_logic, test_yaml_structure_and_sync"
+qwen_qwen3.5-plus-02-15,simulation_integration,simulation_integration/task_001_urdf,FAILED,0/7,0.00%,8197,"test_urdf_base_link_consistency, test_urdf_inertial_integration, test_launch_xacro_command_api, test_launch_resource_indexing, test_launch_parameter_wrapping, test_anti_leakage_ros1_substitution, test_launch_integration_completeness"
+qwen_qwen3.5-plus-02-15,simulation_integration,simulation_integration/task_002_gazebo_plugin,FAILED,3/7,42.86%,8403,"test_launch_empty_world_inclusion, test_launch_world_parameter_passing, test_launch_xml_structure, test_anti_leakage_ros2_substitution"
+qwen_qwen3.5-plus-02-15,simulation_integration,simulation_integration/task_003_turtlebot3_gazebo,FAILED,3/9,33.33%,7783,"test_burger_base_link_mesh, test_burger_collision_geometry, test_burger_inertial_properties, test_waffle_dual_caster_structure, test_waffle_base_link_mesh, test_launch_server_client_separation"
+qwen_qwen3.5-plus-02-15,simulation_integration,simulation_integration/task_004_industrial_robot_simulator,FAILED,1/4,25.00%,19662,"test_ros2_state_node_lifecycle, test_ros2_trajectory_param_logic, test_launch_system_migration_check"
+qwen_qwen3.5-plus-02-15,simulation_integration,simulation_integration/task_005_Allegro_Hand_V5_ROS1_Task,FAILED,3/8,37.50%,6915,"test_cmake_ros2_ament_integrity, test_imu_physics_frequency_scaling_semantics, test_msgbuffer_memory_logic, test_msgbuffer_safety_assertions, test_header_inclusion_semantics"
+qwen_qwen3.5-plus-02-15,simulation_integration,simulation_integration/task_006-ardupilot-gazebo,TRANSLATION_FAILED,0/0,0.00%,0,None
+qwen_qwen3.5-plus-02-15,simulation_integration,simulation_integration/task_007_carla_ros_bridge,FAILED,5/8,62.50%,14313,"test_twist_linear_rotation_logic, test_bridge_update_trigger_with_timestamp, test_actor_factory_pre_tick_update"
+qwen_qwen3.5-plus-02-15,simulation_integration,simulation_integration/task_008_navigation_recovery_action,FAILED,2/4,50.00%,13036,"test_service_client_and_call, test_pose_and_twist_initialization"
+qwen_qwen3.5-plus-02-15,multi_node,multi_node/task_001_rosserial_python_integration,FAILED,8/10,80.00%,16307,"test_executor_spin, test_absence_of_global_node_init"
+qwen_qwen3.5-plus-02-15,multi_node,multi_node/task_002_sm_rosbag_recorder,SUCCESS,7/7,100.00%,14038,None
+qwen_qwen3.5-plus-02-15,multi_node,multi_node/task_004_talker_relay_listener,SUCCESS,8/8,100.00%,13638,None
+qwen_qwen3.5-plus-02-15,multi_node,multi_node/task_005_KIE_multiagent_model,FAILED,9/11,81.82%,29993,"test_md_proper_msg_import, test_if_no_xmlrpc_usage"
+qwen_qwen3.5-plus-02-15,multi_node,multi_node/task_006_swarm_ros_bridge,FAILED,4/8,50.00%,9557,"test_hpp_ros2_interface_migration, test_cpp_node_inheritance_usage, test_cpp_qos_usage, test_system_callback_consistency"
+qwen_qwen3.5-plus-02-15,multi_node,multi_node/task_007_aws_les,FAILED,3/8,37.50%,13107,"test_member_variable_consistency, test_callback_signature_sync, test_inheritance_pattern, test_message_namespace_migration, test_ros1_leakage_cleanup"
+qwen_qwen3.5-plus-02-15,multi_node,multi_node/task_009_fleet_system,FAILED,1/5,20.00%,13685,"test_time_struct_field_sync, test_header_schema_no_seq, test_namespace_conversion_logic, test_no_ros1_naming_leakage"
+qwen_qwen3.5-plus-02-15,multi_node,multi_node/task_011_amr_interop,FAILED,4/6,66.67%,28220,"test_py_ros_to_mqtt_orchestration, test_no_ros1_terminology_leakage"
+qwen_qwen3.5-plus-02-15,multi_node,multi_node/task_012_multimaster_flie,FAILED,5/8,62.50%,30040,"test_monitor_calls_master_api, test_monitor_uses_succeed_helper, test_absence_of_hardcoded_names"
+moonshotai_kimi-k2.5,manipulation,manipulation/task_001_pick_and_place,FAILED,4/6,66.67%,22319,"test_detector_async_non_blocking_pattern, test_static_interface_linkage_consistency"
+moonshotai_kimi-k2.5,manipulation,manipulation/task_002_ur5_pick_and_place,FAILED,5/9,55.56%,22007,"test_controller_move_to_logic, test_no_nested_deadlocks, test_trajectory_interpolation_integrity, test_strict_naming_compliance"
+moonshotai_kimi-k2.5,manipulation,manipulation/task_003_ur5_red_box,FAILED,3/5,60.00%,11176,"test_cmakelists_rosidl_integrity, test_package_xml_modern_format"
+moonshotai_kimi-k2.5,manipulation,manipulation/task_004_simplified_pick_place,FAILED,3/7,42.86%,36938,"test_migration_node_initialization, test_migration_tf2_logic, test_migration_async_handling, test_integration_logic_params"
+moonshotai_kimi-k2.5,manipulation,manipulation/task_005_interbotix_demo,SUCCESS,7/7,100.00%,5233,None
+moonshotai_kimi-k2.5,manipulation,manipulation/task_006_pick_up_objects,FAILED,6/9,66.67%,20336,"test_service_interface_alignment, test_no_leading_slashes_in_topics, test_no_nested_spin"
+moonshotai_kimi-k2.5,manipulation,manipulation/task_007_tm_robot_arms,FAILED,6/10,60.00%,27203,"test_sync_wait_logic, test_mutex_safety, test_demo_blocking_call, test_svr_callback_notification"
+moonshotai_kimi-k2.5,manipulation,manipulation/task_008_allegro_hand,FAILED,5/7,71.43%,22811,"test_emergency_stop_logic, test_variable_naming_consistency"
+moonshotai_kimi-k2.5,manipulation,manipulation/task_009_urdf,FAILED,0/3,0.00%,1078,"test_urdf_kinematics, test_srdf_semantic_logic, test_joint_limits_overrides"
+moonshotai_kimi-k2.5,manipulation,manipulation/task_010_reach_study,FAILED,2/4,50.00%,21771,"test_ros1_remnants_check, test_tf2_ros2_migration"
+moonshotai_kimi-k2.5,navigation,navigation/task_001_simple_map_navigation_2d,FAILED,0/7,0.00%,972,None
+moonshotai_kimi-k2.5,navigation,navigation/task_002_husky_sim_navigation,FAILED,1/7,14.29%,1076,"test_pkg_format_and_buildtool, test_nav_stack_replacement, test_cmake_asset_installation, test_cmake_ament_registration, test_launch_path_resolution, test_launch_conditional_logic"
+moonshotai_kimi-k2.5,navigation,navigation/task_003_waypoint_following,FAILED,0/4,0.00%,7055,"test_dependency_sync_xml_and_cmake, test_interface_sync_cmake_and_cpp, test_cpp_action_server_logic, test_build_system_migration"
+moonshotai_kimi-k2.5,navigation,navigation/task_004_obstacle_avoidance,FAILED,3/5,60.00%,13647,"test_cmake_integration, test_package_xml_deps"
+moonshotai_kimi-k2.5,navigation,navigation/task_005_plugin_replacement,FAILED,2/5,40.00%,15900,"test_interface_signature_consistency, test_build_system_bridge, test_class_export_match"
+moonshotai_kimi-k2.5,navigation,navigation/task_006_exploration_mapping,FAILED,0/3,0.00%,972,"test_hole1_slam_node_translation, test_hole2_costmap_sensor_translation, test_rviz_migration_consistency"
+moonshotai_kimi-k2.5,navigation,navigation/task_007_navigation_sensor_failure,FAILED,5/8,62.50%,10019,"test_service_callback_signatures, test_non_blocking_execution_logic, test_service_binding_logic"
+moonshotai_kimi-k2.5,navigation,navigation/task_008_exploration_mapping,FAILED,3/6,50.00%,10697,"test_architecture_transformation, test_interface_matching_logic, test_yaml_structure_and_sync"
+moonshotai_kimi-k2.5,simulation_integration,simulation_integration/task_001_urdf,FAILED,0/7,0.00%,1892,"test_urdf_base_link_consistency, test_urdf_inertial_integration, test_launch_xacro_command_api, test_launch_resource_indexing, test_launch_parameter_wrapping, test_anti_leakage_ros1_substitution, test_launch_integration_completeness"
+moonshotai_kimi-k2.5,simulation_integration,simulation_integration/task_002_gazebo_plugin,FAILED,3/7,42.86%,3117,"test_launch_empty_world_inclusion, test_launch_world_parameter_passing, test_launch_xml_structure, test_anti_leakage_ros2_substitution"
+moonshotai_kimi-k2.5,simulation_integration,simulation_integration/task_003_turtlebot3_gazebo,FAILED,3/9,33.33%,4044,"test_burger_base_link_mesh, test_burger_collision_geometry, test_burger_inertial_properties, test_waffle_dual_caster_structure, test_waffle_base_link_mesh, test_launch_server_client_separation"
+moonshotai_kimi-k2.5,simulation_integration,simulation_integration/task_004_industrial_robot_simulator,FAILED,2/4,50.00%,21832,"test_ros2_state_node_lifecycle, test_launch_system_migration_check"
+moonshotai_kimi-k2.5,simulation_integration,simulation_integration/task_005_Allegro_Hand_V5_ROS1_Task,FAILED,3/8,37.50%,15577,"test_cmake_ros2_ament_integrity, test_imu_physics_frequency_scaling_semantics, test_msgbuffer_memory_logic, test_msgbuffer_safety_assertions, test_header_inclusion_semantics"
+moonshotai_kimi-k2.5,simulation_integration,simulation_integration/task_006-ardupilot-gazebo,TRANSLATION_FAILED,0/0,0.00%,0,None
+moonshotai_kimi-k2.5,simulation_integration,simulation_integration/task_007_carla_ros_bridge,FAILED,5/8,62.50%,16937,"test_twist_linear_rotation_logic, test_bridge_update_trigger_with_timestamp, test_actor_factory_pre_tick_update"
+moonshotai_kimi-k2.5,simulation_integration,simulation_integration/task_008_navigation_recovery_action,FAILED,2/4,50.00%,5993,"test_service_client_and_call, test_pose_and_twist_initialization"
+moonshotai_kimi-k2.5,multi_node,multi_node/task_001_rosserial_python_integration,SUCCESS,10/10,100.00%,30751,None
+moonshotai_kimi-k2.5,multi_node,multi_node/task_002_sm_rosbag_recorder,SUCCESS,7/7,100.00%,19534,None
+moonshotai_kimi-k2.5,multi_node,multi_node/task_004_talker_relay_listener,SUCCESS,8/8,100.00%,8185,None
+moonshotai_kimi-k2.5,multi_node,multi_node/task_005_KIE_multiagent_model,SUCCESS,11/11,100.00%,46069,None
+moonshotai_kimi-k2.5,multi_node,multi_node/task_006_swarm_ros_bridge,FAILED,5/8,62.50%,18691,"test_hpp_ros2_interface_migration, test_cpp_node_inheritance_usage, test_system_callback_consistency"
+moonshotai_kimi-k2.5,multi_node,multi_node/task_007_aws_les,FAILED,2/8,25.00%,8258,"test_member_variable_consistency, test_callback_signature_sync, test_service_binding_pattern, test_inheritance_pattern, test_message_namespace_migration, test_ros1_leakage_cleanup"
+moonshotai_kimi-k2.5,multi_node,multi_node/task_009_fleet_system,FAILED,1/5,20.00%,13781,"test_time_struct_field_sync, test_header_schema_no_seq, test_namespace_conversion_logic, test_no_ros1_naming_leakage"
+moonshotai_kimi-k2.5,multi_node,multi_node/task_011_amr_interop,FAILED,4/6,66.67%,16960,"test_py_ros_to_mqtt_orchestration, test_no_ros1_terminology_leakage"
+moonshotai_kimi-k2.5,multi_node,multi_node/task_012_multimaster_flie,FAILED,6/8,75.00%,43522,"test_sync_loop_prevention, test_absence_of_hardcoded_names"
+z-ai_glm-5-turbo,manipulation,manipulation/task_001_pick_and_place,TRANSLATION_FAILED,0/0,0.00%,0,None
+z-ai_glm-5-turbo,manipulation,manipulation/task_002_ur5_pick_and_place,FAILED,5/9,55.56%,17402,"test_controller_move_to_logic, test_no_nested_deadlocks, test_trajectory_interpolation_integrity, test_strict_naming_compliance"
+z-ai_glm-5-turbo,manipulation,manipulation/task_003_ur5_red_box,FAILED,2/5,40.00%,7392,"test_service_server_migration, test_cmakelists_rosidl_integrity, test_package_xml_modern_format"
+z-ai_glm-5-turbo,manipulation,manipulation/task_004_simplified_pick_place,FAILED,3/7,42.86%,24215,"test_migration_node_initialization, test_migration_tf2_logic, test_migration_async_handling, test_integration_logic_params"
+z-ai_glm-5-turbo,manipulation,manipulation/task_005_interbotix_demo,FAILED,3/7,42.86%,4158,"test_shared_node_instance, test_constructor_params_migration, test_no_rospy_artifacts, test_cluster_position_destructuring"
+z-ai_glm-5-turbo,manipulation,manipulation/task_006_pick_up_objects,FAILED,7/9,77.78%,19513,"test_no_leading_slashes_in_topics, test_no_nested_spin"
+z-ai_glm-5-turbo,manipulation,manipulation/task_007_tm_robot_arms,FAILED,7/10,70.00%,22532,"test_sync_wait_logic, test_demo_blocking_call, test_svr_callback_notification"
+z-ai_glm-5-turbo,manipulation,manipulation/task_008_allegro_hand,FAILED,5/7,71.43%,14075,"test_emergency_stop_logic, test_variable_naming_consistency"
+z-ai_glm-5-turbo,manipulation,manipulation/task_009_urdf,FAILED,0/3,0.00%,317,"test_urdf_kinematics, test_srdf_semantic_logic, test_joint_limits_overrides"
+z-ai_glm-5-turbo,manipulation,manipulation/task_010_reach_study,FAILED,2/4,50.00%,15130,"test_ros1_remnants_check, test_tf2_ros2_migration"
+z-ai_glm-5-turbo,navigation,navigation/task_001_simple_map_navigation_2d,FAILED,0/7,0.00%,361,None
+z-ai_glm-5-turbo,navigation,navigation/task_002_husky_sim_navigation,FAILED,1/7,14.29%,471,"test_pkg_format_and_buildtool, test_nav_stack_replacement, test_cmake_asset_installation, test_cmake_ament_registration, test_launch_path_resolution, test_launch_conditional_logic"
+z-ai_glm-5-turbo,navigation,navigation/task_003_waypoint_following,FAILED,0/4,0.00%,4370,"test_dependency_sync_xml_and_cmake, test_interface_sync_cmake_and_cpp, test_cpp_action_server_logic, test_build_system_migration"
+z-ai_glm-5-turbo,navigation,navigation/task_004_obstacle_avoidance,FAILED,3/5,60.00%,10139,"test_cmake_integration, test_package_xml_deps"
+z-ai_glm-5-turbo,navigation,navigation/task_005_plugin_replacement,FAILED,2/5,40.00%,14379,"test_interface_signature_consistency, test_build_system_bridge, test_class_export_match"
+z-ai_glm-5-turbo,navigation,navigation/task_006_exploration_mapping,FAILED,0/3,0.00%,435,"test_hole1_slam_node_translation, test_hole2_costmap_sensor_translation, test_rviz_migration_consistency"
+z-ai_glm-5-turbo,navigation,navigation/task_007_navigation_sensor_failure,FAILED,5/8,62.50%,9419,"test_service_callback_signatures, test_parameter_safety_logic, test_service_binding_logic"
+z-ai_glm-5-turbo,navigation,navigation/task_008_exploration_mapping,FAILED,3/6,50.00%,6710,"test_architecture_transformation, test_interface_matching_logic, test_yaml_structure_and_sync"
+z-ai_glm-5-turbo,simulation_integration,simulation_integration/task_001_urdf,FAILED,0/7,0.00%,318,"test_urdf_base_link_consistency, test_urdf_inertial_integration, test_launch_xacro_command_api, test_launch_resource_indexing, test_launch_parameter_wrapping, test_anti_leakage_ros1_substitution, test_launch_integration_completeness"
+z-ai_glm-5-turbo,simulation_integration,simulation_integration/task_002_gazebo_plugin,FAILED,3/7,42.86%,2671,"test_launch_empty_world_inclusion, test_launch_world_parameter_passing, test_launch_xml_structure, test_anti_leakage_ros2_substitution"
+z-ai_glm-5-turbo,simulation_integration,simulation_integration/task_003_turtlebot3_gazebo,FAILED,3/9,33.33%,2277,"test_burger_base_link_mesh, test_burger_collision_geometry, test_burger_inertial_properties, test_waffle_dual_caster_structure, test_waffle_base_link_mesh, test_launch_server_client_separation"
+z-ai_glm-5-turbo,simulation_integration,simulation_integration/task_004_industrial_robot_simulator,FAILED,2/4,50.00%,10445,"test_ros2_state_node_lifecycle, test_launch_system_migration_check"
+z-ai_glm-5-turbo,simulation_integration,simulation_integration/task_005_Allegro_Hand_V5_ROS1_Task,FAILED,2/8,25.00%,13619,"test_cmake_ros2_ament_integrity, test_imu_physics_frequency_scaling_semantics, test_ros2_api_usage, test_msgbuffer_memory_logic, test_msgbuffer_safety_assertions, test_header_inclusion_semantics"
+z-ai_glm-5-turbo,simulation_integration,simulation_integration/task_006-ardupilot-gazebo,FAILED,2/9,22.22%,318,"test_socket_pollin_logic, test_socket_recv_semantics, test_preupdate_protocol_parsing, test_lockstep_logic, test_pwm_normalization_logic, test_joint_command_application, test_failsafe_handling"
+z-ai_glm-5-turbo,simulation_integration,simulation_integration/task_007_carla_ros_bridge,FAILED,4/8,50.00%,14149,"test_twist_linear_rotation_logic, test_bridge_sync_tick_order, test_bridge_update_trigger_with_timestamp, test_actor_factory_pre_tick_update"
+z-ai_glm-5-turbo,simulation_integration,simulation_integration/task_008_navigation_recovery_action,SUCCESS,4/4,100.00%,4584,None
+z-ai_glm-5-turbo,multi_node,multi_node/task_001_rosserial_python_integration,FAILED,8/10,80.00%,29170,"test_executor_spin, test_absence_of_global_node_init"
+z-ai_glm-5-turbo,multi_node,multi_node/task_002_sm_rosbag_recorder,FAILED,6/7,85.71%,21704,test_recorder_clock_source
+z-ai_glm-5-turbo,multi_node,multi_node/task_004_talker_relay_listener,SUCCESS,8/8,100.00%,5922,None
+z-ai_glm-5-turbo,multi_node,multi_node/task_005_KIE_multiagent_model,FAILED,10/11,90.91%,34865,test_if_host_filtering_logic
+z-ai_glm-5-turbo,multi_node,multi_node/task_006_swarm_ros_bridge,FAILED,4/8,50.00%,22939,"test_hpp_ros2_interface_migration, test_cpp_node_inheritance_usage, test_cpp_qos_usage, test_system_callback_consistency"
+z-ai_glm-5-turbo,multi_node,multi_node/task_007_aws_les,FAILED,3/8,37.50%,3488,"test_member_variable_consistency, test_callback_signature_sync, test_inheritance_pattern, test_message_namespace_migration, test_ros1_leakage_cleanup"
+z-ai_glm-5-turbo,multi_node,multi_node/task_009_fleet_system,FAILED,1/5,20.00%,10202,"test_time_struct_field_sync, test_header_schema_no_seq, test_namespace_conversion_logic, test_no_ros1_naming_leakage"
+z-ai_glm-5-turbo,multi_node,multi_node/task_011_amr_interop,FAILED,4/6,66.67%,10192,"test_py_ros_to_mqtt_orchestration, test_no_ros1_terminology_leakage"
+z-ai_glm-5-turbo,multi_node,multi_node/task_012_multimaster_flie,FAILED,6/8,75.00%,38143,"test_monitor_uses_succeed_helper, test_absence_of_hardcoded_names"
 openai_gpt-5.4,manipulation,manipulation/task_001_pick_and_place,FAILED,4/6,66.67%,9349,"test_detector_async_non_blocking_pattern, test_static_interface_linkage_consistency"
 openai_gpt-5.4,manipulation,manipulation/task_002_ur5_pick_and_place,FAILED,6/9,66.67%,10350,"test_controller_move_to_logic, test_no_nested_deadlocks, test_trajectory_interpolation_integrity"
 openai_gpt-5.4,manipulation,manipulation/task_003_ur5_red_box,FAILED,2/5,40.00%,2156,"test_service_server_migration, test_cmakelists_rosidl_integrity, test_package_xml_modern_format"
@@ -77,6 +305,15 @@ openai_gpt-5.4,simulation_integration,simulation_integration/task_005_Allegro_Ha
 openai_gpt-5.4,simulation_integration,simulation_integration/task_006-ardupilot-gazebo,FAILED,2/9,22.22%,295,"test_socket_pollin_logic, test_socket_recv_semantics, test_preupdate_protocol_parsing, test_lockstep_logic, test_pwm_normalization_logic, test_joint_command_application, test_failsafe_handling"
 openai_gpt-5.4,simulation_integration,simulation_integration/task_007_carla_ros_bridge,FAILED,5/8,62.50%,12544,"test_twist_linear_rotation_logic, test_bridge_update_trigger_with_timestamp, test_actor_factory_pre_tick_update"
 openai_gpt-5.4,simulation_integration,simulation_integration/task_008_navigation_recovery_action,FAILED,3/4,75.00%,1739,test_service_client_and_call
+openai_gpt-5.4,multi_node,multi_node/task_001_rosserial_python_integration,SUCCESS,10/10,100.00%,14736,None
+openai_gpt-5.4,multi_node,multi_node/task_002_sm_rosbag_recorder,FAILED,5/7,71.43%,11581,"test_recorder_qos_awareness, test_absence_of_legacy_ros1"
+openai_gpt-5.4,multi_node,multi_node/task_004_talker_relay_listener,SUCCESS,8/8,100.00%,3493,None
+openai_gpt-5.4,multi_node,multi_node/task_005_KIE_multiagent_model,FAILED,9/11,81.82%,23742,"test_md_proper_msg_import, test_if_no_xmlrpc_usage"
+openai_gpt-5.4,multi_node,multi_node/task_006_swarm_ros_bridge,FAILED,4/8,50.00%,7912,"test_hpp_ros2_interface_migration, test_cpp_node_inheritance_usage, test_cpp_qos_usage, test_system_callback_consistency"
+openai_gpt-5.4,multi_node,multi_node/task_007_aws_les,FAILED,3/8,37.50%,1893,"test_member_variable_consistency, test_callback_signature_sync, test_inheritance_pattern, test_message_namespace_migration, test_ros1_leakage_cleanup"
+openai_gpt-5.4,multi_node,multi_node/task_009_fleet_system,FAILED,1/5,20.00%,4878,"test_time_struct_field_sync, test_header_schema_no_seq, test_namespace_conversion_logic, test_no_ros1_naming_leakage"
+openai_gpt-5.4,multi_node,multi_node/task_011_amr_interop,FAILED,4/6,66.67%,8959,"test_py_ros_to_mqtt_orchestration, test_no_ros1_terminology_leakage"
+openai_gpt-5.4,multi_node,multi_node/task_012_multimaster_flie,FAILED,7/8,87.50%,24999,test_absence_of_hardcoded_names
 anthropic_claude-opus-4.6,manipulation,manipulation/task_001_pick_and_place,FAILED,2/6,33.33%,12100,"test_detector_async_non_blocking_pattern, test_state_machine_future_synchronization, test_static_interface_linkage_consistency, test_parameter_declaration_compliance"
 anthropic_claude-opus-4.6,manipulation,manipulation/task_002_ur5_pick_and_place,FAILED,5/9,55.56%,13140,"test_controller_move_to_logic, test_no_nested_deadlocks, test_trajectory_interpolation_integrity, test_strict_naming_compliance"
 anthropic_claude-opus-4.6,manipulation,manipulation/task_003_ur5_red_box,FAILED,3/5,60.00%,3149,"test_cmakelists_rosidl_integrity, test_package_xml_modern_format"
@@ -103,6 +340,50 @@ anthropic_claude-opus-4.6,simulation_integration,simulation_integration/task_005
 anthropic_claude-opus-4.6,simulation_integration,simulation_integration/task_006-ardupilot-gazebo,TRANSLATION_FAILED,0/0,0.00%,0,None
 anthropic_claude-opus-4.6,simulation_integration,simulation_integration/task_007_carla_ros_bridge,FAILED,5/8,62.50%,17177,"test_twist_linear_rotation_logic, test_bridge_update_trigger_with_timestamp, test_actor_factory_pre_tick_update"
 anthropic_claude-opus-4.6,simulation_integration,simulation_integration/task_008_navigation_recovery_action,FAILED,2/4,50.00%,2085,"test_service_client_and_call, test_pose_and_twist_initialization"
+anthropic_claude-opus-4.6,multi_node,multi_node/task_001_rosserial_python_integration,FAILED,9/10,90.00%,18938,test_absence_of_global_node_init
+anthropic_claude-opus-4.6,multi_node,multi_node/task_002_sm_rosbag_recorder,SUCCESS,7/7,100.00%,15703,None
+anthropic_claude-opus-4.6,multi_node,multi_node/task_004_talker_relay_listener,SUCCESS,8/8,100.00%,4449,None
+anthropic_claude-opus-4.6,multi_node,multi_node/task_005_KIE_multiagent_model,SUCCESS,11/11,100.00%,34885,None
+anthropic_claude-opus-4.6,multi_node,multi_node/task_006_swarm_ros_bridge,FAILED,5/8,62.50%,10829,"test_cpp_node_inheritance_usage, test_cpp_qos_usage, test_system_callback_consistency"
+anthropic_claude-opus-4.6,multi_node,multi_node/task_007_aws_les,FAILED,3/8,37.50%,2653,"test_member_variable_consistency, test_callback_signature_sync, test_inheritance_pattern, test_message_namespace_migration, test_ros1_leakage_cleanup"
+anthropic_claude-opus-4.6,multi_node,multi_node/task_009_fleet_system,FAILED,1/5,20.00%,7052,"test_time_struct_field_sync, test_header_schema_no_seq, test_namespace_conversion_logic, test_no_ros1_naming_leakage"
+anthropic_claude-opus-4.6,multi_node,multi_node/task_011_amr_interop,FAILED,4/6,66.67%,12206,"test_py_ros_to_mqtt_orchestration, test_no_ros1_terminology_leakage"
+anthropic_claude-opus-4.6,multi_node,multi_node/task_012_multimaster_flie,FAILED,4/8,50.00%,34000,"test_monitor_calls_master_api, test_monitor_uses_succeed_helper, test_monitor_populates_master_info, test_absence_of_hardcoded_names"
+meta-llama_llama-3.3-70b-instruct,manipulation,manipulation/task_001_pick_and_place,FAILED,4/6,66.67%,9305,"test_state_machine_future_synchronization, test_static_interface_linkage_consistency"
+meta-llama_llama-3.3-70b-instruct,manipulation,manipulation/task_002_ur5_pick_and_place,FAILED,7/9,77.78%,9448,"test_controller_move_to_logic, test_trajectory_interpolation_integrity"
+meta-llama_llama-3.3-70b-instruct,manipulation,manipulation/task_003_ur5_red_box,FAILED,2/5,40.00%,2325,"test_service_server_migration, test_cmakelists_rosidl_integrity, test_package_xml_modern_format"
+meta-llama_llama-3.3-70b-instruct,manipulation,manipulation/task_004_simplified_pick_place,FAILED,2/7,28.57%,10250,"test_migration_node_initialization, test_migration_tf2_logic, test_migration_async_handling, test_migration_scaling_logic, test_integration_logic_params"
+meta-llama_llama-3.3-70b-instruct,manipulation,manipulation/task_005_interbotix_demo,FAILED,3/7,42.86%,988,"test_shared_node_instance, test_tf_naming_convention, test_constructor_params_migration, test_cluster_position_destructuring"
+meta-llama_llama-3.3-70b-instruct,manipulation,manipulation/task_006_pick_up_objects,FAILED,7/9,77.78%,8630,"test_service_interface_alignment, test_no_nested_spin"
+meta-llama_llama-3.3-70b-instruct,manipulation,manipulation/task_007_tm_robot_arms,FAILED,5/10,50.00%,11949,"test_sync_wait_logic, test_mutex_safety, test_recv_error_handling, test_demo_blocking_call, test_svr_callback_notification"
+meta-llama_llama-3.3-70b-instruct,manipulation,manipulation/task_008_allegro_hand,FAILED,5/7,71.43%,8517,"test_emergency_stop_logic, test_variable_naming_consistency"
+meta-llama_llama-3.3-70b-instruct,manipulation,manipulation/task_009_urdf,FAILED,0/3,0.00%,335,"test_urdf_kinematics, test_srdf_semantic_logic, test_joint_limits_overrides"
+meta-llama_llama-3.3-70b-instruct,manipulation,manipulation/task_010_reach_study,FAILED,2/4,50.00%,9186,"test_ros1_remnants_check, test_tf2_ros2_migration"
+meta-llama_llama-3.3-70b-instruct,navigation,navigation/task_001_simple_map_navigation_2d,FAILED,0/7,0.00%,339,None
+meta-llama_llama-3.3-70b-instruct,navigation,navigation/task_002_husky_sim_navigation,FAILED,1/7,14.29%,332,"test_pkg_format_and_buildtool, test_nav_stack_replacement, test_cmake_asset_installation, test_cmake_ament_registration, test_launch_path_resolution, test_launch_conditional_logic"
+meta-llama_llama-3.3-70b-instruct,navigation,navigation/task_003_waypoint_following,FAILED,0/4,0.00%,1761,"test_dependency_sync_xml_and_cmake, test_interface_sync_cmake_and_cpp, test_cpp_action_server_logic, test_build_system_migration"
+meta-llama_llama-3.3-70b-instruct,navigation,navigation/task_004_obstacle_avoidance,FAILED,2/5,40.00%,6256,"test_navigation_geometry, test_cmake_integration, test_package_xml_deps"
+meta-llama_llama-3.3-70b-instruct,navigation,navigation/task_005_plugin_replacement,FAILED,3/5,60.00%,6628,"test_interface_signature_consistency, test_build_system_bridge"
+meta-llama_llama-3.3-70b-instruct,navigation,navigation/task_006_exploration_mapping,FAILED,0/3,0.00%,1296,"test_hole1_slam_node_translation, test_hole2_costmap_sensor_translation, test_rviz_migration_consistency"
+meta-llama_llama-3.3-70b-instruct,navigation,navigation/task_007_navigation_sensor_failure,FAILED,4/8,50.00%,6490,"test_executor_and_node_declaration, test_service_callback_signatures, test_executor_node_linkage, test_non_blocking_execution_logic"
+meta-llama_llama-3.3-70b-instruct,navigation,navigation/task_008_exploration_mapping,FAILED,2/6,33.33%,2215,"test_architecture_transformation, test_interface_matching_logic, test_ros2_read_write_signatures, test_yaml_structure_and_sync"
+meta-llama_llama-3.3-70b-instruct,simulation_integration,simulation_integration/task_001_urdf,FAILED,0/7,0.00%,334,"test_urdf_base_link_consistency, test_urdf_inertial_integration, test_launch_xacro_command_api, test_launch_resource_indexing, test_launch_parameter_wrapping, test_anti_leakage_ros1_substitution, test_launch_integration_completeness"
+meta-llama_llama-3.3-70b-instruct,simulation_integration,simulation_integration/task_002_gazebo_plugin,FAILED,3/7,42.86%,885,"test_launch_empty_world_inclusion, test_launch_world_parameter_passing, test_launch_xml_structure, test_anti_leakage_ros2_substitution"
+meta-llama_llama-3.3-70b-instruct,simulation_integration,simulation_integration/task_003_turtlebot3_gazebo,FAILED,1/9,11.11%,1512,"test_burger_base_link_mesh, test_burger_collision_geometry, test_burger_inertial_properties, test_waffle_dual_caster_structure, test_waffle_base_link_mesh, test_launch_uses_modern_gz_sim, test_launch_server_client_separation, test_no_legacy_gazebo_nodes"
+meta-llama_llama-3.3-70b-instruct,simulation_integration,simulation_integration/task_004_industrial_robot_simulator,FAILED,2/4,50.00%,6449,"test_ros2_state_node_lifecycle, test_launch_system_migration_check"
+meta-llama_llama-3.3-70b-instruct,simulation_integration,simulation_integration/task_005_Allegro_Hand_V5_ROS1_Task,FAILED,2/8,25.00%,5734,"test_cmake_ros2_ament_integrity, test_imu_physics_frequency_scaling_semantics, test_ros2_api_usage, test_msgbuffer_memory_logic, test_msgbuffer_safety_assertions, test_header_inclusion_semantics"
+meta-llama_llama-3.3-70b-instruct,simulation_integration,simulation_integration/task_006-ardupilot-gazebo,FAILED,2/9,22.22%,323,"test_socket_pollin_logic, test_socket_recv_semantics, test_preupdate_protocol_parsing, test_lockstep_logic, test_pwm_normalization_logic, test_joint_command_application, test_failsafe_handling"
+meta-llama_llama-3.3-70b-instruct,simulation_integration,simulation_integration/task_007_carla_ros_bridge,FAILED,3/8,37.50%,12429,"test_twist_linear_rotation_logic, test_twist_angular_unit_conversion, test_twist_angular_handedness_inversion, test_bridge_update_trigger_with_timestamp, test_actor_factory_pre_tick_update"
+meta-llama_llama-3.3-70b-instruct,simulation_integration,simulation_integration/task_008_navigation_recovery_action,FAILED,1/4,25.00%,1530,"test_no_ros1_dependencies, test_subscriber_migration, test_service_client_and_call"
+meta-llama_llama-3.3-70b-instruct,multi_node,multi_node/task_001_rosserial_python_integration,FAILED,9/10,90.00%,14722,test_absence_of_global_node_init
+meta-llama_llama-3.3-70b-instruct,multi_node,multi_node/task_002_sm_rosbag_recorder,FAILED,5/7,71.43%,11799,"test_recorder_qos_awareness, test_talker_parameter_intent"
+meta-llama_llama-3.3-70b-instruct,multi_node,multi_node/task_004_talker_relay_listener,SUCCESS,8/8,100.00%,2410,None
+meta-llama_llama-3.3-70b-instruct,multi_node,multi_node/task_005_KIE_multiagent_model,FAILED,6/11,54.55%,26054,"test_md_ros2_publisher_definition, test_md_variable_consistency, test_if_no_xmlrpc_usage, test_if_host_filtering_logic, test_if_wait_loop_mechanism"
+meta-llama_llama-3.3-70b-instruct,multi_node,multi_node/task_006_swarm_ros_bridge,FAILED,4/8,50.00%,6868,"test_hpp_ros2_interface_migration, test_hpp_no_ros1_leakage, test_cpp_qos_usage, test_system_callback_consistency"
+meta-llama_llama-3.3-70b-instruct,multi_node,multi_node/task_007_aws_les,FAILED,3/8,37.50%,1912,"test_member_variable_consistency, test_callback_signature_sync, test_inheritance_pattern, test_message_namespace_migration, test_ros1_leakage_cleanup"
+meta-llama_llama-3.3-70b-instruct,multi_node,multi_node/task_009_fleet_system,FAILED,2/5,40.00%,4704,"test_time_struct_field_sync, test_header_schema_no_seq, test_no_ros1_naming_leakage"
+meta-llama_llama-3.3-70b-instruct,multi_node,multi_node/task_011_amr_interop,FAILED,4/6,66.67%,9243,"test_py_ros_to_mqtt_orchestration, test_no_ros1_terminology_leakage"
+meta-llama_llama-3.3-70b-instruct,multi_node,multi_node/task_012_multimaster_flie,FAILED,1/8,12.50%,21156,"test_monitor_calls_master_api, test_monitor_populates_master_info, test_sync_uses_multicall, test_sync_loop_prevention, test_sync_filter_application, test_sync_preserves_remote_uri, test_absence_of_hardcoded_names"
 google_gemini-2.5-flash,manipulation,manipulation/task_001_pick_and_place,FAILED,3/6,50.00%,12659,"test_detector_async_non_blocking_pattern, test_static_interface_linkage_consistency, test_parameter_declaration_compliance"
 google_gemini-2.5-flash,manipulation,manipulation/task_002_ur5_pick_and_place,FAILED,6/9,66.67%,14364,"test_controller_move_to_logic, test_no_nested_deadlocks, test_trajectory_interpolation_integrity"
 google_gemini-2.5-flash,manipulation,manipulation/task_003_ur5_red_box,FAILED,3/5,60.00%,2893,"test_cmakelists_rosidl_integrity, test_package_xml_modern_format"
@@ -129,6 +410,15 @@ google_gemini-2.5-flash,simulation_integration,simulation_integration/task_005_A
 google_gemini-2.5-flash,simulation_integration,simulation_integration/task_006-ardupilot-gazebo,TRANSLATION_FAILED,0/0,0.00%,0,None
 google_gemini-2.5-flash,simulation_integration,simulation_integration/task_007_carla_ros_bridge,FAILED,3/8,37.50%,16725,"test_twist_linear_rotation_logic, test_twist_angular_unit_conversion, test_bridge_sync_tick_order, test_bridge_update_trigger_with_timestamp, test_actor_factory_pre_tick_update"
 google_gemini-2.5-flash,simulation_integration,simulation_integration/task_008_navigation_recovery_action,FAILED,3/4,75.00%,2142,test_service_client_and_call
+google_gemini-2.5-flash,multi_node,multi_node/task_001_rosserial_python_integration,FAILED,9/10,90.00%,20274,test_absence_of_global_node_init
+google_gemini-2.5-flash,multi_node,multi_node/task_002_sm_rosbag_recorder,FAILED,5/7,71.43%,15332,"test_recorder_clock_source, test_absence_of_legacy_ros1"
+google_gemini-2.5-flash,multi_node,multi_node/task_004_talker_relay_listener,FAILED,7/8,87.50%,3954,test_babbler_timer_paradigm
+google_gemini-2.5-flash,multi_node,multi_node/task_005_KIE_multiagent_model,FAILED,10/11,90.91%,32846,test_if_host_filtering_logic
+google_gemini-2.5-flash,multi_node,multi_node/task_006_swarm_ros_bridge,FAILED,4/8,50.00%,9831,"test_hpp_ros2_interface_migration, test_cpp_node_inheritance_usage, test_cpp_qos_usage, test_system_callback_consistency"
+google_gemini-2.5-flash,multi_node,multi_node/task_007_aws_les,FAILED,3/8,37.50%,2303,"test_member_variable_consistency, test_callback_signature_sync, test_inheritance_pattern, test_message_namespace_migration, test_ros1_leakage_cleanup"
+google_gemini-2.5-flash,multi_node,multi_node/task_009_fleet_system,FAILED,1/5,20.00%,6792,"test_time_struct_field_sync, test_header_schema_no_seq, test_namespace_conversion_logic, test_no_ros1_naming_leakage"
+google_gemini-2.5-flash,multi_node,multi_node/task_011_amr_interop,FAILED,4/6,66.67%,12153,"test_py_ros_to_mqtt_orchestration, test_no_ros1_terminology_leakage"
+google_gemini-2.5-flash,multi_node,multi_node/task_012_multimaster_flie,FAILED,1/8,12.50%,35008,"test_monitor_calls_master_api, test_monitor_uses_succeed_helper, test_monitor_populates_master_info, test_sync_uses_multicall, test_sync_loop_prevention, test_sync_preserves_remote_uri, test_absence_of_hardcoded_names"
 anthropic_claude-3.7-sonnet,manipulation,manipulation/task_001_pick_and_place,FAILED,3/6,50.00%,12259,"test_detector_async_non_blocking_pattern, test_static_interface_linkage_consistency, test_parameter_declaration_compliance"
 anthropic_claude-3.7-sonnet,manipulation,manipulation/task_002_ur5_pick_and_place,FAILED,5/9,55.56%,12953,"test_controller_move_to_logic, test_no_nested_deadlocks, test_trajectory_interpolation_integrity, test_strict_naming_compliance"
 anthropic_claude-3.7-sonnet,manipulation,manipulation/task_003_ur5_red_box,FAILED,3/5,60.00%,2969,"test_cmakelists_rosidl_integrity, test_package_xml_modern_format"
@@ -155,3 +445,12 @@ anthropic_claude-3.7-sonnet,simulation_integration,simulation_integration/task_0
 anthropic_claude-3.7-sonnet,simulation_integration,simulation_integration/task_006-ardupilot-gazebo,TRANSLATION_FAILED,0/0,0.00%,0,None
 anthropic_claude-3.7-sonnet,simulation_integration,simulation_integration/task_007_carla_ros_bridge,FAILED,5/8,62.50%,17274,"test_bridge_sync_tick_order, test_bridge_update_trigger_with_timestamp, test_actor_factory_pre_tick_update"
 anthropic_claude-3.7-sonnet,simulation_integration,simulation_integration/task_008_navigation_recovery_action,SUCCESS,4/4,100.00%,2351,None
+anthropic_claude-3.7-sonnet,multi_node,multi_node/task_001_rosserial_python_integration,FAILED,9/10,90.00%,19885,test_absence_of_global_node_init
+anthropic_claude-3.7-sonnet,multi_node,multi_node/task_002_sm_rosbag_recorder,SUCCESS,7/7,100.00%,15701,None
+anthropic_claude-3.7-sonnet,multi_node,multi_node/task_004_talker_relay_listener,SUCCESS,8/8,100.00%,4492,None
+anthropic_claude-3.7-sonnet,multi_node,multi_node/task_005_KIE_multiagent_model,SUCCESS,11/11,100.00%,35834,None
+anthropic_claude-3.7-sonnet,multi_node,multi_node/task_006_swarm_ros_bridge,FAILED,4/8,50.00%,10575,"test_hpp_ros2_interface_migration, test_cpp_node_inheritance_usage, test_cpp_qos_usage, test_system_callback_consistency"
+anthropic_claude-3.7-sonnet,multi_node,multi_node/task_007_aws_les,FAILED,3/8,37.50%,2633,"test_member_variable_consistency, test_callback_signature_sync, test_inheritance_pattern, test_message_namespace_migration, test_ros1_leakage_cleanup"
+anthropic_claude-3.7-sonnet,multi_node,multi_node/task_009_fleet_system,FAILED,1/5,20.00%,6188,"test_time_struct_field_sync, test_header_schema_no_seq, test_namespace_conversion_logic, test_no_ros1_naming_leakage"
+anthropic_claude-3.7-sonnet,multi_node,multi_node/task_011_amr_interop,FAILED,5/6,83.33%,12281,test_no_ros1_terminology_leakage
+anthropic_claude-3.7-sonnet,multi_node,multi_node/task_012_multimaster_flie,FAILED,3/8,37.50%,35966,"test_monitor_calls_master_api, test_monitor_uses_succeed_helper, test_monitor_populates_master_info, test_sync_loop_prevention, test_absence_of_hardcoded_names"

@@ -31,11 +31,11 @@
 #include <QColor>
 #include <QRgb>
 
-#include <algorithm>
 #include <cmath>
 #include <functional>
-#include <limits>
 #include <string>
+#include <limits>
+#include <algorithm>
 
 #include "geometry_msgs/msg/twist.hpp"
 #include "rclcpp/rclcpp.hpp"
@@ -202,7 +202,6 @@ bool Turtle::update(
 {
   bool modified = false;
   qreal old_orient = orient_;
-  QPointF old_pos = pos_;
 
   // first process any teleportation requests, in order
   V_TeleportRequest::iterator it = teleport_requests_.begin();
@@ -269,72 +268,44 @@ bool Turtle::update(
     }
   }
 
-  if (nh_->now() - last_command_time_ > rclcpp::Duration::from_seconds(1.0)) {
+  if (nh_->now() - last_command_time_ > rclcpp::Duration::from_seconds(0.5)) {
     lin_vel_x_ = 0.0;
     lin_vel_y_ = 0.0;
     ang_vel_ = 0.0;
   }
 
-  bool holonomic = false;
-  nh_->get_parameter_or("holonomic", holonomic, false);
+  QPointF old_pos = pos_;
 
-  orient_ = normalizeAngle(orient_ + ang_vel_ * dt);
+  orient_ = orient_ + ang_vel_ * dt;
+  orient_ = normalizeAngle(orient_);
+  pos_.rx() += std::cos(orient_) * lin_vel_x_ * dt - std::sin(orient_) * lin_vel_y_ * dt;
+  pos_.ry() -= std::cos(orient_) * lin_vel_y_ * dt + std::sin(orient_) * lin_vel_x_ * dt;
 
-  if (holonomic) {
-    pos_.rx() += (std::cos(orient_) * lin_vel_x_ - std::sin(orient_) * lin_vel_y_) * dt;
-    pos_.ry() += -(std::sin(orient_) * lin_vel_x_ + std::cos(orient_) * lin_vel_y_) * dt;
-  } else {
-    pos_.rx() += std::cos(orient_) * lin_vel_x_ * dt;
-    pos_.ry() += -std::sin(orient_) * lin_vel_x_ * dt;
+  if (pos_.x() < 0.0 || pos_.x() > canvas_width ||
+      pos_.y() < 0.0 || pos_.y() > canvas_height) {
+    RCLCPP_WARN(nh_->get_logger(), "Oh no! I hit the wall! (Clamping from [x=%f, y=%f])", pos_.x(), pos_.y());
+    pos_.setX(std::max(0.0, std::min(static_cast<double>(canvas_width), pos_.x())));
+    pos_.setY(std::max(0.0, std::min(static_cast<double>(canvas_height), pos_.y())));
   }
 
-  bool hit_wall = false;
-  if (pos_.x() < 0.0 || pos_.x() > canvas_width || pos_.y() < 0.0 || pos_.y() > canvas_height) {
-    hit_wall = true;
-  }
-
-  pos_.setX(std::min(std::max(pos_.x(), 0.0), static_cast<double>(canvas_width)));
-  pos_.setY(std::min(std::max(pos_.y(), 0.0), static_cast<double>(canvas_height)));
-
-  if (hit_wall) {
-    RCLCPP_WARN(nh_->get_logger(), "Turtle hit the wall");
-  }
-
-  constexpr double kFov = 30.0 * PI / 180.0;
-  constexpr int kSamples = 31;
-  double shortest_echo = std::numeric_limits<double>::infinity();
-
-  auto test_intersection = [&](double t, double ix, double iy) {
-      if (t >= 0.0 && ix >= 0.0 && ix <= canvas_width && iy >= 0.0 && iy <= canvas_height) {
-        shortest_echo = std::min(shortest_echo, t);
-      }
-    };
-
-  for (int i = 0; i < kSamples; ++i) {
-    const double ratio = (kSamples == 1) ? 0.0 : static_cast<double>(i) / static_cast<double>(kSamples - 1);
-    const double ray_angle = normalizeAngle(orient_ - 0.5 * kFov + ratio * kFov);
-    const double dx = std::cos(ray_angle);
-    const double dy = -std::sin(ray_angle);
-
-    if (std::fabs(dx) > 1e-12) {
-      double t_left = (0.0 - pos_.x()) / dx;
-      test_intersection(t_left, 0.0, pos_.y() + t_left * dy);
-
-      double t_right = (canvas_width - pos_.x()) / dx;
-      test_intersection(t_right, canvas_width, pos_.y() + t_right * dy);
+  double shortest_distance = std::numeric_limits<double>::max();
+  for (double angle = orient_ - PI / 12.0; angle <= orient_ + PI / 12.0; angle += PI / 36.0) {
+    double dist_x = std::numeric_limits<double>::max();
+    double dist_y = std::numeric_limits<double>::max();
+    if (std::cos(angle) > 0) {
+      dist_x = (canvas_width - pos_.x()) / std::cos(angle);
+    } else if (std::cos(angle) < 0) {
+      dist_x = -pos_.x() / std::cos(angle);
     }
-
-    if (std::fabs(dy) > 1e-12) {
-      double t_top = (0.0 - pos_.y()) / dy;
-      test_intersection(t_top, pos_.x() + t_top * dx, 0.0);
-
-      double t_bottom = (canvas_height - pos_.y()) / dy;
-      test_intersection(t_bottom, pos_.x() + t_bottom * dx, canvas_height);
+    if (std::sin(angle) > 0) {
+      dist_y = pos_.y() / std::sin(angle);
+    } else if (std::sin(angle) < 0) {
+      dist_y = -(canvas_height - pos_.y()) / std::sin(angle);
     }
-  }
-
-  if (!std::isfinite(shortest_echo)) {
-    shortest_echo = 0.0;
+    double dist = std::min(dist_x, dist_y);
+    if (dist > 0 && dist < shortest_distance) {
+      shortest_distance = dist;
+    }
   }
 
   // Publish pose of the turtle
@@ -357,8 +328,8 @@ bool Turtle::update(
   }
 
   RCLCPP_DEBUG(
-    nh_->get_logger(), "[%s]: pos_x: %f pos_y: %f theta: %f sonar_first_echo: %f",
-    nh_->get_namespace(), pos_.x(), pos_.y(), orient_, shortest_echo);
+    nh_->get_logger(), "[%s]: pos_x: %f pos_y: %f theta: %f",
+    nh_->get_namespace(), pos_.x(), pos_.y(), orient_);
 
   if (orient_ != old_orient) {
     rotateImage();

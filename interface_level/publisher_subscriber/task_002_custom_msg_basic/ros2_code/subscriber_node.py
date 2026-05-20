@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import rclpy
-from std_msgs.msg import String
-
+from rclpy.node import Node
 
 class Person:
     def __init__(self):
@@ -9,14 +8,14 @@ class Person:
         self.age = 0
         self.height = 0
 
-
 node = None
 
-
 def callback(msg):
+    # TODO
     # Print received data
-    node.get_logger().info(f"Received: {msg}")
-
+    global node
+    if node is not None:
+        node.get_logger().info(f"Received: {msg.name}, {msg.age}, {msg.height}")
 
 def main(args=None):
     global node
@@ -24,18 +23,13 @@ def main(args=None):
     node = rclpy.create_node('person_subscriber')
 
     # Create a subscriber listening to /person_info
-    subscription = node.create_subscription(
-        String,
-        '/person_info',
-        callback,
-        10
-    )
-    node.subscription = subscription
+    subscriber = node.create_subscription(Person, '/person_info', callback, 10)
 
     rclpy.spin(node)
+    #END OF TODO
+    
     node.destroy_node()
     rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()

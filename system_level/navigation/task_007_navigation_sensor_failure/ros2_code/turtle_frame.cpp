@@ -73,36 +73,33 @@ TurtleFrame::TurtleFrame(rclcpp::Node::SharedPtr & node_handle, QWidget * parent
   nh_ = node_handle;
   executor_.add_node(nh_);
 
-  rcl_interfaces::msg::ParameterDescriptor descriptor;
+  rcl_interfaces::msg::ParameterDescriptor range_desc;
   rcl_interfaces::msg::IntegerRange range;
   range.from_value = 0;
-  range.to_value = 255;
   range.step = 1;
-  descriptor.integer_range.push_back(range);
+  range.to_value = 255;
+  range_desc.integer_range.push_back(range);
 
-  nh_->declare_parameter("background_r", DEFAULT_BG_R, descriptor);
-  nh_->declare_parameter("background_g", DEFAULT_BG_G, descriptor);
-  nh_->declare_parameter("background_b", DEFAULT_BG_B, descriptor);
+  nh_->declare_parameter("background_r", DEFAULT_BG_R, range_desc);
+  nh_->declare_parameter("background_g", DEFAULT_BG_G, range_desc);
+  nh_->declare_parameter("background_b", DEFAULT_BG_B, range_desc);
 
   clear_srv_ = nh_->create_service<std_srvs::srv::Empty>(
-    "clear",
-    std::bind(&TurtleFrame::clearCallback, this, std::placeholders::_1, std::placeholders::_2));
+    "clear", std::bind(&TurtleFrame::clearCallback, this, std::placeholders::_1, std::placeholders::_2));
   reset_srv_ = nh_->create_service<std_srvs::srv::Empty>(
-    "reset",
-    std::bind(&TurtleFrame::resetCallback, this, std::placeholders::_1, std::placeholders::_2));
+    "reset", std::bind(&TurtleFrame::resetCallback, this, std::placeholders::_1, std::placeholders::_2));
   spawn_srv_ = nh_->create_service<turtlesim_msgs::srv::Spawn>(
-    "spawn",
-    std::bind(&TurtleFrame::spawnCallback, this, std::placeholders::_1, std::placeholders::_2));
+    "spawn", std::bind(&TurtleFrame::spawnCallback, this, std::placeholders::_1, std::placeholders::_2));
   kill_srv_ = nh_->create_service<turtlesim_msgs::srv::Kill>(
-    "kill",
-    std::bind(&TurtleFrame::killCallback, this, std::placeholders::_1, std::placeholders::_2));
+    "kill", std::bind(&TurtleFrame::killCallback, this, std::placeholders::_1, std::placeholders::_2));
 
   parameter_event_sub_ = nh_->create_subscription<rcl_interfaces::msg::ParameterEvent>(
-    "/parameter_events", 10,
+    "/parameter_events", rclcpp::QoS(1000),
     std::bind(&TurtleFrame::parameterEventCallback, this, std::placeholders::_1));
 
   // spawn all available turtle types
   if (false) {
+    QStringList turtles;
     for (int index = 0; index < turtles.size(); ++index) {
       QString name = turtles[index];
       name = name.split(".").first();
@@ -211,15 +208,10 @@ void TurtleFrame::clear()
 
 void TurtleFrame::onUpdate()
 {
-  if (!rclcpp::ok(nh_->get_node_base_interface()->get_context())) {
-    close();
-    return;
-  }
-
-  executor_.spin_some();
-  updateTurtles();
-
-  if (!rclcpp::ok(nh_->get_node_base_interface()->get_context())) {
+  if (rclcpp::ok()) {
+    executor_.spin_some();
+    updateTurtles();
+  } else {
     close();
   }
 }

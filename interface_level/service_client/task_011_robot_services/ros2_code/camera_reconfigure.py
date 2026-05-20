@@ -18,40 +18,37 @@
 
 import sys
 import time
-from sys import exit
-
 import rclpy
 from rclpy.node import Node
-from rclpy.parameter import Parameter
-from rclpy.parameter_client import AsyncParametersClient
+from rcl_interfaces.srv import SetParameters
+from rcl_interfaces.msg import Parameter, ParameterValue, ParameterType
+from sys import exit
 
 
-class CameraReconfigure(object):
+class CameraReconfigure(Node):
     def __init__(self):
-        self.node = Node("camera_reconfigure")
-        target_node = self.node.declare_parameter(
-            "target_node", "/head_camera/driver"
-        ).get_parameter_value().string_value
-        self.client = AsyncParametersClient(self.node, target_node)
+        super().__init__('camera_reconfigure')
+        self.client = self.create_client(SetParameters, '/camera/camera_node/set_parameters')
+        if not self.client.wait_for_service(timeout_sec=5.0):
+            self.get_logger().error('Camera parameter service not available')
 
-        while not self.client.wait_for_service(timeout_sec=1.0):
-            self.node.get_logger().info("Waiting for parameter service...")
+    def _set_auto_params(self, enable: bool):
+        req = SetParameters.Request()
+        val = ParameterValue(type=ParameterType.PARAMETER_BOOL, bool_value=enable)
+        req.parameters.append(Parameter(name='auto_exposure', value=val))
+        req.parameters.append(Parameter(name='auto_white_balance', value=val))
+        
+        future = self.client.call_async(req)
+        rclpy.spin_until_future_complete(self, future)
+        return future.result()
 
     def disable_auto(self):
-        params = [
-            Parameter("auto_exposure", value=False),
-            Parameter("auto_white_balance", value=False),
-        ]
-        future = self.client.set_parameters(params)
-        rclpy.spin_until_future_complete(self.node, future)
+        self.get_logger().info('Disabling auto exposure and white balance...')
+        self._set_auto_params(False)
 
     def enable_auto(self):
-        params = [
-            Parameter("auto_exposure", value=True),
-            Parameter("auto_white_balance", value=True),
-        ]
-        future = self.client.set_parameters(params)
-        rclpy.spin_until_future_complete(self.node, future)
+        self.get_logger().info('Enabling auto exposure and white balance...')
+        self._set_auto_params(True)
 
 
 if __name__ == "__main__":
@@ -67,7 +64,7 @@ if __name__ == "__main__":
     else:
         reconfigure.disable_auto()
 
-    time.sleep(1.0)
-
-    reconfigure.node.destroy_node()
+    time.sleep(1)
+    
+    reconfigure.destroy_node()
     rclpy.shutdown()

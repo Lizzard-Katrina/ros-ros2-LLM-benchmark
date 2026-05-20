@@ -1,44 +1,40 @@
 #!/usr/bin/env python3
-import copy
+import rclpy
+
+import threading
 import time
 import traceback
-
-import rclpy
-import threading
 
 import smach
 from .ros_state import RosState
 
 __all__ = ['ServiceState']
 
-
 class ServiceState(RosState):
     """State for calling a service."""
-
-    def __init__(
-            self,
+    def __init__(self,
             node,
             # Service info
             service_name,
             service_spec,
             # Request Policy
-            request=None,
-            request_cb=None,
-            request_cb_args=[],
-            request_cb_kwargs={},
-            request_key=None,
-            request_slots=[],
+            request = None,
+            request_cb = None,
+            request_cb_args = [],
+            request_cb_kwargs = {},
+            request_key = None,
+            request_slots = [],
             # Response Policy
-            response_cb=None,
-            response_cb_args=[],
-            response_cb_kwargs={},
-            response_key=None,
-            response_slots=[],
+            response_cb = None,
+            response_cb_args = [],
+            response_cb_kwargs = {},
+            response_key = None,
+            response_slots = [],
             # Keys
-            input_keys=[],
-            output_keys=[],
-            outcomes=[],
-    ):
+            input_keys = [],
+            output_keys = [],
+            outcomes = [],
+            ):
 
         RosState.__init__(self, node, outcomes=['succeeded', 'aborted', 'preempted'])
 
@@ -54,10 +50,9 @@ class ServiceState(RosState):
         else:
             self._request = request
 
+
         if request_cb is not None and not hasattr(request_cb, '__call__'):
-            raise smach.InvalidStateError(
-                "Request callback object given to ServiceState that IS NOT a function object"
-            )
+            raise smach.InvalidStateError("Request callback object given to ServiceState that IS NOT a function object")
 
         self._request_cb = request_cb
         self._request_cb_args = request_cb_args
@@ -81,9 +76,7 @@ class ServiceState(RosState):
 
         # Store response policy
         if response_cb is not None and not hasattr(response_cb, '__call__'):
-            raise smach.InvalidStateError(
-                "Response callback object given to ServiceState that IS NOT a function object"
-            )
+            raise smach.InvalidStateError("Response callback object given to ServiceState that IS NOT a function object")
 
         self._response_cb = response_cb
         self._response_cb_args = response_cb_args
@@ -123,112 +116,76 @@ class ServiceState(RosState):
             self.service_preempt()
             return 'preempted'
 
-        response_cb_outcome = None
-
         # Make sure we're connected to the service
         try:
-            while rclpy.ok() and not self._proxy.wait_for_service(timeout_sec=0.1):
+            while not self._proxy.wait_for_service(timeout_sec=1.0):
                 if self.preempt_requested():
                     self.node.get_logger().info("Preempting %s while waiting for service." % self._service_name)
                     self.service_preempt()
                     return 'preempted'
+                if not rclpy.ok():
+                    return 'aborted'
+                self.node.get_logger().info("Waiting for service %s..." % self._service_name)
 
-            if not rclpy.ok():
-                self.node.get_logger().error(
-                    "ROS shutdown while waiting for service %s." % self._service_name
-                )
-                return 'aborted'
-
-            # Build request
             if self._request_key is not None:
-                request = ud[self._request_key]
-            else:
-                request = copy.deepcopy(self._request)
+                self._request = ud[self._request_key]
 
             for key in self._request_slots:
-                setattr(request, key, ud[key])
+                setattr(self._request, key, ud[key])
 
-            # Execute request callback
             if self._request_cb is not None:
-                cb_req = self._request_cb(
+                self._request_cb(
                     smach.Remapper(
                         ud,
                         self._request_cb_input_keys,
                         self._request_cb_output_keys,
-                        []
-                    ),
-                    request,
+                        []),
+                    self._request,
                     *self._request_cb_args,
-                    **self._request_cb_kwargs
-                )
-                if cb_req is not None:
-                    request = cb_req
+                    **self._request_cb_kwargs)
 
-            self._request = request
-
-            # Async call + polling wait (executor-safe for SMACH thread)
             future = self._proxy.call_async(self._request)
             while rclpy.ok() and not future.done():
                 if self.preempt_requested():
-                    self.node.get_logger().info("Preempting %s during service call." % self._service_name)
-                    future.cancel()
+                    self.node.get_logger().info("Preempting %s while waiting for service response." % self._service_name)
                     self.service_preempt()
                     return 'preempted'
-                time.sleep(0.01)
+                time.sleep(0.05)
 
-            if not rclpy.ok():
-                self.node.get_logger().error(
-                    "ROS shutdown while waiting for response from %s." % self._service_name
-                )
+            if future.result() is not None:
+                self._response = future.result()
+            else:
+                self.node.get_logger().error("Service call failed: %s" % future.exception())
                 return 'aborted'
 
-            if future.cancelled():
-                self.node.get_logger().warn("Service call to %s was cancelled." % self._service_name)
-                return 'preempted'
-
-            exception = future.exception()
-            if exception is not None:
-                self.node.get_logger().error(
-                    "Service call to %s failed: %s" % (self._service_name, str(exception))
-                )
-                return 'aborted'
-
-            self._response = future.result()
-
-        except Exception:
-            self.node.get_logger().error(
-                "Could not call service %s: %s" % (self._service_name, traceback.format_exc())
-            )
+        except Exception as e:
+            self.node.get_logger().error("Service call failed: %s" % str(e))
             return 'aborted'
 
+        response_cb_outcome = None
         if self._response_cb is not None:
             try:
                 response_cb_outcome = self._response_cb(
-                    smach.Remapper(
-                        ud,
-                        self._response_cb_input_keys,
-                        self._response_cb_output_keys,
-                        []),
-                    self._response,
-                    *self._response_cb_args,
-                    **self._response_cb_kwargs)
+                        smach.Remapper(
+                                ud,
+                                self._response_cb_input_keys,
+                                self._response_cb_output_keys,
+                                []),
+                        self._response,
+                        *self._response_cb_args,
+                        **self._response_cb_kwargs)
                 if response_cb_outcome is not None and response_cb_outcome not in self.get_registered_outcomes():
-                    self.node.get_logger().error(
-                        "Result callback for service " + self._service_name + ", " + str(self._response_cb) +
-                        " was not registered with the response_cb_outcomes argument. The response callback returned '" +
-                        str(response_cb_outcome) + "' but the only registered outcomes are: " +
-                        str(self.get_registered_outcomes())
-                    )
+                    self.node.get_logger().error("Result callback for service "+self._service_name+", "+str(self._response_cb)+" was not registered with the response_cb_outcomes argument. The response callback returned '"+str(response_cb_outcome)+"' but the only registered outcomes are: "+str(self.get_registered_outcomes()))
                     return 'aborted'
-            except Exception:
-                self.node.get_logger().error("Could not execute response callback: " + traceback.format_exc())
+            except:
+                self.node.get_logger().error("Could not execute response callback: "+traceback.format_exc())
                 return 'aborted'
 
         if self._response_key is not None:
             ud[self._response_key] = self._response
 
         for key in self._response_slots:
-            ud[key] = getattr(self._response, key)
+            ud[key] = getattr(self._response,key)
 
         if response_cb_outcome is not None:
             return response_cb_outcome

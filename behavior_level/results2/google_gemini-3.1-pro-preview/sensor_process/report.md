@@ -1,0 +1,15 @@
+# System Level Benchmark Report: SENSOR_PROCESS
+
+| Task ID | Status | Score | Failed Functions | Tokens |
+| :--- | :--- | :--- | :--- | :--- |
+| sensor_process/task_001_laser_obstacle_detection | SUCCESS | 4/4 | None | 4349 |
+| sensor_process/task_002_camera_edge_detection | SUCCESS | 6/6 | None | 1943 |
+| sensor_process/task_003_rgbd_pointcloud_generation | FAILED | 5/6 | test_mandatory_kernel_call | 8592 |
+| sensor_process/task_004_imu_odometry_estimation | FAILED | 4/6 | test_3d_rotation_coupling, test_acceleration_3d_projection | 12824 |
+| sensor_process/task_005_sonar_distance_estimation | FAILED | 3/6 | test_numerical_stability_epsilon, test_sonar_max_range_limit, test_sonar_y_mirroring_fix | 9391 |
+| sensor_process/task_006_image_pipeline | FAILED | 7/9 | test_template_dispatch_completeness, test_rgb_offset_style_compliance | 4977 |
+| sensor_process/task_007_hector_slam | FAILED | 6/7 | test_timestamp_preservation | 15714 |
+| sensor_process/task_008_darknet | FAILED | 4/6 | test_flexible_logging_macros, test_flexible_mutex_locking | 14555 |
+| sensor_process/task_009_lio_sam | FAILED | 4/6 | test_callback_group_initialization, test_service_response_success_set | 43621 |
+| sensor_process/task_010_radar_velocity_estimation | FAILED | 4/8 | test_ros2_logging_migration, test_ros2_clock_usage, test_mutex_lock_guard, test_zero_timestamp_handling | 6086 |
+| sensor_process/task_011_camera_lidar_fusion | SUCCESS | 6/6 | None | 18160 |

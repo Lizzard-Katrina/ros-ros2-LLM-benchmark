@@ -1,0 +1,31 @@
+# Pre-baked base image for the groundtruth pipeline's Tier1(build)+Tier3(runtime) checks.
+# Building this once and reusing it avoids re-running apt-get update/install on every
+# single task verification (which is both slow and, per a live network hiccup we hit,
+# occasionally flaky/hanging).
+#
+# Build:
+#   docker build -t groundtruth-base:humble -f groundtruth_pipeline/docker/Dockerfile.base groundtruth_pipeline/docker
+#
+# Use it by pointing docker_verify.py at it instead of the raw upstream image:
+#   export GROUNDTRUTH_BASE_IMAGE=groundtruth-base:humble
+
+FROM osrf/ros:humble-desktop
+
+RUN apt-get update -qq && apt-get install -y -qq \
+    python3-colcon-common-extensions \
+    python3-pip \
+    ros-humble-rosidl-default-generators \
+    # small extra ROS2 packages that individual tasks have turned out to need beyond
+    # the desktop image's default set -- add to this list as future tasks surface more
+    ros-humble-filters \
+    ros-humble-laser-filters \
+    ros-humble-message-filters \
+    ros-humble-tf2-geometry-msgs \
+    ros-humble-image-transport \
+    ros-humble-cv-bridge \
+    socat \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --no-cache-dir pytest
+
+CMD ["/bin/bash"]

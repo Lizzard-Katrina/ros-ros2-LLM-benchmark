@@ -1,0 +1,650 @@
+[
+  {
+    "task": "behavior_level/perception_control/task_001_color_blob_tracking",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/perception_control/task_002_camera_depth_reach_target",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/perception_control/task_003_multi_node_perception_control",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/perception_control/task_004_mobile_lidar_obstacle_avoidance",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/perception_control/task_005_ORBBEC",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/perception_control/task_006_3d_sensor_moveit_arm_control",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/perception_control/task_007_autonomous_navigation",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/perception_control/task_008_limo_robot",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/perception_control/task_009_stretch_pipeline",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/sensor_process/task_001_laser_obstacle_detection",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/sensor_process/task_002_camera_edge_detection",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/sensor_process/task_003_rgbd_pointcloud_generation",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/sensor_process/task_004_imu_odometry_estimation",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/sensor_process/task_005_sonar_distance_estimation",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/sensor_process/task_006_image_pipeline",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/sensor_process/task_007_hector_slam",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/sensor_process/task_008_darknet",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/sensor_process/task_009_lio_sam",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/sensor_process/task_010_radar_velocity_estimation",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/sensor_process/task_011_camera_lidar_fusion",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/state_machine/task_001_smach_basic",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/state_machine/task_002_mas_execution_manager",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/state_machine/task_003_tutorial_baseline",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/state_machine/task_004_ros_task_manage",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/state_machine/task_005_flexbe_behavior_engine",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/state_machine/task_006_flexbe_2",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/state_machine/task_007_smacc",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/state_machine/task_008A_robot_statemachine_scaffold",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "behavior_level/state_machine/task_009_sm_dance_bot_strikes_back",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/action_server/task_001_base_case",
+    "eligible": true,
+    "reason": "no ros1_code/source cloned (no reference material) -- will translate from ros1_code alone",
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/action_server/task_002_turtlebot3_patrol_action",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/action_server/task_003_pr2_gripper_action_server",
+    "eligible": true,
+    "reason": "no ros1_code/source cloned (no reference material) -- will translate from ros1_code alone",
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/action_server/task_004_turtle_bot_3",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/action_server/task_005_robot_voice_action",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/action_server/task_006_amcl_navigation",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/action_server/task_007_move_base_navigation_action",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/action_server/task_008_follow_joint_trajectory_action",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/action_server/task_009_moveit_motion_planning_action",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/action_server/task_010_pick_place",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/action_server/task_011_pr2_door",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/action_server/task_012_move_arm_cartesian_action",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/parameter_server/task_001_basic_param",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/parameter_server/task_002_dynamic_robot_configuration",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/parameter_server/task_003_Mobile_robot_control",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/parameter_server/task_004_turtlrbot3_params",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/parameter_server/task_005_laser_scan_filter_params",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/parameter_server/task_006_dynamic_param_rqt_reconfigure",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/parameter_server/task_007_navigation_stack_config",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/parameter_server/task_008_gazebo_sim_param",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/parameter_server/task_009_fetch_arm_params",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/parameter_server/task_010_sensor_fusion_params",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/parameter_server/task_011_moveit_motion_params",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/parameter_server/task_012_px4_flight_params",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/parameter_server/task_013_slam_mapping_params",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/publisher_subscriber/task_001_simple_pub_sub",
+    "eligible": true,
+    "reason": "no ros1_code/source cloned (no reference material) -- will translate from ros1_code alone",
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/publisher_subscriber/task_002_custom_msg_basic",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/publisher_subscriber/task_003_image_transport",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/publisher_subscriber/task_004_laser_scan_origin",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/publisher_subscriber/task_005_ros1_ros2_bridge",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/publisher_subscriber/task_006_multi_topic_synchronization",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/publisher_subscriber/task_007_latched_publisher",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/publisher_subscriber/task_009_nodelet_pubsub",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/publisher_subscriber/task_010_husky_stress_test",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/service_client/task_001_simple_service",
+    "eligible": true,
+    "reason": "no ros1_code/source cloned (no reference material) -- will translate from ros1_code alone",
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/service_client/task_002_custom_srv",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/service_client/task_003_mp3_db_service",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/service_client/task_005_gazebo",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/service_client/task_006_gazebo_set_get_state",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/service_client/task_007_navigation_make_plan",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/service_client/task_008_clear_costmaps",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/service_client/task_009_moveit_planning_scene",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/service_client/task_010_controller_manager",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "interface_level/service_client/task_011_robot_services",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/manipulation/task_001_pick_and_place",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/manipulation/task_002_ur5_pick_and_place",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/manipulation/task_003_ur5_red_box",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/manipulation/task_004_simplified_pick_place",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/manipulation/task_005_interbotix_demo",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/manipulation/task_006_pick_up_objects",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/manipulation/task_007_tm_robot_arms",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/manipulation/task_008_allegro_hand",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/manipulation/task_009_urdf",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/manipulation/task_010_reach_study",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/multi_node/task_001_rosserial_python_integration",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/multi_node/task_002_sm_rosbag_recorder",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/multi_node/task_004_talker_relay_listener",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/multi_node/task_005_KIE_multiagent_model",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/multi_node/task_006_swarm_ros_bridge",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/multi_node/task_007_aws_les",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/multi_node/task_009_fleet_system",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/multi_node/task_011_amr_interop",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/multi_node/task_012_multimaster_flie",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/navigation/task_001_simple_map_navigation_2d",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/navigation/task_002_husky_sim_navigation",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/navigation/task_003_waypoint_following",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/navigation/task_004_obstacle_avoidance",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/navigation/task_005_plugin_replacement",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/navigation/task_006_exploration_mapping",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/navigation/task_007_navigation_sensor_failure",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/navigation/task_008_exploration_mapping",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/simulation_integration/task_001_urdf",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/simulation_integration/task_002_gazebo_plugin",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/simulation_integration/task_003_turtlebot3_gazebo",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/simulation_integration/task_004_industrial_robot_simulator",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/simulation_integration/task_005_Allegro_Hand_V5_ROS1_Task",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/simulation_integration/task_006-ardupilot-gazebo",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/simulation_integration/task_007_carla_ros_bridge",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  },
+  {
+    "task": "system_level/simulation_integration/task_008_navigation_recovery_action",
+    "eligible": true,
+    "reason": null,
+    "current_groundtruth_status": "GROUNDTRUTH_VERIFIED"
+  }
+]

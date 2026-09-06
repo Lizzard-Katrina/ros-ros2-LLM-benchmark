@@ -1,0 +1,6 @@
+string node_id
+uint32 sequence_id
+bool released
+task_011_amr_interop/NodePosition node_position
+task_011_amr_interop/Action[] actions
+string node_description

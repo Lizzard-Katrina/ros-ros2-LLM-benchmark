@@ -1,0 +1,3 @@
+string group_name
+int32 num_planning_attempts
+float64 allowed_planning_time

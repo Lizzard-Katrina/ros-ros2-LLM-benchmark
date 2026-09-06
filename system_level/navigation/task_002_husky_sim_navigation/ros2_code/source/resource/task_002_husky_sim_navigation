@@ -1,0 +1,204 @@
+[END FILENAME]
+
+[FILENAME: test/test_runtime_ros2.py]
+"""
+Runtime test for the Husky Navigation migration (task_002).
+
+This test validates:
+1. The package.xml is well-formed with correct format and dependencies.
+2. The CMakeLists.txt installs required directories.
+3. The launch file (move_base.launch) uses proper ROS2 patterns.
+4. Cross-file consistency between launch and package.xml.
+5. A real rclpy node can be instantiated to verify ROS2 infrastructure works.
+"""
+
+import os
+import re
+import time
+import subprocess
+import pytest
+from pathlib import Path
+
+import rclpy
+from rclpy.node import Node
+
+
+# Resolve file paths relative to this test file (test/ directory is one level below pkg root)
+TEST_DIR = Path(__file__).resolve().parent
+PKG_ROOT = TEST_DIR.parent
+PKG_XML = PKG_ROOT / "package.xml"
+CMAKE_FILE = PKG_ROOT / "CMakeLists.txt"
+LAUNCH_FILE = PKG_ROOT / "move_base.launch"
+LAUNCH_FILE_PY = PKG_ROOT / "launch" / "move_base.launch.py"
+
+
+def get_content(path):
+    return path.read_text() if path.exists() else ""
+
+
+class TestPackageXml:
+    """Tests for package.xml correctness."""
+
+    def test_pkg_format_3(self):
+        content = get_content(PKG_XML)
+        assert re.search(r'<package\s+format=["\']3["\']>', content), \
+            "package.xml must use format 3."
+
+    def test_ament_cmake_buildtool(self):
+        content = get_content(PKG_XML)
+        assert re.search(r'<buildtool_depend>\s*ament_cmake\s*</buildtool_depend>', content), \
+            "Buildtool must be ament_cmake."
+
+    def test_no_catkin(self):
+        content = get_content(PKG_XML)
+        assert "catkin" not in content.lower(), "No catkin references allowed."
+
+    def test_nav2_bringup_dependency(self):
+        content = get_content(PKG_XML)
+        assert re.search(r'<(?:depend|exec_depend)>\s*nav2_bringup\s*</', content), \
+            "Missing nav2_bringup dependency."
+
+    def test_slam_toolbox_dependency(self):
+        content = get_content(PKG_XML)
+        assert re.search(r'<(?:depend|exec_depend)>\s*slam_toolbox\s*</', content), \
+            "Missing slam_toolbox dependency."
+
+    def test_no_move_base(self):
+        content = get_content(PKG_XML)
+        assert not re.search(r'<(?:depend|run_depend)>\s*move_base\s*</', content), \
+            "Legacy move_base dependency should not be present."
+
+    def test_nav2_lifecycle_manager_dependency(self):
+        content = get_content(PKG_XML)
+        assert re.search(r'<(?:depend|exec_depend)>\s*nav2_lifecycle_manager\s*</', content), \
+            "Missing nav2_lifecycle_manager dependency."
+
+
+class TestCMakeLists:
+    """Tests for CMakeLists.txt correctness."""
+
+    def test_ament_package_call(self):
+        content = get_content(CMAKE_FILE)
+        assert re.search(r'ament_package\s*\(\s*\)', content), \
+            "CMakeLists.txt must call ament_package()."
+
+    def test_no_catkin_package(self):
+        content = get_content(CMAKE_FILE)
+        assert "catkin_package" not in content, \
+            "Legacy catkin_package() must be removed."
+
+    def test_install_config(self):
+        content = get_content(CMAKE_FILE)
+        assert re.search(r'install\s*\(\s*DIRECTORY\s+[^)]*\bconfig\b', content, re.DOTALL), \
+            "config directory must be installed."
+
+    def test_install_launch(self):
+        content = get_content(CMAKE_FILE)
+        assert re.search(r'install\s*\(\s*DIRECTORY\s+[^)]*\blaunch\b', content, re.DOTALL), \
+            "launch directory must be installed."
+
+    def test_install_maps(self):
+        content = get_content(CMAKE_FILE)
+        assert re.search(r'install\s*\(\s*DIRECTORY\s+[^)]*\bmaps\b', content, re.DOTALL), \
+            "maps directory must be installed."
+
+
+class TestLaunchFile:
+    """Tests for the move_base.launch (Python launch) file."""
+
+    def test_launch_file_exists(self):
+        assert LAUNCH_FILE.exists(), "move_base.launch must exist."
+
+    def test_get_package_share_directory(self):
+        content = get_content(LAUNCH_FILE)
+        assert 'get_package_share_directory' in content, \
+            "Must use get_package_share_directory for path resolution."
+
+    def test_no_ros1_find_syntax(self):
+        content = get_content(LAUNCH_FILE)
+        assert "$(find" not in content, \
+            "Legacy ROS1 $(find ...) syntax is not allowed."
+
+    def test_declare_no_static_map_arg(self):
+        content = get_content(LAUNCH_FILE)
+        assert re.search(r'DeclareLaunchArgument\s*\(\s*[\'"]no_static_map[\'"]', content), \
+            "The 'no_static_map' argument declaration is missing."
+
+    def test_conditional_logic(self):
+        content = get_content(LAUNCH_FILE)
+        assert re.search(r'(?:IfCondition|UnlessCondition|PythonExpression)', content), \
+            "Conditional logic must be ported from ROS1 XML."
+
+
+class TestCrossFileConsistency:
+    """Tests for cross-file dependency consistency."""
+
+    def test_nav2_bringup_in_both(self):
+        pkg_content = get_content(PKG_XML)
+        launch_content = get_content(LAUNCH_FILE)
+        if 'nav2_bringup' in launch_content:
+            assert 'nav2_bringup' in pkg_content, \
+                "nav2_bringup used in launch but missing from package.xml."
+
+    def test_nav2_lifecycle_manager_in_both(self):
+        pkg_content = get_content(PKG_XML)
+        launch_content = get_content(LAUNCH_FILE)
+        if 'nav2_lifecycle_manager' in launch_content:
+            assert 'nav2_lifecycle_manager' in pkg_content, \
+                "nav2_lifecycle_manager used in launch but missing from package.xml."
+
+    def test_slam_toolbox_in_both(self):
+        pkg_content = get_content(PKG_XML)
+        launch_content = get_content(LAUNCH_FILE)
+        if 'slam_toolbox' in launch_content:
+            assert 'slam_toolbox' in pkg_content, \
+                "slam_toolbox used in launch but missing from package.xml."
+
+
+class TestROS2Runtime:
+    """Runtime test using a real rclpy node to verify ROS2 infrastructure."""
+
+    def test_rclpy_node_creation_and_parameter(self):
+        """Create a real rclpy node, set a parameter, and verify its value."""
+        rclpy.init()
+        node = None
+        try:
+            node = Node('husky_nav_test_node')
+
+            # Declare and set a parameter that mirrors the no_static_map concept
+            node.declare_parameter('no_static_map', False)
+            param_value = node.get_parameter('no_static_map').get_parameter_value().bool_value
+            assert param_value is False, \
+                f"Expected no_static_map=False, got {param_value}"
+
+            # Set it to True and verify
+            from rclpy.parameter import Parameter
+            node.set_parameters([Parameter('no_static_map', Parameter.Type.BOOL, True)])
+            param_value = node.get_parameter('no_static_map').get_parameter_value().bool_value
+            assert param_value is True, \
+                f"Expected no_static_map=True after set, got {param_value}"
+
+            # Verify the node name
+            assert node.get_name() == 'husky_nav_test_node'
+
+        finally:
+            if node is not None:
+                node.destroy_node()
+            rclpy.shutdown()
+
+    def test_launch_file_is_valid_python(self):
+        """Verify the launch file is valid Python by importing it."""
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("move_base_launch", str(LAUNCH_FILE))
+        assert spec is not None, "Could not create module spec from launch file."
+        module = importlib.util.module_from_spec(spec)
+        try:
+            spec.loader.exec_module(module)
+        except Exception as e:
+            # It may fail due to missing installed packages, but syntax should be valid
+            # We only care that it's valid Python, not that all packages are installed
+            if "SyntaxError" in type(e).__name__:
+                pytest.fail(f"Launch file has syntax errors: {e}")
+        # Verify generate_launch_description exists
+        assert hasattr(module, 'generate_launch_description'), \
+            "Launch file must define generate_launch_description()."

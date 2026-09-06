@@ -1,0 +1,2 @@
+string hardware_interface
+string[] resources

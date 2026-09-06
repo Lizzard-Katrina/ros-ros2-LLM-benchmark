@@ -1,0 +1,7 @@
+<library path="navfn">
+  <class name="navfn/NavfnROS" type="navfn::NavfnROS" base_class_type="nav_core::BaseGlobalPlanner">
+    <description>
+      A global planner plugin that uses the NavFn navigation function with Dijkstra's algorithm.
+    </description>
+  </class>
+</library>

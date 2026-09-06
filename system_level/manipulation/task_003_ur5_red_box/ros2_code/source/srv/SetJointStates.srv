@@ -1,0 +1,7 @@
+std_msgs/Float32 forearm_0
+std_msgs/Float32 forearm_1
+std_msgs/Float32 arm_0
+std_msgs/Float32 arm_1
+---
+bool success
+string message

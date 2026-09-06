@@ -1,0 +1,4 @@
+string info_type
+string info_level
+task_011_amr_interop/InfoReference[] info_references
+string info_description

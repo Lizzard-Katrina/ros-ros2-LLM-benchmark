@@ -1,0 +1,23 @@
+{
+  "status": "GROUNDTRUTH_VERIFIED",
+  "model": "anthropic/claude-opus-4.6",
+  "rounds_needed": 2,
+  "attempts": [
+    {
+      "round": 0,
+      "build_ok": true,
+      "test_ok": false,
+      "stage_failed": "test",
+      "build_log_tail": null,
+      "test_log_tail": "nit__.py:88: in init\n    context.init(args, domain_id=domain_id)\nopt/ros/humble/local/lib/python3.10/dist-packages/rclpy/context.py:70: in init\n    raise RuntimeError('Context.init() must only be called once')\nE   RuntimeError: Context.init() must only be called once\n______________________ test_reload_libraries_with_restore ______________________\nros2_ws/src/task_010_controller_manager/test_runtime_ros2.py:108: in test_reload_libraries_with_restore\n    rclpy.init()\nopt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py:88: in init\n    context.init(args, domain_id=domain_id)\nopt/ros/humble/local/lib/python3.10/dist-packages/rclpy/context.py:70: in init\n    raise RuntimeError('Context.init() must only be called once')\nE   RuntimeError: Context.init() must only be called once\n_____________________________ test_load_controller _____________________________\nros2_ws/src/task_010_controller_manager/test_runtime_ros2.py:128: in test_load_controller\n    rclpy.init()\nopt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py:88: in init\n    context.init(args, domain_id=domain_id)\nopt/ros/humble/local/lib/python3.10/dist-packages/rclpy/context.py:70: in init\n    raise RuntimeError('Context.init() must only be called once')\nE   RuntimeError: Context.init() must only be called once\n_____________________________ test_stop_controller _____________________________\nros2_ws/src/task_010_controller_manager/test_runtime_ros2.py:145: in test_stop_controller\n    rclpy.init()\nopt/ros/humble/local/lib/python3.10/dist-packages/rclpy/__init__.py:88: in init\n    context.init(args, domain_id=domain_id)\nopt/ros/humble/local/lib/python3.10/dist-packages/rclpy/context.py:70: in init\n    raise RuntimeError('Context.init() must only be called once')\nE   RuntimeError: Context.init() must only be called once\n=========================== short test summary info ============================\nFAILED ros2_ws/src/task_010_controller_manager/test_runtime_ros2.py::test_start_stop_controllers\nFAILED ros2_ws/src/task_010_controller_manager/test_runtime_ros2.py::test_list_controllers\nFAILED ros2_ws/src/task_010_controller_manager/test_runtime_ros2.py::test_reload_libraries_no_restore\nFAILED ros2_ws/src/task_010_controller_manager/test_runtime_ros2.py::test_reload_libraries_with_restore\nFAILED ros2_ws/src/task_010_controller_manager/test_runtime_ros2.py::test_load_controller\nFAILED ros2_ws/src/task_010_controller_manager/test_runtime_ros2.py::test_stop_controller\n6 failed in 3.36s\n"
+    },
+    {
+      "round": 1,
+      "build_ok": true,
+      "test_ok": true,
+      "stage_failed": null,
+      "build_log_tail": null,
+      "test_log_tail": null
+    }
+  ]
+}

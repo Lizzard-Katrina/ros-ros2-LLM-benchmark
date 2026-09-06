@@ -1,0 +1,31 @@
+{
+  "status": "GROUNDTRUTH_VERIFIED",
+  "model": "anthropic/claude-opus-4.6",
+  "rounds_needed": 4,
+  "attempts": [
+    {
+      "round": 0,
+      "build_ok": true,
+      "test_ok": false,
+      "stage_failed": "test"
+    },
+    {
+      "round": 1,
+      "build_ok": false,
+      "test_ok": false,
+      "stage_failed": "build"
+    },
+    {
+      "round": 2,
+      "build_ok": true,
+      "test_ok": false,
+      "stage_failed": "test"
+    },
+    {
+      "round": 3,
+      "build_ok": true,
+      "test_ok": true,
+      "stage_failed": null
+    }
+  ]
+}

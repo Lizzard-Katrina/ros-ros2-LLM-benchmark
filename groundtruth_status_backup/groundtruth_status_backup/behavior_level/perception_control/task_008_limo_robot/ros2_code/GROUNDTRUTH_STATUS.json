@@ -1,0 +1,23 @@
+{
+  "status": "GROUNDTRUTH_VERIFIED",
+  "model": "anthropic/claude-opus-4.6",
+  "rounds_needed": 2,
+  "attempts": [
+    {
+      "round": 0,
+      "build_ok": true,
+      "test_ok": false,
+      "stage_failed": "test",
+      "build_log_tail": null,
+      "test_log_tail": "_______ TestStaticOracle.test_ackermann_inverse_kinematics ______________\nros2_ws/src/task_008_limo_robot/test_runtime_ros2.py:58: in test_ackermann_inverse_kinematics\n    assert has_math, \"Missing Ackermann geometry (atan/tan) using wheelbase.\"\nE   AssertionError: Missing Ackermann geometry (atan/tan) using wheelbase.\nE   assert None\n________________ TestStaticOracle.test_steering_limit_clamping _________________\nros2_ws/src/task_008_limo_robot/test_runtime_ros2.py:63: in test_steering_limit_clamping\n    assert has_clamping, \"Steering angle must be clamped by max_inner_angle_.\"\nE   AssertionError: Steering angle must be clamped by max_inner_angle_.\nE   assert False\n________________ TestStaticOracle.test_odom_integration_frames _________________\nros2_ws/src/task_008_limo_robot/test_runtime_ros2.py:69: in test_odom_integration_frames\n    assert has_rot_x and has_rot_y, \"Incorrect velocity projection into global frame.\"\nE   AssertionError: Incorrect velocity projection into global frame.\nE   assert (None)\n_______________ TestStaticOracle.test_mecanum_lateral_awareness ________________\nros2_ws/src/task_008_limo_robot/test_runtime_ros2.py:74: in test_mecanum_lateral_awareness\n    assert is_aware, \"Lateral velocity (vy) ignored in Mecanum odometry.\"\nE   AssertionError: Lateral velocity (vy) ignored in Mecanum odometry.\nE   assert False\n_____________ TestStaticOracle.test_time_differential_consistency ______________\nros2_ws/src/task_008_limo_robot/test_runtime_ros2.py:78: in test_time_differential_consistency\n    assert \"dt\" in blk and re.search(r\"\\*.*?dt\", blk), \\\nE   AssertionError: Pose update missing time delta (dt) scaling.\nE   assert ('dt' in '\\n    // Calculate time delta\\n    double current_time = stamp;\\n    if (last_time_ == 0.0) {\\n        last_time_ = current_time;\\n        return;\\n    ')\n=========================== short test summary info ============================\nFAILED ros2_ws/src/task_008_limo_robot/test_runtime_ros2.py::TestStaticOracle::test_ackermann_inverse_kinematics\nFAILED ros2_ws/src/task_008_limo_robot/test_runtime_ros2.py::TestStaticOracle::test_steering_limit_clamping\nFAILED ros2_ws/src/task_008_limo_robot/test_runtime_ros2.py::TestStaticOracle::test_odom_integration_frames\nFAILED ros2_ws/src/task_008_limo_robot/test_runtime_ros2.py::TestStaticOracle::test_mecanum_lateral_awareness\nFAILED ros2_ws/src/task_008_limo_robot/test_runtime_ros2.py::TestStaticOracle::test_time_differential_consistency\n5 failed, 2 passed, 1 skipped in 0.81s\n"
+    },
+    {
+      "round": 1,
+      "build_ok": true,
+      "test_ok": true,
+      "stage_failed": null,
+      "build_log_tail": null,
+      "test_log_tail": null
+    }
+  ]
+}

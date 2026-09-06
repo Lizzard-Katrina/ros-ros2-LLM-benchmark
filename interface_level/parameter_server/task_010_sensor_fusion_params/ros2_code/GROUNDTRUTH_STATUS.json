@@ -1,0 +1,7 @@
+{
+  "status": "GROUNDTRUTH_VERIFIED",
+  "verified_by": "manual (verify_only.py, no LLM)",
+  "build_ok": true,
+  "test_ok": true,
+  "stage_failed": null
+}

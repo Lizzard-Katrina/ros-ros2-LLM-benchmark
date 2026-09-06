@@ -1,0 +1,6 @@
+<launch>
+  <!-- Include the gazebo_ros empty_world launch file and override the world_name argument -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find gazebo_tutorials)/worlds/hello.world"/>
+  </include>
+</launch>

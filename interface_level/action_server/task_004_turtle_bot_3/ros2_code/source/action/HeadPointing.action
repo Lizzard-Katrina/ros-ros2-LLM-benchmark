@@ -1,0 +1,10 @@
+# Goal
+string target_frame
+---
+# Result
+bool success
+string message
+---
+# Feedback
+float32 progress
+string status

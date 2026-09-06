@@ -1,0 +1,5 @@
+string action_type
+string action_id
+string blocking_type
+string action_description
+task_011_amr_interop/ActionParameter[] action_parameters

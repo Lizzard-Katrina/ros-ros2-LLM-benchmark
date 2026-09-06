@@ -1,0 +1,4 @@
+task_008a_robot_statemachine_scaffold/OperationMode operation_mode
+---
+bool success
+string message

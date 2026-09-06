@@ -1,0 +1,3 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays

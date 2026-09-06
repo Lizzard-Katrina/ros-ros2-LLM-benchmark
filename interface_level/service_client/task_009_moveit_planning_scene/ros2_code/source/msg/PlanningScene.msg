@@ -1,0 +1,11 @@
+# Simplified version of moveit_msgs/PlanningScene
+string name
+task_009_moveit_planning_scene/RobotState robot_state
+string robot_model_name
+# geometry_msgs/TransformStamped[] fixed_frame_transforms
+task_009_moveit_planning_scene/AllowedCollisionMatrix allowed_collision_matrix
+task_009_moveit_planning_scene/LinkPadding[] link_padding
+task_009_moveit_planning_scene/LinkScale[] link_scale
+task_009_moveit_planning_scene/ObjectColor[] object_colors
+task_009_moveit_planning_scene/PlanningSceneWorld world
+bool is_diff

@@ -1,0 +1,12 @@
+uint64 timestamp
+float32 param1
+float32 param2
+uint16 command
+uint8 target_system
+uint8 target_component
+uint8 source_system
+uint8 source_component
+bool from_external
+
+uint16 VEHICLE_CMD_COMPONENT_ARM_DISARM=400
+uint16 VEHICLE_CMD_DO_SET_MODE=176

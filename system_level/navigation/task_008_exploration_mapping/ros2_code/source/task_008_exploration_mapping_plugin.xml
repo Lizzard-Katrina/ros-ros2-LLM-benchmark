@@ -1,0 +1,9 @@
+<library path="robot_hardware_interface">
+  <class name="task_008_exploration_mapping/ROBOTHardwareInterface"
+         type="ROBOTHardwareInterface"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Differential drive robot hardware interface for I2C motor control.
+    </description>
+  </class>
+</library>

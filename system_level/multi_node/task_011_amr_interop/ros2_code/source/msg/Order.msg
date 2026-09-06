@@ -1,0 +1,10 @@
+uint32 header_id
+string timestamp
+string version
+string manufacturer
+string serial_number
+string order_id
+uint32 order_update_id
+string zone_set_id
+task_011_amr_interop/Node[] nodes
+task_011_amr_interop/Edge[] edges

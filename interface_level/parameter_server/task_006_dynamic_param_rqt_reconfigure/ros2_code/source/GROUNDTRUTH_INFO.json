@@ -1,0 +1,4 @@
+{
+  "status": "NEEDS_RECONCILIATION",
+  "reason": "source file (ros1_code/source/) is ROS2-flavored but diverges from ros1_code/<file> outside the TODO block too (renamed vars/refactor/different version) -- cannot be used as a direct drop-in. Needs manual/agentic translation using the source as strong reference, then build+run verification."
+}

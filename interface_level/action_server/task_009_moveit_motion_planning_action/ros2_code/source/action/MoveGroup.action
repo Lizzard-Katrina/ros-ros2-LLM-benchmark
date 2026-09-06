@@ -1,0 +1,12 @@
+# Goal
+task_009_moveit_motion_planning_action/MotionPlanRequest request
+task_009_moveit_motion_planning_action/PlanningOptions planning_options
+---
+# Result
+task_009_moveit_motion_planning_action/MoveItErrorCodes error_code
+task_009_moveit_motion_planning_action/RobotTrajectory planned_trajectory
+task_009_moveit_motion_planning_action/RobotState trajectory_start
+float64 planning_time
+---
+# Feedback
+string state

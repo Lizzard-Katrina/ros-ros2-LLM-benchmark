@@ -1,0 +1,3 @@
+#!/usr/bin/env python3
+from task_003_tutorial_baseline_py.code import main
+main()

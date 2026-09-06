@@ -1,0 +1,8 @@
+string name
+string xml
+string robot_namespace
+geometry_msgs/Pose initial_pose
+string reference_frame
+---
+bool success
+string status_message

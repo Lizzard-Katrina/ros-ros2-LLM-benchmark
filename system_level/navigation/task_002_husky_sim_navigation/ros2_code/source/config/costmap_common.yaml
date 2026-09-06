@@ -1,0 +1,7 @@
+# Common costmap parameters
+robot_radius: 0.4
+obstacle_layer:
+  enabled: true
+inflation_layer:
+  enabled: true
+  inflation_radius: 0.55

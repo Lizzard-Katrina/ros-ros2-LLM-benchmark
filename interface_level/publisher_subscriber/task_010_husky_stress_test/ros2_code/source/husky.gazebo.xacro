@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<!--
+  ROS2 Husky Gazebo URDF/Xacro (translated from ROS1 husky.gazebo.xacro)
+
+  This file defines the Gazebo sensor plugins for the Husky robot,
+  including IMU and GPS/NavSat interfaces with high-frequency publishing.
+
+  Sensor publishers defined here:
+    - IMU: /imu/data (sensor_msgs/Imu) at 50 Hz
+    - GPS: /navsat/fix (sensor_msgs/NavSatFix) at 10 Hz
+    - GPS velocity: /navsat/vel (geometry_msgs/TwistStamped) at 10 Hz
+-->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="husky_gazebo">
+
+  <!-- Base link (reference) -->
+  <link name="base_link">
+    <inertial>
+      <mass value="50.0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.5" ixy="0" ixz="0" iyy="0.5" iyz="0" izz="0.5"/>
+    </inertial>
+  </link>
+
+  <!-- IMU sensor link -->
+  <link name="imu_link">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <!-- GPS/NavSat sensor link -->
+  <link name="navsat_link">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/>
+    </inertial>
+  </link>
+
+  <!-- Joint connecting base_link to imu_link -->
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+    <origin xyz="0 0 0.25" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Joint connecting base_link to navsat_link -->
+  <joint name="navsat_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="navsat_link"/>
+    <origin xyz="0 0 0.3" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Gazebo IMU sensor plugin (ROS2 gazebo_ros) -->
+  <gazebo reference="imu_link">
+    <sensor name="imu_sensor" type="imu">
+      <always_on>true</always_on>
+      <updateRate>50</updateRate>
+      <plugin name="imu_controller" filename="libgazebo_ros_imu_sensor.so">
+        <ros>
+          <namespace>/</namespace>
+          <remapping>~/out:=imu/data</remapping>
+        </ros>
+        <topicName>imu/data</topicName>
+        <frameName>imu_link</frameName>
+        <updateRateHZ>50</updateRateHZ>
+        <gaussianNoise>0.01</gaussianNoise>
+        <xyzOffset>0 0 0</xyzOffset>
+        <rpyOffset>0 0 0</rpyOffset>
+        <!-- High frequency publish_rate for inertial measurement -->
+        <publish_rate>50.0</publish_rate>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <!-- Gazebo GPS/NavSat sensor plugin (ROS2 gazebo_ros) -->
+  <gazebo reference="navsat_link">
+    <sensor name="gps_sensor" type="gps">
+      <always_on>true</always_on>
+      <updateRate>10</updateRate>
+      <plugin name="gps_controller" filename="libgazebo_ros_gps_sensor.so">
+        <ros>
+          <namespace>/</namespace>
+          <remapping>~/out:=navsat/fix</remapping>
+        </ros>
+        <topicName>navsat/fix</topicName>
+        <velocityTopicName>navsat/vel</velocityTopicName>
+        <frameName>navsat_link</frameName>
+        <updateRate>10</updateRate>
+        <!-- frequency for navsat fix publishing -->
+        <frequency>10.0</frequency>
+        <publish_rate>10.0</publish_rate>
+        <referenceLatitude>49.9</referenceLatitude>
+        <referenceLongitude>8.9</referenceLongitude>
+        <referenceHeading>0</referenceHeading>
+        <referenceAltitude>0</referenceAltitude>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+</robot>

@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+
+# BSD 3-Clause License
+#
+# Copyright (c) 2022 InOrbit, Inc.
+# Copyright (c) 2022 Clearpath Robotics, Inc.
+
+# Constants
+DEFAULT_NODE_NAME = "controller"
+DEFAULT_NAMESPACE = "vda5050"
+DEFAULT_ROBOT_NAME = "robot_1"
+DEFAULT_MANUFACTURER_NAME = "robots"
+DEFAULT_SERIAL_NUMBER = "robot_1"
+DEFAULT_PROTOCOL_VERSION = "2.0.0"
+DEFAULT_STARTING_NODE_ID = ""
+SUPPORTED_PROTOCOL_VERSIONS = ["1.1.0", "2.0.0"]
+DEFAULT_NAV_THROUGH_NODES = False
+DEFAULT_INTERFACE_NAME = "uagv"
+
+DEFAULT_GET_STATE_SVC_NAME = "adapter/get_state"
+DEFAULT_SUPPORTED_ACTIONS_SVC_NAME = "adapter/supported_actions"
+DEFAULT_VDA_ACTION_ACT_NAME = "adapter/vda_action"
+DEFAULT_NAV_TO_NODE_ACT_NAME = "adapter/nav_to_node"
+DEFAULT_NAV_THROUGH_NODES_ACT_NAME = "adapter/nav_through_nodes"
+
+DEFAULT_STATE_PUB_PERIOD = 5.0  # sec
+DEFAULT_CONNECTION_PUB_PERIOD = 15.0  # sec
+DEFAULT_VISUALIZATION_PUB_PERIOD = 1.0  # sec
+DEFAULT_EXECUTE_ORDER_PERIOD = 0.1  # sec

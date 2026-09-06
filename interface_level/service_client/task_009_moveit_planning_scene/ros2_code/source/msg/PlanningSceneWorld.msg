@@ -1,0 +1,3 @@
+# Simplified version of moveit_msgs/PlanningSceneWorld
+task_009_moveit_planning_scene/CollisionObject[] collision_objects
+octomap_msgs/OctomapWithPose octomap

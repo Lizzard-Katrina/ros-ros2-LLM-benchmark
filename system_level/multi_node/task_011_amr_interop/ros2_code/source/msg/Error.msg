@@ -1,0 +1,4 @@
+string error_type
+string error_level
+task_011_amr_interop/ErrorReference[] error_references
+string error_description

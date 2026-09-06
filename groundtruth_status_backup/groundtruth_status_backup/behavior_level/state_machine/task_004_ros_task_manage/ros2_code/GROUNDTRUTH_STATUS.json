@@ -1,0 +1,23 @@
+{
+  "status": "GROUNDTRUTH_VERIFIED",
+  "model": "anthropic/claude-opus-4.6",
+  "rounds_needed": 2,
+  "attempts": [
+    {
+      "round": 0,
+      "build_ok": true,
+      "test_ok": false,
+      "stage_failed": "test",
+      "build_log_tail": null,
+      "test_log_tail": "_manage/test_runtime_ros2.py:265: in test_request_preempt_calls_stop\n    from TaskSmach import TaskState\nros2_ws/src/task_004_ros_task_manage/TaskSmach.py:3: in <module>\n    import smach\nE   ModuleNotFoundError: No module named 'smach'\n________________ test_signal_handler_sets_shutdown_and_preempts ________________\nros2_ws/src/task_004_ros_task_manage/test_runtime_ros2.py:291: in test_signal_handler_sets_shutdown_and_preempts\n    from TaskSmach import MissionStateMachine\nros2_ws/src/task_004_ros_task_manage/TaskSmach.py:3: in <module>\n    import smach\nE   ModuleNotFoundError: No module named 'smach'\n_________________ test_mission_state_machine_init_creates_node _________________\nros2_ws/src/task_004_ros_task_manage/test_runtime_ros2.py:317: in test_mission_state_machine_init_creates_node\n    from TaskSmach import MissionStateMachine\nros2_ws/src/task_004_ros_task_manage/TaskSmach.py:3: in <module>\n    import smach\nE   ModuleNotFoundError: No module named 'smach'\n____________________ test_get_label_generates_unique_labels ____________________\nros2_ws/src/task_004_ros_task_manage/test_runtime_ros2.py:345: in test_get_label_generates_unique_labels\n    from TaskSmach import MissionStateMachine\nros2_ws/src/task_004_ros_task_manage/TaskSmach.py:3: in <module>\n    import smach\nE   ModuleNotFoundError: No module named 'smach'\n=========================== short test summary info ============================\nFAILED ros2_ws/src/task_004_ros_task_manage/test_runtime_ros2.py::test_task_state_execute_completed\nFAILED ros2_ws/src/task_004_ros_task_manage/test_runtime_ros2.py::test_task_state_execute_timeout\nFAILED ros2_ws/src/task_004_ros_task_manage/test_runtime_ros2.py::test_task_state_execute_failed\nFAILED ros2_ws/src/task_004_ros_task_manage/test_runtime_ros2.py::test_task_state_execute_interrupted\nFAILED ros2_ws/src/task_004_ros_task_manage/test_runtime_ros2.py::test_task_state_execute_condition_exception\nFAILED ros2_ws/src/task_004_ros_task_manage/test_runtime_ros2.py::test_task_state_shutdown_returns_mission_completed\nFAILED ros2_ws/src/task_004_ros_task_manage/test_runtime_ros2.py::test_request_preempt_calls_stop\nFAILED ros2_ws/src/task_004_ros_task_manage/test_runtime_ros2.py::test_signal_handler_sets_shutdown_and_preempts\nFAILED ros2_ws/src/task_004_ros_task_manage/test_runtime_ros2.py::test_mission_state_machine_init_creates_node\nFAILED ros2_ws/src/task_004_ros_task_manage/test_runtime_ros2.py::test_get_label_generates_unique_labels\n10 failed, 7 passed in 1.81s\n"
+    },
+    {
+      "round": 1,
+      "build_ok": true,
+      "test_ok": true,
+      "stage_failed": null,
+      "build_log_tail": null,
+      "test_log_tail": null
+    }
+  ]
+}

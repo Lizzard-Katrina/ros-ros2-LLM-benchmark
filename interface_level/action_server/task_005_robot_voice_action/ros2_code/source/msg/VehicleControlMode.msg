@@ -1,0 +1,3 @@
+uint64 timestamp
+bool flag_armed
+bool flag_multicopter_position_control_enabled

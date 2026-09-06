@@ -1,0 +1,6 @@
+string load_id
+string load_type
+string load_description
+float64 weight 0.0
+geometry_msgs/Vector3 bounding_box_reference
+geometry_msgs/Vector3 bounding_box_dimensions

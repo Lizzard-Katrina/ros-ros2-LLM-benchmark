@@ -1,0 +1,4 @@
+{
+  "status": "DIRECT_EXTRACT_VERIFIED",
+  "method": "diff-verified: the only lines removed/replaced between ros1_code/<file> and ros1_code/source/<file> fall entirely inside the TODO...ENDOF-TODO block. The source file (already ROS2/rclpy/rclcpp) is used as-is as groundtruth."
+}

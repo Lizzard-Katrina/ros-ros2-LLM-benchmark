@@ -1,0 +1,5 @@
+string edge_id
+uint32 sequence_id
+string edge_description
+bool released true
+task_011_amr_interop/Trajectory trajectory

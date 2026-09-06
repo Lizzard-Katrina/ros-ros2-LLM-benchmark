@@ -1,0 +1,5 @@
+# Simplified version of moveit_msgs/RobotState
+sensor_msgs/JointState joint_state
+sensor_msgs/MultiDOFJointState multi_dof_joint_state
+task_009_moveit_planning_scene/AttachedCollisionObject[] attached_collision_objects
+bool is_diff

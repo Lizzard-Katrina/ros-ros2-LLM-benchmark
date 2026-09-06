@@ -1,0 +1,12 @@
+string text_request
+string content_type
+string accept_type
+std_msgs/UInt8MultiArray audio_request
+---
+string text_response
+std_msgs/UInt8MultiArray audio_response
+string dialog_state
+string intent_name
+string message_format_type
+string session_attributes
+task_007_aws_les/KeyValue[] slots

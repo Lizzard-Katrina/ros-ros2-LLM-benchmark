@@ -1,0 +1,5 @@
+string key
+bool use_cache
+---
+bool success
+string value

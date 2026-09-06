@@ -1,0 +1,112 @@
+[
+    {
+        "task_id": "state_machine/task_001_smach_basic",
+        "status": "SUCCESS",
+        "score": "8/8",
+        "pass_rate": "100.00%",
+        "tokens": 8988,
+        "failed_cases": []
+    },
+    {
+        "task_id": "state_machine/task_002_mas_execution_manager",
+        "status": "FAILED",
+        "score": "5/7",
+        "pass_rate": "71.43%",
+        "tokens": 6394,
+        "failed_cases": [
+            {
+                "test_function": "test_topic_and_msg_integrity",
+                "error_message": "AssertionError: Topic mismatch: Subscription must use ActionFeedback on the feedback topic.\nassert None\n +  where None = <function search at 0x7f8e90815f30>('create_subscription\\\\s*\\\\(.*ActionFeedback.*[\\'\\\\\"]/kcl_rosplan/action_feedback[\\'\\\\\"]', 'import rclpy\\nfrom rclpy.qos import QoSProfile, DurabilityPolicy\\nimport smach\\nfrom std_msgs.msg import String\\nimpo...y(self, sentence):\\n        say_msg = String()\\n        say_msg.data = sentence\\n        self.say_pub.publish(say_msg)')\n +    where <function search at 0x7f8e90815f30> = re.search"
+            },
+            {
+                "test_function": "test_interface_params_retention",
+                "error_message": "AssertionError: Data Flow Error: Ontology interface must receive the url and prefix parameters.\nassert None\n +  where None = <function search at 0x7f8e90815f30>('DomesticOntologyInterface\\\\s*\\\\(\\\\s*[^,]+url[^,]*,\\\\s*[^,]+prefix', 'import rclpy\\nfrom rclpy.qos import QoSProfile, DurabilityPolicy\\nimport smach\\nfrom std_msgs.msg import String\\nimpo...y(self, sentence):\\n        say_msg = String()\\n        say_msg.data = sentence\\n        self.say_pub.publish(say_msg)')\n +    where <function search at 0x7f8e90815f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_003_tutorial_baseline",
+        "status": "SUCCESS",
+        "score": "7/7",
+        "pass_rate": "100.00%",
+        "tokens": 4865,
+        "failed_cases": []
+    },
+    {
+        "task_id": "state_machine/task_004_ros_task_manage",
+        "status": "FAILED",
+        "score": "6/7",
+        "pass_rate": "85.71%",
+        "tokens": 12346,
+        "failed_cases": [
+            {
+                "test_function": "test_introspection_node_handle",
+                "error_message": "AssertionError: API Error: IntrospectionServer must be passed the 'self.node' handle.\nassert None\n +  where None = <function search at 0x7f9feb1a9f30>('IntrospectionServer\\\\(.*self\\\\.node', 'import rclpy\\nfrom rclpy.node import Node\\nfrom rclpy.executors import MultiThreadedExecutor\\nfrom task_manager_lib.T...Epsilon(),transitions)\\n        else:\\n            smach.Sequence.add(label, self.TaskEpsilon())\\n        return label')\n +    where <function search at 0x7f9feb1a9f30> = re.search"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_005_flexbe_behavior_engine",
+        "status": "FAILED",
+        "score": "4/5",
+        "pass_rate": "80.00%",
+        "tokens": 5858,
+        "failed_cases": [
+            {
+                "test_function": "test_placeholder_removal",
+                "error_message": "AssertionError: Logic Error: NotImplementedError was not removed.\nassert 'NotImplementedError' not in '#!/usr/bin/...tive_goals()'\n  'NotImplementedError' is contained here:\n        raise NotImplementedError(\"MoveBase is not available in ROS 2 at this time!\")\n  ?           +++++++++++++++++++\n    \n            # Create and populate action goal\n    \n            # Old ROS 1 code...\n  \n  ...Full output truncated (30 lines hidden), use '-vv' to show"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_006_flexbe_2",
+        "status": "FAILED",
+        "score": "4/5",
+        "pass_rate": "80.00%",
+        "tokens": 7737,
+        "failed_cases": [
+            {
+                "test_function": "test_incremental_update_logic",
+                "error_message": "AssertionError: Logic Error: Must check if a joint value is None before assigning to avoid overwriting with stale data.\nassert ('is None' in '#!/usr/bin/env python3\\n\\n# Copyright 2023 Philipp Schillinger,  Christopher Newport University\\n#\\n# Redistribution ...start_time = self.get_clock().now()\\n\\n    def on_exit(self, userdata):\\n        self._sub.disable_buffer(self._topic)' or '== None' in '#!/usr/bin/env python3\\n\\n# Copyright 2023 Philipp Schillinger,  Christopher Newport University\\n#\\n# Redistribution ...start_time = self.get_clock().now()\\n\\n    def on_exit(self, userdata):\\n        self._sub.disable_buffer(self._topic)')"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_007_smacc",
+        "status": "FAILED",
+        "score": "3/5",
+        "pass_rate": "60.00%",
+        "tokens": 5966,
+        "failed_cases": [
+            {
+                "test_function": "test_functional_preservation",
+                "error_message": "AssertionError: Functional Error: onExit() logic was lost during migration.\nassert 'onExit()' in '#include <smacc/smacc_asynchronous_client_behavior.hpp>\\n#include <rclcpp/rclcpp.hpp>\\n\\nnamespace smacc\\n{\\n    void...oid SmaccAsyncClientBehavior::postFailureEvent()\\n    {\\n        postFailureEventFn_();\\n    }\\n\\n} // namespace smacc'"
+            },
+            {
+                "test_function": "test_memory_safety_and_types",
+                "error_message": "AssertionError: Safety Warning: Risky [=] capture of 'this' without lifetime protection.\nassert False\n +  where False = any(<generator object test_memory_safety_and_types.<locals>.<genexpr> at 0x7fd5676cece0>)"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_008A_robot_statemachine_scaffold",
+        "status": "FAILED",
+        "score": "5/6",
+        "pass_rate": "83.33%",
+        "tokens": 9873,
+        "failed_cases": [
+            {
+                "test_function": "test_parameter_lifecycle_strict",
+                "error_message": "AssertionError: Logic Error: Found only 1 declarations. ROS 2 requires declaring every parameter.\nassert 1 >= 3\n +  where 1 = len(['this->declare_parameter'])"
+            }
+        ]
+    },
+    {
+        "task_id": "state_machine/task_009_sm_dance_bot_strikes_back",
+        "status": "TRANSLATION_FAILED",
+        "score": "0/0",
+        "pass_rate": "0.00%",
+        "tokens": 0,
+        "failed_cases": []
+    }
+]
